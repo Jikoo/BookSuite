@@ -1,7 +1,7 @@
 name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
-version: 1.1.0
+version: 1.1.1
 author: Jikoo (Planar Warp)
 
 permissions:
@@ -10,15 +10,18 @@ permissions:
         default: op
         children:
             booksuite.copy: true
+            booksuite.copy.free: true
             booksuite.denycopy: false
+    booksuite.copy.deny:
+        description: causes crafting tables to work as usual when right clicked with a written book -- be careful when assigning! will override copy node
+        default: false
     booksuite.copy:
         description: allows users to copy all books with the printing press block
         children:
             booksuite.copy.self: true
             booksuite.copy.other: true
-    booksuite.denycopy:
-        description: causes crafting tables to work as usual when right clicked with a written book -- be careful when assigning! will override copy node
-        default: false
     booksuite.copy.self:
         description: Can copy own books
         default: true
+    booksuite.copy.free:
+        description: books for free! :D
