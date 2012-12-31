@@ -7,21 +7,16 @@ author: Jikoo (Planar Warp)
 permissions:
     booksuite.*:
         description: Everything bookish and sweet!
-        default: op
         children:
+            booksuite.free: true
+            booksuite.other: true
             booksuite.copy: true
-            booksuite.copy.free: true
-            booksuite.copy.deny: false
-    booksuite.copy.deny:
-        description: causes crafting tables to work as usual when right clicked with a written book -- be careful when assigning! will override copy node
-        default: false
-    booksuite.copy:
+    booksuite.free:
         description: allows users to copy all books with the printing press block
-        children:
-            booksuite.copy.self: true
-            booksuite.copy.other: true
-    booksuite.copy.self:
-        description: Can copy own books
-        default: true
-    booksuite.copy.free:
+        default: op
+    booksuite.other:
         description: books for free! :D
+        default: op
+    booksuite.copy:
+        description: can do ANY copying
+        default: true
