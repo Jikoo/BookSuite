@@ -11,7 +11,7 @@ permissions:
         children:
             booksuite.copy: true
             booksuite.copy.free: true
-            booksuite.denycopy: false
+            booksuite.copy.deny: false
     booksuite.copy.deny:
         description: causes crafting tables to work as usual when right clicked with a written book -- be careful when assigning! will override copy node
         default: false
