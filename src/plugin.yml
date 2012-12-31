@@ -1,0 +1,10 @@
+name: BookSuite
+
+main: com.github.Jikoo.BookSuite.BookSuite
+version: 1.0.0
+author: Jikoo (Planar Warp)
+
+permissions:
+    booksuite.copy:
+        description: allows users to copy books with the printing press block
+        default: op

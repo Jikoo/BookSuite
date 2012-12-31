@@ -1,0 +1,10 @@
+0.1.0
+    - Created and functional
+0.1.1
+    - Does not open crafting bench on right click with book
+    - Notifies on inventory full and does not attempt to duplicate book
+0.1.2
+    - added permission to use
+    - added permission to plugin.yaml, defaults to ops
+1.0.0
+    - Released on GitHub

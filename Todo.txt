@@ -1,0 +1,8 @@
+config file
+rip design off of PrintingPress (stairs upside-down above, slab on use, revert to stairs)
+use book materials - ink, book (feather? perhaps configurable cost... copy.other for increased cost. Food for thought.)
+Permissions todo:
+    - copy.self - default to true
+    - copy.other - op
+    - copy.free - op, requires adding book material usage.
+    - deny - prevent usage completely (make crafting bench open as usual and not display a message?)
