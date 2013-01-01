@@ -1,5 +1,6 @@
-config file
-rip design off of PrintingPress (stairs upside-down above, slab on use, revert to stairs)
-use book materials - ink, book (feather? perhaps configurable cost... copy.other for increased cost. Food for thought.)
+config file:
+    - more permissions! usePerms
+    - configurable cost per book?
+    - support other costs (leather, 3 pages, ink)
 
 standalone editor for the books (with automatic uploading!)

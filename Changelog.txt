@@ -1,14 +1,22 @@
 0.1.0
-    - Created and functional
+	- Created and functional
 0.1.1
-    - Does not open crafting bench on right click with book
-    - Notifies on inventory full and does not attempt to duplicate book
+	- Does not open crafting bench on right click with book
+	- Notifies on inventory full and does not attempt to duplicate book
 0.1.2
-    - added permission to use
-    - added permission to plugin.yaml, defaults to ops
+	- added permission to use
+	- added permission to plugin.yaml, defaults to ops
 1.0.0
-    - Released on GitHub
+	- Released on GitHub
 1.0.1
 	- tweaks to permissions and memory useage reduction
 2.0.0
 	- added the /makebook command
+2.1.0
+	- added "stamp" made of any inverted stair block
+	- started reworking permissions system
+	- added cost for /makebook
+	- added regex to remove redundant format clears
+	- fixed bug: warned players without booksuite.copy (now booksuite.copy.self) on ANY PlayerInteractEvent
+	- removed booksuite.deny temporarily - will readd with config
+	- KNOWN BUG [trivial]: If a second press is used by the same player while the first is "stamping" the second stamp's stairblock will overwrite the first.

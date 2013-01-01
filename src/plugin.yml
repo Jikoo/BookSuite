@@ -1,32 +1,44 @@
 name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
-version: 2.0.0
-author: Adam Gunn (Planar Warp)  Ted Meyer (tmathmeyer)
+version: 2.1.0
+authors: Adam Gunn (Planar Warp/Jikoo)  Ted Meyer (tmathmeyer)
 
 permissions:
     booksuite.*:
         description: Everything bookish and sweet!
         children:
-            booksuite.free: true
-            booksuite.other: true
-            booksuite.copy: true
-            booksuite.makebook: true
+            booksuite.book.free: true
+            booksuite.copy.other: true
+            booksuite.command.makebook: true
     booksuite.free:
-        description: allows users to copy all books with the printing press block
+        description: No cost associated with getting a book!
         default: op
-    booksuite.other:
-        description: books for free! :D
-        default: op
-    booksuite.copy:
-        description: can do ANY copying
+    booksuite.copy.self:
+        description: copy own books
+        children:
+            booksuite.copy.deny: false
+            booksuite.copy.deny.nowarn: false
         default: true
-    booksuite.makebook:
+    booksuite.copy.other:
+        description: copy all books
+        children:
+            booksuite.copy.self: true
+        default: op
+    booksuite.copy.deny:
+        description: NONFUNCTIONAL YET. Needs config file. Deny book copying
+        children:
+            booksuite.copy.deny.nowarn: false
+        default: false
+    booksuite.copy.deny.nowarn:
+        description: NONFUNCTIONAL YET. Needs config file. Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
+        default: false
+    booksuite.command.makebook:
         description: make a book from file
         default: true
 commands:
    makebook:
       description: makes a book from markuptextfile
       usage: /makebook booktitle url
-      permission: booksuite.makebook
+      permission: booksuite.command.makebook
       permission-message: You don't have <permission>

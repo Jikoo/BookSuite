@@ -1,6 +1,6 @@
 A multipurpose book-based suite
 Current features:
-    - right click a crafting table with a written book to duplicate it.
+    - right click a "press" (crafting table with inverted stairs above) with a written book to duplicate it.
     - /makebook {title} {url}
 Defaults:
     regular user:
