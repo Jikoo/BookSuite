@@ -66,7 +66,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 
 	public boolean addBook(Player p, ItemStack book2copy){
 		if (p.getInventory().firstEmpty() == -1)return false;
-		p.getInventory().addItem(i);
+		p.getInventory().addItem(book2copy);
 		p.sendMessage(ChatColor.DARK_GREEN+"Book copied!");
 		return true;
 	}
