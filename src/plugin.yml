@@ -2,7 +2,7 @@ name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
 version: 1.1.1
-author: Jikoo (Planar Warp)
+author: Adam Gunn (Planar Warp)  Ted Meyer (tmathmeyer)
 
 permissions:
     booksuite.*:
@@ -11,6 +11,7 @@ permissions:
             booksuite.free: true
             booksuite.other: true
             booksuite.copy: true
+            booksuite.makebook: true
     booksuite.free:
         description: allows users to copy all books with the printing press block
         default: op
@@ -20,3 +21,12 @@ permissions:
     booksuite.copy:
         description: can do ANY copying
         default: true
+    booksuite.makebook:
+        description: make a book from file
+        default: true
+commands:
+   makebook:
+      description: makes a book from markuptextfile
+      usage: /makebook booktitle url
+      permission: booksuite.makebook
+      permission-message: You don't have <permission>

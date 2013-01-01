@@ -21,6 +21,7 @@ public class BookSuite extends JavaPlugin implements Listener{
     public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
 		getLogger().info("BookSuite v"+version+" enabled!");
+		getCommand("makebook").setExecutor(new BookSuiteCommandExecutor(this));
     }
 	@Override
     public void onDisable() {
@@ -45,7 +46,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 		if (p.hasPermission("booksuite.copy.free")){
 			if (!addBook(p, book2copy))
 				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
-
 			return;
 		}
 		
@@ -61,12 +61,12 @@ public class BookSuite extends JavaPlugin implements Listener{
 		else{
 			p.sendMessage(ChatColor.DARK_RED+"To copy a book, you need "+neededSupplies+".");
 		}
-		p.updateInventory();
 	}
 
 	public boolean addBook(Player p, ItemStack book2copy){
 		if (p.getInventory().firstEmpty() == -1)return false;
-		p.getInventory().addItem(book2copy);
+		p.getInventory().addItem(book2copy.clone());
+		p.updateInventory();
 		p.sendMessage(ChatColor.DARK_GREEN+"Book copied!");
 		return true;
 	}
@@ -74,7 +74,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 
 
 
-	@SuppressWarnings("deprecation")
 	@EventHandler //copy book (PrintingPress)
 	public void onPlayerInteract(PlayerInteractEvent event){
 		Player p = event.getPlayer();
