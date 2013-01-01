@@ -10,3 +10,5 @@
     - Released on GitHub
 1.0.1
 	- tweaks to permissions and memory useage reduction
+2.0.0
+	- added the /makebook command
