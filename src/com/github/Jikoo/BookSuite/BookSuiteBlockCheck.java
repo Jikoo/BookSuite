@@ -1,7 +1,5 @@
 package com.github.Jikoo.BookSuite;
 
-import java.util.Arrays;
-
 import org.bukkit.block.Block;
 
 public class BookSuiteBlockCheck {
@@ -25,3 +23,4 @@ public class BookSuiteBlockCheck {
 		return false;
 	}
 }
+	

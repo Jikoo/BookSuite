@@ -25,3 +25,6 @@
 	- removed bug from 2.1.0. now opens crafting table if double tapped to quickly, with no effect on the printing process
 	- changed the format for /makebook (see demobook.book)
 	- starting framework for server book storage and upload
+2.1.2
+	- added config
+	- reimplemented deny permissions

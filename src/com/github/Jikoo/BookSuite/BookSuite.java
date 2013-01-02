@@ -1,9 +1,5 @@
 package com.github.Jikoo.BookSuite;
 
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -11,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,14 +20,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class BookSuite extends JavaPlugin implements Listener{
-	String version = "2.1.0";
+	String version = "2.1.2";
 	String neededSupplies = "";
 	BlockState originalBlock;
 	BlockState newBlock;
+	Boolean usePermissions;
 	
 	
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
+		FileConfiguration fc = getConfig();
+		try {
+			usePermissions = fc.getBoolean("usePermissions");
+		} catch (Exception e) {
+		}
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("makebook").setExecutor(new BookSuiteCommandExecutor(this));
 		getLogger().info("BookSuite v"+version+" enabled!");
@@ -79,7 +83,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 	public boolean canObtainBook(Player p){
 		Inventory inv = p.getInventory();
 		
-		if (p.hasPermission("booksuite.free") || p.getGameMode().equals(GameMode.CREATIVE)){
+		if (p.hasPermission("booksuite.free") || p.getGameMode().equals(GameMode.CREATIVE) || (!usePermissions && p.isOp())){
 			if (inv.firstEmpty()==-1){
 				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				return false;
@@ -114,12 +118,26 @@ public class BookSuite extends JavaPlugin implements Listener{
 	 * @return
 	 */
 	public boolean checkPermission(Player p, String a){
-		if (p.hasPermission("booksuite.copy.other"))
+		if (usePermissions){
+			if (p.hasPermission("booksuite.copy.other"))
+				return true;
+			if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
+				return true;
+			else if (p.hasPermission("booksuite.copy.self"))
+				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
+			else
+				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
+		}
+		else if (p.isOp())
 			return true;
-		if (a.equals(p.getName()))
+		else if (a.equals(p.getName()))
 			return true;
-		else  
-			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
+		else p.sendMessage(ChatColor.DARK_RED+"Only ops can copy others' books.");
+		return false;
+	}
+	public boolean denyUseage(Player p){
+		if (p.hasPermission("booksuite.copy.deny.nowarn"))
+			return true;
 		return false;
 	}
 	
@@ -221,7 +239,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 			if (is.getType().equals(Material.WRITTEN_BOOK) && clicked.getType().equals(Material.WORKBENCH)){
 				
 				Block blockUp = clicked.getRelative(BlockFace.UP);
-				if (BookSuiteBlockCheck.isInvertedStairs(blockUp)){
+				if (BookSuiteBlockCheck.isInvertedStairs(blockUp) && !denyUseage(p)){
 					
 					BookMeta bm = (BookMeta) is.getItemMeta();
 					if (checkPermission(p, bm.getAuthor()) && canObtainBook(p))

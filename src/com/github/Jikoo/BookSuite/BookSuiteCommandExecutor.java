@@ -1,7 +1,5 @@
 package com.github.Jikoo.BookSuite;
 
-import java.net.URL;
-import java.util.Scanner;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,7 +8,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
 public class BookSuiteCommandExecutor implements CommandExecutor{
 	
@@ -33,7 +30,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		Player p = (Player) sender;
 		
-		if (!p.hasPermission("booksuite.command.makebook")){
+		if (plugin.usePermissions && !p.hasPermission("booksuite.command.makebook")){
 			sender.sendMessage(ChatColor.DARK_RED+"you do not have permission to make books from file");
 			return false;
 		}

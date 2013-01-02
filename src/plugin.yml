@@ -13,32 +13,25 @@ permissions:
             booksuite.command.makebook: true
     booksuite.free:
         description: No cost associated with getting a book!
-        default: op
     booksuite.copy.self:
         description: copy own books
         children:
             booksuite.copy.deny: false
             booksuite.copy.deny.nowarn: false
-        default: true
     booksuite.copy.other:
         description: copy all books
         children:
             booksuite.copy.self: true
-        default: op
     booksuite.copy.deny:
-        description: NONFUNCTIONAL YET. Needs config file. Deny book copying
+        description: Deny book copying
         children:
             booksuite.copy.deny.nowarn: false
-        default: false
     booksuite.copy.deny.nowarn:
-        description: NONFUNCTIONAL YET. Needs config file. Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
-        default: false
+        description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
     booksuite.command.makebook:
         description: make a book from file
-        default: true
 commands:
    makebook:
       description: makes a book from markuptextfile
-      usage: /makebook booktitle url
       permission: booksuite.command.makebook
       permission-message: You don't have <permission>
