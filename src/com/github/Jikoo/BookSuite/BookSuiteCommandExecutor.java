@@ -37,7 +37,11 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			sender.sendMessage(ChatColor.DARK_RED+"you do not have permission to make books from file");
 			return false;
 		}
-		if (!plugin.canObtainBook(p)) return false;
+		
+		if (!plugin.canObtainBook(p)){
+			return false;
+		}
+		
 		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
 		BookMeta text = (BookMeta)newbook.getItemMeta();
 		
