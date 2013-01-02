@@ -20,3 +20,8 @@
 	- fixed bug: warned players without booksuite.copy (now booksuite.copy.self) on ANY PlayerInteractEvent
 	- removed booksuite.deny temporarily - will readd with config
 	- KNOWN BUG [trivial]: If a second press is used by the same player while the first is "stamping" the second stamp's stairblock will overwrite the first.
+
+2.1.1
+	- removed bug from 2.1.0. now opens crafting table if double tapped to quickly, with no effect on the printing process
+	- changed the format for /makebook (see demobook.book)
+	- starting framework for server book storage and upload

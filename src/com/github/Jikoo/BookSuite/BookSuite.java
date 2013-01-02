@@ -139,6 +139,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 		changeStairBlock(b);
 		revertBlockPause(b);
 		p.getInventory().addItem(is.clone());
+		p.updateInventory();
 		p.sendMessage(ChatColor.DARK_GREEN+"Book copied!");
 	}
 	
