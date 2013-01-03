@@ -20,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class BookSuite extends JavaPlugin implements Listener{
-	String version = "2.1.2";
+	String version = "2.1.3";
 	String neededSupplies = "";
 	BlockState originalBlock;
 	BlockState newBlock;
@@ -245,9 +245,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 					if (checkPermission(p, bm.getAuthor()) && canObtainBook(p))
 						operatePress(p, is, blockUp);
 					event.setCancelled(true);
-				}
-				else{
-					p.sendMessage(""+blockUp.getTypeId());
 				}
 			}
 			
