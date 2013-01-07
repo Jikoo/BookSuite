@@ -40,9 +40,8 @@ public class BookSuiteFileManager {
 				else{
 					page+=line+"<n>";
 				}
-				s.close();
 			}
-			
+			s.close();
 			return text;
 		}
 		catch(Exception ex) {
