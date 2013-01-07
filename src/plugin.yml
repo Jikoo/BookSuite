@@ -14,14 +14,20 @@ permissions:
             booksuite.mail.send: true
             booksuite.mail.receive: true
             booksuite.mail.all: true
+            booksuite.mail.attach: true
+            booksuite.mail.attach.self: true
+    booksuite.free:
+        description: No cost associated with getting a book!
     booksuite.mail.send:
         description: Send mail with a right click!
     booksuite.mail.all:
         description: Global mailing!
     booksuite.mail.receive:
         description: can check/receive non-global (personal) mail
-    booksuite.free:
-        description: No cost associated with getting a book!
+    booksuite.mail.attach:
+        description: send items with mail!
+    booksuite.mail.attach.self:
+        description: mail self items - Enable with caution, can be used as a personal enderchest with no space limit.
     booksuite.copy.self:
         description: copy own books
         children:
