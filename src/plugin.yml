@@ -12,8 +12,14 @@ permissions:
             booksuite.copy.other: true
             booksuite.command.makebook: true
             booksuite.mail.send: true
-    boksuite.mail.send:
+            booksuite.mail.receive: true
+            booksuite.mail.all: true
+    booksuite.mail.send:
         description: Send mail with a right click!
+    booksuite.mail.all:
+        description: Global mailing!
+    booksuite.mail.receive:
+        description: can check/receive non-global (personal) mail
     booksuite.free:
         description: No cost associated with getting a book!
     booksuite.copy.self:
@@ -26,7 +32,7 @@ permissions:
         children:
             booksuite.copy.self: true
     booksuite.copy.deny:
-        description: Deny book copying
+        description: Deny book copying, send deny message
         children:
             booksuite.copy.deny.nowarn: false
     booksuite.copy.deny.nowarn:
