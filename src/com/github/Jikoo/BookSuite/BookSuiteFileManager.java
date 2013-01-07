@@ -53,11 +53,11 @@ public class BookSuiteFileManager {
 	
 	
 	public static String parseText(String text){
-		text = text.replaceAll("(<|\\[)[iI][a-zA-Z]*(>|\\])", "§o");
-		text = text.replaceAll("(<|\\[)[bB][a-zA-Z]*(>|\\])", "§l");
-		text = text.replaceAll("(<|\\[)[uU][a-zA-Z]*(>|\\])", "§n");
-		text = text.replaceAll("(<|\\[)([sS][a-zA-Z]*|del)(>|\\])", "§m");
-		text = text.replaceAll("(<|\\[)[mM][a-zA-Z]*(>|\\])", "§k");
+		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "§o");
+		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
+		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
+		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "§m");
+		text = text.replaceAll("(<|\\[)m(agic)?(>|\\])", "§k");
 		
 		text = text.replaceAll("(<|\\[)color=", "<");
  		text = text.replaceAll("(<|\\[)black(>|\\])", "§0");
@@ -77,7 +77,7 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(<|\\[)yellow(>|\\])", "§e");
 		text = text.replaceAll("(<|\\[)white(>|\\])", "§f");
 		
-		text = text.replaceAll("(<|\\[)/([bimsuBIMSU][a-zA-Z]*|del|format)(>|\\])", "§r");
+		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format)(>|\\])", "§r");
 		text = text.replaceAll("(<|\\[)/color(>|\\])", "§0");
 		text = text.replaceAll("<n>", "\n");
 		text = text.replaceAll("(§r)+", "§r");
