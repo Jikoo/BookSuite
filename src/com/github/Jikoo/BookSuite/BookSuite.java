@@ -20,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class BookSuite extends JavaPlugin implements Listener{
-	String version = "2.1.3";
+	String version = "3.0.0";
 	String neededSupplies = "";
 	BlockState originalBlock;
 	BlockState newBlock;
@@ -222,7 +222,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 	
 	
 	/**
-	 * copy book (PrintingPress)
+	 * copy book (PrintingPress) or send mail
 	 * 
 	 * @param event world triggered event
 	 */
@@ -247,9 +247,20 @@ public class BookSuite extends JavaPlugin implements Listener{
 					event.setCancelled(true);
 				}
 			}
-			
-			
-			
 		}
+		
+		
+		
+		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
+			Player p = event.getPlayer();
+			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
+				if (p.hasPermission("booksuite.mail.send")){
+					BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+					new BookSuiteMailHandler(this, p).sendMail(bm);
+					event.setCancelled(true);
+				}
+			}
+		
+		
 	}
 }

@@ -1,7 +1,7 @@
 name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
-version: 2.1.0
+version: 3.0.0
 author: Adam Gunn (Planar Warp)  Ted Meyer (tmathmeyer)
 
 permissions:
@@ -11,6 +11,9 @@ permissions:
             booksuite.book.free: true
             booksuite.copy.other: true
             booksuite.command.makebook: true
+            booksuite.mail.send: true
+    boksuite.mail.send:
+        description: Send mail with a right click!
     booksuite.free:
         description: No cost associated with getting a book!
     booksuite.copy.self:
