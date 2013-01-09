@@ -36,7 +36,7 @@ public class BookSuiteParsedMailHandler {
 		recps.replaceFirst("\\A.*\\b", "");//consume start of page up to first word characters
 		recps.replaceAll("to:\\s*", "");//if "to:" consume that+ following spaces
 		recps.replaceAll("\\W", "\n");//all non-word characters (a-zA-Z_0-9) replaced with \n
-		recps.replaceFirst("\n+", "\n");//consume repeat \n
+		recps.replaceAll("(\n)+", "\n");//consume repeat \n
 		recps.replaceAll("\n$", "");//consume \n at end
 		recipientNames = recps.split("\n");
 		
