@@ -9,7 +9,7 @@
 
 
   <path id="bukkit.class.path">
-    <pathelement location="~/Build/craftbukkit.jar" />
+    <pathelement location="/home/pi/Build/craftbukkit.jar" />
     <pathelement location="${build.dir}" />
   </path>
 
