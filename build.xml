@@ -37,7 +37,7 @@
 
   <!-- Creates Javadoc -->
   <target name="docs" depends="compile">
-    <javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
+    <javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}" encoding="iso-8859-1">
       <!-- Define which files / directory should get included, we include all -->
        <fileset dir="${src.dir}">
                 <include name="**" />
