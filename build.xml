@@ -7,6 +7,12 @@
   <property name="dist.dir" location="dist" />
   <property name="docs.dir" location="docs" />
 
+
+  <path id="bukkit.class.path">
+    <pathelement location="~/Build/craftbukkit.jar" />
+    <pathelement location="${build.dir}" />
+  </path>
+
   <!-- Deletes the existing build, docs and dist directory-->
   <target name="clean">
     <delete dir="${build.dir}" />
@@ -24,6 +30,7 @@
   <!-- Compiles the java code (including the usage of library for JUnit -->
   <target name="compile" depends="clean, makedir">
     <javac srcdir="${src.dir}" destdir="${build.dir}" encoding="iso-8859-1">
+      <classpath refid="bukkit.class.path" />
     </javac>
 
   </target>
