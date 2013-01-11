@@ -260,8 +260,9 @@ public class BookSuite extends JavaPlugin implements Listener{
 		}
 
 
-
+		// this is for taking a "package/envelope" that contains a "gift" and opening it into your inventory.
 		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
+			/* THIS IS GOING TO BE DONE VIA COMMAND NOW
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
 				if (p.hasPermission("booksuite.mail.send")){
@@ -269,8 +270,20 @@ public class BookSuite extends JavaPlugin implements Listener{
 					new BookSuiteMailHandler(this, p).sendMail(bm);
 					event.setCancelled(true);
 				}
+			*/
+			Player p = event.getPlayer();
+			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
+				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+				if (bm.getPage(0).equals("To: "+p.getName())){
+					
+				}
+				else if(bm.getPage(0).contains("To: ")){
+					p.sendMessage(ChatColor.DARK_RED+"This package is not addressed to you. However you got it, you shouldnt have it. put it back now. or else.");
+				}
+			}
+			
 		}
-
+		
 
 	}
 }
