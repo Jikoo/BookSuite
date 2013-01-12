@@ -22,7 +22,6 @@
 	- KNOWN BUG [trivial]: If a second press is used by the same player while the first is "stamping" the second stamp's stairblock will overwrite the first.
 
 2.1.1
-	- removed bug from 2.1.0. now opens crafting table if double tapped to quickly, with no effect on the printing process
 	- changed the format for /makebook (see demobook.book)
 	- starting framework for server book storage and upload
 2.1.2
@@ -30,3 +29,8 @@
 	- reimplemented deny permissions
 2.1.3
 	- fixed bug: right click on invalid "stamp" (read: regular crafting table) or with booksuite.copy.deny.nowarn returns itemId of block above
+3.0.0a1
+    - minor changes to regex for mailing
+    - removed unused class
+    - reorganized copying code to make main class more readable
+    - fixed 2.1.0 bug (no longer store block data in main class)

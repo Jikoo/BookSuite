@@ -1,12 +1,11 @@
 package com.github.Jikoo.BookSuite;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,10 +20,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class BookSuite extends JavaPlugin implements Listener{
 	String version = "3.0.0";
-	String neededSupplies = "";
-	BlockState originalBlock;
-	BlockState newBlock;
 	Boolean usePermissions;
+	String neededSupplies = "";
 
 
 	@Override
@@ -44,12 +41,10 @@ public class BookSuite extends JavaPlugin implements Listener{
 
 
 
-
 	@Override
 	public void onDisable() {
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
-
 
 
 
@@ -68,7 +63,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 		else neededSupplies = "a book and an ink sack";
 		return false;
 	}
-
 
 
 
@@ -108,119 +102,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 	}
 
 
-
-
-
-	/**
-	 * 
-	 * @param p
-	 * @param a
-	 * @return
-	 */
-	public boolean checkPermission(Player p, String a){
-		if (usePermissions){
-			if (p.hasPermission("booksuite.copy.other"))
-				return true;
-			if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
-				return true;
-			else if (p.hasPermission("booksuite.copy.self"))
-				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
-			else
-				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
-		}
-		else if (p.isOp())
-			return true;
-		else if (a.equals(p.getName()))
-			return true;
-		else p.sendMessage(ChatColor.DARK_RED+"Only ops can copy others' books.");
-		return false;
-	}
-	public boolean denyUseage(Player p){
-		if (p.hasPermission("booksuite.copy.deny.nowarn"))
-			return true;
-		return false;
-	}
-
-
-
-
-
-
-	/**
-	 * 
-	 * @param p
-	 * @param is
-	 * @param b
-	 */
-	public void operatePress(Player p, ItemStack is, Block b){
-		originalBlock = b.getState();
-		changeStairBlock(b);
-		revertBlockPause(b);
-		p.getInventory().addItem(is.clone());
-		p.updateInventory();
-		p.sendMessage(ChatColor.DARK_GREEN+"Book copied!");
-	}
-
-
-
-
-
-	/**
-	 * turns the stair block into a slab for graphical effect
-	 * 
-	 * @param b the stair block to be transformed
-	 */
-	public void changeStairBlock(Block b){
-		if (b.getTypeId() == 53)//WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 0, false);//WOOD_STEP
-
-		else if (b.getTypeId() == 67)//COBBLESTONE_STAIRS
-			b.setTypeIdAndData(44, (byte) 3, false);//STEP
-
-		else if (b.getTypeId() == 108)//BRICK_STAIRS
-			b.setTypeIdAndData(44, (byte) 4, false);//STEP
-
-		else if (b.getTypeId() == 109)//SMOOTH_STAIRS
-			b.setTypeIdAndData(44, (byte) 5, false);//STEP
-
-		else if (b.getTypeId() == 114)//NETHER_BRICK_STAIRS
-			b.setTypeIdAndData(44, (byte) 6, false);//STEP
-
-		else if (b.getTypeId() == 128)//SANDSTONE_STAIRS
-			b.setTypeIdAndData(44, (byte) 1, false);//STEP
-
-		else if (b.getTypeId() == 134)//SPRUCE_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 1, false);//WOOD_STEP
-
-		else if (b.getTypeId() == 135)//BIRCH_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 2, false);//WOOD_STEP
-
-		else if (b.getTypeId() == 136)//JUNGLE_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 3, false);//WOOD_STEP
-
-		newBlock = b.getState();
-	}
-
-
-
-
-	public class revertBlock implements Runnable{
-		Block b;
-		revertBlock(Block block){
-			b = block;
-		}
-		public void run() {
-			b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock.getData().getData(), false);
-		}
-	}
-	public void revertBlockPause(Block b){
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new revertBlock(b), 20L);
-	}
-
-
-
-
-
 	/**
 	 * copy book (PrintingPress) or send mail
 	 * 
@@ -233,17 +114,16 @@ public class BookSuite extends JavaPlugin implements Listener{
 			Player p = event.getPlayer();
 			ItemStack is = p.getItemInHand();
 			Block clicked = event.getClickedBlock();
-
+			Block blockUp = clicked.getRelative(BlockFace.UP);
 
 
 			if (is.getType().equals(Material.WRITTEN_BOOK) && clicked.getType().equals(Material.WORKBENCH)){
-
-				Block blockUp = clicked.getRelative(BlockFace.UP);
-				if (BookSuiteBlockCheck.isInvertedStairs(blockUp) && !denyUseage(p)){
+				BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
+				if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
 
 					BookMeta bm = (BookMeta) is.getItemMeta();
-					if (checkPermission(p, bm.getAuthor()) && canObtainBook(p))
-						operatePress(p, is, blockUp);
+					if (press.checkCopyPermission(bm.getAuthor()) && canObtainBook(p))
+						press.operatePress();
 					event.setCancelled(true);
 				}
 			}
@@ -251,31 +131,34 @@ public class BookSuite extends JavaPlugin implements Listener{
 			
 			
 			//this is for checking mail
-			if (clicked.getType().equals(Material.CHEST)){
-				//test if there is a sign above it saying "mail"
-				//if so, read from the player's local-file inventory and put those items into the chest
-				//make sure to test if the player has the ability to look into the chest before adding items
-				//once the items have been added to the players mailbox, REMOVE THEM FROM THE FILE
-			}
+			if (clicked.getType().equals(Material.CHEST))
+				if (blockUp.getType().equals(Material.SIGN)) {
+				Sign sign = (Sign) blockUp;
+				if (sign.getLine(0).contains("mail"));//rudimentary example
+					p.sendMessage(ChatColor.DARK_GREEN+"This will eventually be a mailbox! Woo!");
+				} 
+				/*
+				 * test if there is a sign above it saying "mail"
+				 * if so, read from the player's local-file inventory and put those items into the chest
+				 * make sure to test if the player has the ability to look into the chest before adding items
+				 * once the items have been added to the players mailbox, REMOVE THEM FROM THE FILE
+				 * re-add on chest close, if possible
+				 */
+			
 		}
 
 
 		// this is for taking a "package/envelope" that contains a "gift" and opening it into your inventory.
 		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
-			/* THIS IS GOING TO BE DONE VIA COMMAND NOW
-			Player p = event.getPlayer();
-			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
-				if (p.hasPermission("booksuite.mail.send")){
-					BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-					new BookSuiteMailHandler(this, p).sendMail(bm);
-					event.setCancelled(true);
-				}
-			*/
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getPage(0).equals("To: "+p.getName())){
 					
+				}
+				else if (p.hasPermission("booksuite.mail.send")){
+					new BookSuiteMailExecutor(this, p).sendMail();
+					event.setCancelled(true);
 				}
 				else if(bm.getPage(0).contains("To: ")){
 					p.sendMessage(ChatColor.DARK_RED+"This package is not addressed to you. However you got it, you shouldnt have it. put it back now. or else.");
