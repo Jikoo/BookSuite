@@ -5,13 +5,10 @@ import java.io.FileWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,53 +16,19 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class BookSuiteFileManager {
 	
 	
-	public static BookMeta makeBookMetaFromURL(String url, Player p){
-		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-		BookMeta text = (BookMeta)newbook.getItemMeta();
-		
-		text.setAuthor(p.getName());
-		
-		try {
-			URL u = new URL(url);
-			Scanner s = new Scanner(u.openStream());
-			String page = "";
-			while(s.hasNext()){
-				String line = s.nextLine();
-				
-				if (line.length()>=2 && line.substring(0, 2).equals("//")){
-					//do nothing, this line is a book comment
-				}
-				else if (line.contains("<title>")){
-					text.setTitle(line.replaceAll("<title>", "").replaceAll("</title>", ""));
-				}
-				else if(line.contains("<page>")){
-					page = "";
-				}
-				else if (line.contains("</page>")){
-					text.addPage(parseBookText(page));
-				}
-				else{
-					page+=line+"<n>";
-				}
-			}
-			s.close();
-			return text;
-		}
-		catch(Exception ex) {
-			p.sendMessage(ChatColor.DARK_RED+"There was a syntax error in the file you provided, or the URL did no check out.");
-			return null;
-		}
-	}
-	
-	
-	
-	public static BookMeta makeBookMetaFromFile(File directory, String filename){
+	public static BookMeta makeBookMetaFromText(String file, String location){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		
 		
 		try {
-			File bookFile = new File(directory, filename);
-			Scanner s = new Scanner(bookFile);
+			Scanner s;
+			try {
+				URL u = new URL(file);
+				s = new Scanner(u.openStream());
+			} catch (Exception e) {
+				File bookFile = new File(location, file);
+				s = new Scanner(bookFile);
+			}
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();
@@ -149,7 +112,8 @@ public class BookSuiteFileManager {
 		}
 		catch(Exception ex) {
 			im.setDisplayName("Item file error! Accept my condolences.");
-			return null;
+			is.setItemMeta(im);
+			return is;
 		}
 	}
 	
@@ -227,12 +191,12 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", "§2");
 		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", "§3");
 		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", "§4");
-		text = text.replaceAll("(<|\\[)purple(>|\\])", "§5");
+		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", "§5");
 		text = text.replaceAll("(<|\\[)gold(>|\\])", "§6");
-		text = text.replaceAll("(<|\\[)grey(>|\\])", "§7");
+		text = text.replaceAll("(<|\\[)gr(e|a)y(>|\\])", "§7");
 		text = text.replaceAll("(<|\\[)dark_?grey(>|\\])", "§8");
 		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", "§9");
-		text = text.replaceAll("(<|\\[)(light_?)?green(>|\\])", "§a");
+		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", "§a");
 		text = text.replaceAll("(<|\\[)aqua(>|\\])", "§b");
 		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", "§c");
 		text = text.replaceAll("(<|\\[)pink(>|\\])", "§d");

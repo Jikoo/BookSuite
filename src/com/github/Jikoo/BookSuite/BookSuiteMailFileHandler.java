@@ -9,7 +9,13 @@ import java.util.Scanner;
 public class BookSuiteMailFileHandler {
 	
 	public static String getSentMails(String username) throws IOException{
-		File f = getUserIndexFile(username);
+		File f;
+		try {
+			f = getUserIndexFile(username);
+		} catch (Exception e){
+			createIndex(username);
+			f = getUserIndexFile(username);
+		}
 		List<String> s = new ArrayList<String>();
 		Scanner reader = new Scanner(f);
 		while(reader.hasNext()){

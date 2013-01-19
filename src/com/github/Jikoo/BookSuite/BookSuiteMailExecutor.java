@@ -32,7 +32,7 @@ String itemMetaName;
 
 
 	public void getSendingData(){
-		BookMeta bm = (BookMeta) p.getItemInHand();//This is already guaranteed to be a written book by event handler
+		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 		if (bm.getTitle().equalsIgnoreCase("package")){
 			String[] pageData = bm.getPage(0).split("\n");
 			title = pageData[0];
