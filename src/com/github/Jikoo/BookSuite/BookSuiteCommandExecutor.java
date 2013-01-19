@@ -46,7 +46,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		
-		newbook.setItemMeta(BookSuiteFileManager.makeBookMetaData(args[0], p));
+		newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromURL(args[0], p));
 		
 		p.getInventory().addItem(newbook);
 		return true;

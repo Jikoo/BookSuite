@@ -10,7 +10,7 @@ public class BookSuiteMailExecutor {
 BookSuite plugin;
 Player p;
 String to;
-String bookMessageName;
+String title;
 String itemMetaName;
 	
 	public BookSuiteMailExecutor(BookSuite plugin, Player p){
@@ -30,28 +30,23 @@ String itemMetaName;
 
 
 
-	//The whole point is that it's commandless >.> why have a packing slip or details in the book then?
-	/*public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (! (sender instanceof Player) ){
-			sender.sendMessage(ChatColor.DARK_RED+"you must be a player to use this command");
-			return false;
-		}
-		*/
+
 	public void getSendingData(){
-		PlayerInventory i = p.getInventory();
 		BookMeta bm = (BookMeta) p.getItemInHand();//This is already guaranteed to be a written book by event handler
-		String title = bm.getTitle();
-		title.replaceFirst("[\\W_]*", "");//(any non [a-zA-Z0-9] consumed)
-		if (title.equalsIgnoreCase("packingslip")){
-			to = bm.getPage(0);
-			bookMessageName = bm.getPage(1);
-			itemMetaName = bm.getPage(2);
+		if (bm.getTitle().equalsIgnoreCase("package")){
+			String[] pageData = bm.getPage(0).split("\n");
+			title = pageData[0];
+			to = pageData[1];
+			itemMetaName = pageData[2];
+			
 		}
 	}
 	
 	public void parseSendingData(){
-		to.replaceFirst("\\A.*[Tt][Oo]:\\s*", "");
+		title.replaceFirst("\\A.*([Pp]ackage|[Tt]itle):\\s*", "");
+		title.replaceAll("\\W", "");
+		to.replaceFirst("\\A.*[Tt]o:\\s*", "");
 		to.replaceAll("\\W", "");
-		//no clue what we want to do for the rest, but it can be handled in similar format.
+		itemMetaName.replaceFirst("\\A.*[Ii]tem:\\s*", "");
 	}
 }

@@ -97,7 +97,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 			return true;
 		}
 
-		p.sendMessage(ChatColor.DARK_RED+"To copy a book, you need "+neededSupplies+".");
+		p.sendMessage(ChatColor.DARK_RED+"To create a book, you need "+neededSupplies+".");
 		return false;
 	}
 
