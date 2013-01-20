@@ -18,6 +18,7 @@ String to;
 String title;
 String itemMetaName;
 BookMeta bm;
+boolean hasItemAttached;
 	
 	public BookSuiteMailExecutor(BookSuite plugin, Player p){
 		this.plugin = plugin;
@@ -27,27 +28,40 @@ BookMeta bm;
 
 
 	public void sendMail(){
-		p.sendMessage(ChatColor.DARK_RED+"This function does not yet exist.");
 		getSendingData();
 		parseSendingData();
 		BookMeta newBook = (BookMeta) new ItemStack(Material.WRITTEN_BOOK).getItemMeta();
 		newBook.setAuthor(p.getName());
+		Inventory inv = p.getInventory();
+		boolean hasItemInInv = false;
 		for (int i=1; i<bm.getPageCount(); i++)
 			newBook.addPage(bm.getPage(i));
 		if (itemMetaName!=""){
 			newBook.setTitle("Package: "+title);
 			newBook.addPage("Attached: "+itemMetaName);
-			Inventory inv = p.getInventory();
 			for (ItemStack is:inv.getContents())
 				if (is.hasItemMeta())
 					if(is.getItemMeta().hasDisplayName())
 						if (is.getItemMeta().getDisplayName().equalsIgnoreCase(itemMetaName)){
 							BookSuiteFileManager.makeFileFromItemStack(is, plugin.getDataFolder()+"/Mail/"+to+"/Items/", itemMetaName);
 							inv.remove(is);
+							hasItemInInv = true;
 						}
 		} else newBook.setTitle(title);
+		if (hasItemAttached && !hasItemInInv){
+			p.sendMessage(ChatColor.DARK_RED+"Error retrieving item, please check spelling.");
+			ItemStack unsign = p.getItemInHand();
+			BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
+			unsignMeta.setAuthor(null);
+			unsignMeta.setTitle(null);
+			unsign.setItemMeta(unsignMeta);
+			unsign.setType(Material.BOOK_AND_QUILL);
+			return;
+		}
 		BookSuiteFileManager.makeFileFromBookMeta(newBook, plugin.getDataFolder()+"/Mail/"+to+"/Books/", title);
-		//TODO append index.bsm
+		inv.remove(p.getItemInHand());
+		BookSuiteFileManager.appendMailIndex(plugin.getDataFolder()+"/Mail/"+to, title);
+		p.sendMessage(ChatColor.DARK_GREEN+"Mail sent successfully!");
 		
 		
 		
@@ -81,6 +95,7 @@ BookMeta bm;
 			title = pageData[0];
 			to = pageData[1];
 			itemMetaName = pageData[2];
+			if (pageData[2]!=null&&pageData[2]!="") hasItemAttached = true;
 			
 		}
 	}
@@ -90,6 +105,8 @@ BookMeta bm;
 		title.replaceAll("\\W", "");
 		to.replaceFirst("\\A.*[Tt]o:\\s*", "");
 		to.replaceAll("\\W", "");
-		itemMetaName.replaceFirst("\\A.*[Ii]tem:\\s*", "");
+		itemMetaName.replaceFirst("\\A.*([Ii]tem|[Aa]ttach):\\s*", "");
+		if(itemMetaName.equalsIgnoreCase("n/a")||itemMetaName.equalsIgnoreCase("none")||itemMetaName.equalsIgnoreCase("nothing"))
+			itemMetaName="";
 	}
 }

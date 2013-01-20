@@ -207,4 +207,25 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(§r)+", "§r");
 		return text;
 	}
+	
+	
+	
+	
+	public static void appendMailIndex(String directory, String appendText){
+		try {
+			File indexFile = new File(directory, "index.bsm");
+			FileWriter index = new FileWriter(indexFile);;
+			if (indexFile.exists()) index.append("\n"+appendText);
+			else index.write(appendText);
+			index.close();
+		} catch (Exception e) {
+			//Pshwhatever. Not like they need to know the mail didn't send right.
+		}
+		
+		
+	}
+	
+	
+	
+	
 }
