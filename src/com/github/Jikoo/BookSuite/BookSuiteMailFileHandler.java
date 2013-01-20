@@ -21,6 +21,7 @@ public class BookSuiteMailFileHandler {
 		while(reader.hasNext()){
 			s.add(reader.nextLine());
 		}
+		
 		return null; //temporary
 	}
 	

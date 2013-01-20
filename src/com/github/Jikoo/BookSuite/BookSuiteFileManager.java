@@ -16,19 +16,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class BookSuiteFileManager {
 	
 	
-	public static BookMeta makeBookMetaFromText(String file, String location){
+	public static BookMeta makeBookMetaFromText(String file, String location, String type){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		
 		
 		try {
 			Scanner s;
-			try {
+			if (type.equals("url")){
 				URL u = new URL(file);
 				s = new Scanner(u.openStream());
-			} catch (Exception e) {
-				File bookFile = new File(location, file);
-				s = new Scanner(bookFile);
-			}
+			} else s = new Scanner(new File(location, file));
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();
@@ -67,7 +64,7 @@ public class BookSuiteFileManager {
 		ItemStack is = new ItemStack (3, 1);
 		ItemMeta im = is.getItemMeta();
 		try {
-			File itemFile = new File(directory, filename);
+			File itemFile = new File(directory, filename+".item");
 			Scanner s = new Scanner(itemFile);
 			List<String> lore = new ArrayList<String>();
 			boolean handlingEnchants = false;
@@ -121,7 +118,7 @@ public class BookSuiteFileManager {
 	
 	
 	
-	public static boolean makeFileFromBookMeta(BookMeta bm, File directory, String filename){
+	public static boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename){
 		
 		try {
 			File bookFile = new File(directory, filename);
@@ -141,9 +138,9 @@ public class BookSuiteFileManager {
 	
 	
 	
-	public static boolean makeFileFromItemStack(ItemStack is, File directory, String filename){
+	public static boolean makeFileFromItemStack(ItemStack is, String directory, String filename){
 		try {
-			File bookFile = new File(directory, filename);
+			File bookFile = new File(directory, filename+".item");
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<Type>"+is.getType().name()+"</Type>\n");
 			file.append("<Amount>"+is.getAmount()+"</Amount>");
