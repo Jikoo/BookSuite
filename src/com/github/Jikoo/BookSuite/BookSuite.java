@@ -133,17 +133,12 @@ public class BookSuite extends JavaPlugin implements Listener{
 			//this is for checking mail
 			if (clicked.getType().equals(Material.CHEST))
 				if (blockUp.getType().equals(Material.SIGN)) {
-				Sign sign = (Sign) blockUp;
-				if (sign.getLine(0).contains("mail"));//rudimentary example
-					p.sendMessage(ChatColor.DARK_GREEN+"This will eventually be a mailbox! Woo!");
+					Sign sign = (Sign) blockUp;
+					if (sign.getLine(0).replace(ChatColor.DARK_RED+"\\[[Mm]ail[Bb]ox\\]", "No sign line can contain this string.").equals("No sign line can contain this string.")){//rudimentary example
+						p.openInventory(BookSuiteMailExecutor.getMailBoxInv(p, this));
+						event.setCancelled(true);
+					}
 				} 
-				/*
-				 * test if there is a sign above it saying "mail"
-				 * if so, read from the player's local-file inventory and put those items into the chest
-				 * make sure to test if the player has the ability to look into the chest before adding items
-				 * once the items have been added to the players mailbox, REMOVE THEM FROM THE FILE
-				 * re-add on chest close, if possible
-				 */
 			
 		}
 
@@ -153,8 +148,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				if (bm.getPage(0).equals("To: "+p.getName())){
-					
+				if (bm.getTitle().contains("Package: ")){
+					//unpack
 				}
 				else if (p.hasPermission("booksuite.mail.send")){
 					new BookSuiteMailExecutor(this, p).sendMail();

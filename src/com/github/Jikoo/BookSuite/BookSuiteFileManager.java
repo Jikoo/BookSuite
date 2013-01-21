@@ -22,7 +22,7 @@ public class BookSuiteFileManager {
 		
 		try {
 			Scanner s;
-			if (type.equals("url")){
+			if (type.equalsIgnoreCase("url")){
 				URL u = new URL(file);
 				s = new Scanner(u.openStream());
 			} else s = new Scanner(new File(location, file));
@@ -211,15 +211,16 @@ public class BookSuiteFileManager {
 	
 	
 	
-	public static void appendMailIndex(String directory, String appendText){
+	public static boolean appendMailIndex(String directory, String appendText){
 		try {
 			File indexFile = new File(directory, "index.bsm");
 			FileWriter index = new FileWriter(indexFile);;
-			if (indexFile.exists()) index.append("\n"+appendText);
-			else index.write(appendText);
+			if (indexFile.exists()) index.append(appendText+"\n");
+			else index.write(appendText+"\n");
 			index.close();
+			return true;
 		} catch (Exception e) {
-			//Pshwhatever. Not like they need to know the mail didn't send right.
+			return false;
 		}
 		
 		
