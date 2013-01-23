@@ -11,15 +11,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 public class BookSuiteMailExecutor {
-	
-BookSuite plugin;
-Player p;
-String to;
-String title;
-String itemMetaName;
-BookMeta bm;
-boolean mailHasItemAttached;
-	
+
+	BookSuite plugin;
+	Player p;
+	String to;
+	String title;
+	String itemMetaName;
+	BookMeta bm;
+	boolean mailHasItemAttached;
+
 	public BookSuiteMailExecutor(BookSuite plugin, Player p){
 		this.plugin = plugin;
 		this.p = p;
@@ -30,7 +30,7 @@ boolean mailHasItemAttached;
 	public void sendMail(){
 		bm = (BookMeta) p.getItemInHand().getItemMeta();
 		if (p.getName()!=bm.getAuthor()&&!p.hasPermission("booksuite.mail.send.other"))
-		parseSendingData();
+			parseSendingData();
 		BookMeta newBook = (BookMeta) new ItemStack(Material.WRITTEN_BOOK).getItemMeta();
 		newBook.setAuthor(bm.getAuthor());
 		Inventory inv = p.getInventory();
@@ -49,8 +49,8 @@ boolean mailHasItemAttached;
 							playerHasItem = true;
 						}
 		} else newBook.setTitle(title);
-		
-		
+
+
 		if (mailHasItemAttached && !playerHasItem){
 			p.sendMessage(ChatColor.DARK_RED+"Error: no such named item, please check spelling.");
 			ItemStack unsign = p.getItemInHand();
@@ -61,33 +61,33 @@ boolean mailHasItemAttached;
 			unsign.setType(Material.BOOK_AND_QUILL);
 			return;
 		}
-		
-		
+
+
 		if(BookSuiteFileManager.appendMailIndex(plugin.getDataFolder()+"/Mail/"+to, title)){
 			if (mailHasItemAttached && playerHasItem){
 				BookSuiteFileManager.makeFileFromItemStack(removeThis, plugin.getDataFolder()+"/Mail/"+to+"/Items/", itemMetaName+".item");
 				inv.remove(removeThis);
 			}
-			
-			
+
+
 			BookSuiteFileManager.makeFileFromBookMeta(newBook, plugin.getDataFolder()+"/Mail/"+to+"/Books/", title+".book");
 			inv.remove(p.getItemInHand());
 			p.sendMessage(ChatColor.DARK_GREEN+"Mail sent successfully!");
 		} else p.sendMessage(ChatColor.DARK_RED+"Error writing mail index!");
 	}
-	
-	
+
+
 	
 	public static Inventory getMailBoxInv(Player p, BookSuite plugin){
 		Inventory mailbox =  Bukkit.createInventory(p, 2, p.getDisplayName()+"'s MailBox");
-		Scanner s = new Scanner(plugin.getDataFolder()+"/Mail/index.bsm");
+		Scanner s = new Scanner(plugin.getDataFolder()+"/Mail/"+p.getDisplayName()+"index.bsm");
 		while (s.hasNext()){
 			if (mailbox.firstEmpty()!=-1){
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				is.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(s.nextLine()+".book", plugin.getDataFolder()+"/Mail/"+p.getName()+"/Books/", ""));
 				mailbox.addItem(is);
 			}
-			
+
 		}
 		return mailbox;
 	}

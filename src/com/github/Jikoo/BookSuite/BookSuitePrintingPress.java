@@ -35,10 +35,10 @@ public class BookSuitePrintingPress {
 	 * @param b the block to be tested
 	 * @return whether the block is an inverted stair
 	 */
-	public static boolean isInvertedStairs(Block b){
+	public boolean isInvertedStairs(){
 		int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136};
 		for(int i: acceptable)
-			if (i==b.getTypeId())return b.getData()>3;
+			if (i==blockUp.getTypeId())return blockUp.getData()>3;
 		return false;
 	}
 
@@ -47,14 +47,17 @@ public class BookSuitePrintingPress {
 
 
 	/**
-	 * @param a
+	 * tests whether the user has permission to copy books, and if so, whether they have the permission to copy books written by others
+	 * 
+	 * @param author the author of the book
+	 * 
 	 * @return
 	 */
-	public boolean checkCopyPermission(String a){
+	public boolean checkCopyPermission(String author){
 		if (plugin.usePermissions){
 			if (p.hasPermission("booksuite.copy.other"))
 				return true;
-			if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
+			if (p.hasPermission("booksuite.copy.self") && author.equals(p.getName()))
 				return true;
 			else if (p.hasPermission("booksuite.copy.self"))
 				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
@@ -63,7 +66,7 @@ public class BookSuitePrintingPress {
 		}
 		else if (p.isOp())
 			return true;
-		else if (a.equals(p.getName()))
+		else if (author.equals(p.getName()))
 			return true;
 		else p.sendMessage(ChatColor.DARK_RED+"Only ops can copy others' books.");
 		return false;
@@ -75,6 +78,9 @@ public class BookSuitePrintingPress {
 	}
 
 
+	
+	
+	@SuppressWarnings("deprecation")
 	public void operatePress(){
 		changeStairBlock(blockUp);
 		revertBlockPause(blockUp);
