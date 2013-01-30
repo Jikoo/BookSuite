@@ -2,7 +2,7 @@ name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
 version: 3.0.0
-author: Adam Gunn (Planar Warp)  Ted Meyer (tmathmeyer)
+author: Adam Gunn (PlanarWarp)  Ted Meyer (tmathmeyer)
 
 permissions:
     booksuite.*:

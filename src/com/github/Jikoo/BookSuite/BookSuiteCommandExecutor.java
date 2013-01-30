@@ -45,7 +45,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		
-		if(args[0].equalsIgnoreCase("url")||args[0].equalsIgnoreCase("file")){
+		if(args[0] == "url"||args[0] == "file"){
 			newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(args[1], plugin.getDataFolder()+"/SavedBooks/", args[0]));
 			if (!newbook.hasItemMeta()){
 				p.sendMessage(ChatColor.DARK_RED+"Error reading book file.");

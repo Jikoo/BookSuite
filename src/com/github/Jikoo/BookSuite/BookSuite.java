@@ -51,7 +51,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 
 
 	/**
-	 * checks if the player has the supplies needed to make a book, whether it be from file or via printingpress.
+	 * checks if the player has the supplies needed
 	 * 
 	 * @param inv the inventory of the player
 	 * @return whether the player has the supplies needed to copy the book
@@ -69,7 +69,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 
 
 	/**
-	 * master method for checking if the player can obtain the books, and for removing the supplies provided they can.
+	 * master method for checking if the player can obtain the books
 	 *
 	 * @param p the player attempting to obtain the book
 	 * @return whether the player can obtain the book
@@ -92,7 +92,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.addItem(new ItemStack(Material.BOOK, 1));
-				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				return false;
 			}
 			return true;
@@ -110,21 +109,18 @@ public class BookSuite extends JavaPlugin implements Listener{
 	 */
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event){
-		
-		// lets get some basic information about the user
-		Player p = event.getPlayer();
-		ItemStack is = p.getItemInHand();
-		Block clicked = event.getClickedBlock();
-		Block blockUp = clicked.getRelative(BlockFace.UP);
-		Action playerAction = event.getAction();
-		
-		if (playerAction.equals(Action.RIGHT_CLICK_BLOCK)){
-			
-			
-			// if the user clicks a crafting table with a book, attempt to copy it with the printing press portion of BookSuite
+		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
+
+			Player p = event.getPlayer();
+			ItemStack is = p.getItemInHand();
+			Block clicked = event.getClickedBlock();
+			Block blockUp = clicked.getRelative(BlockFace.UP);
+
+
 			if (is.getType().equals(Material.WRITTEN_BOOK) && clicked.getType().equals(Material.WORKBENCH)){
 				BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
-				if (press.isInvertedStairs() && !press.denyUseage()){
+				if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
+
 					BookMeta bm = (BookMeta) is.getItemMeta();
 					if (press.checkCopyPermission(bm.getAuthor()) && canObtainBook(p))
 						press.operatePress();
@@ -134,36 +130,31 @@ public class BookSuite extends JavaPlugin implements Listener{
 			
 			
 			
-			// if there is a sign above the chest, and the sign has text "MailBox" "mailBox" Mailbox" or "mailbox"
-			// then this is a mailbox, and we can get the user's private mail.
-			if (clicked.getType().equals(Material.CHEST)){
+			//this is for checking mail
+			if (clicked.getType().equals(Material.CHEST))
 				if (blockUp.getType().equals(Material.SIGN)) {
 					Sign sign = (Sign) blockUp;
-					if (sign.getLine(0).replace(ChatColor.DARK_RED+"\\[[Mm]ail[Bb]ox\\]", "No sign line can contain this string.").equals("No sign line can contain this string.")){//rudimentary example
+					if (sign.getLine(0).equals(ChatColor.DARK_RED+"No sign line can contain this string.")){//rudimentary example
 						p.openInventory(BookSuiteMailExecutor.getMailBoxInv(p, this));
 						event.setCancelled(true);
 					}
-				}
-			}
+				} 
+			
 		}
 
 
-		// if the player right clicks the air with a book, one of two things will happen:
-		//   -- if it is a "package" then we extract the information from it and add the items to the players inventory. ONE ITEM PER BOOK?
-		//   -- if it is a "packing slip" then we remove the book and write the meta information to the file for the players in the "to:" field
-		if (playerAction.equals(Action.RIGHT_CLICK_AIR)){
+		// this is for taking a "package/envelope" that contains a "gift" and opening it into your inventory.
+		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
+			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){
-					//unpack
+					if(new BookSuiteMailExecutor(this, p, event).loadMail())
+						event.setCancelled(true);
 				}
-				else if (p.hasPermission("booksuite.mail.send")){
-					new BookSuiteMailExecutor(this, p).sendMail();
-					event.setCancelled(true);
-				}
-				else if(bm.getPage(0).contains("To: ")){
-					p.sendMessage(ChatColor.DARK_RED+"This package is not addressed to you. However you got it, you shouldnt have it. put it back now. or else.");
-				}
+				else if (p.hasPermission("booksuite.mail.send"))
+					if (new BookSuiteMailExecutor(this, p, event).sendMail())
+						event.setCancelled(true);
 			}
 			
 		}

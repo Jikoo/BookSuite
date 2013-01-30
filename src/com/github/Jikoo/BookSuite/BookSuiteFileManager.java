@@ -60,7 +60,7 @@ public class BookSuiteFileManager {
 	
 	
 	
-	public static ItemStack makeItemStackFromFile(File directory, String filename){
+	public static ItemStack makeItemStackFromFile(String directory, String filename){
 		ItemStack is = new ItemStack (3, 1);
 		ItemMeta im = is.getItemMeta();
 		try {
@@ -125,7 +125,7 @@ public class BookSuiteFileManager {
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<author>"+bm.getAuthor()+"</author>\n");
 			file.append("<title>"+bm.getTitle()+"</title>\n");
-			for (int i=0; i<bm.getPageCount(); i++)
+			for (int i=1; i<=bm.getPageCount(); i++)
 				file.append("<page>\n"+bm.getPage(i)+"\n</page>\n");
 			file.close();
 			return true;
@@ -227,6 +227,14 @@ public class BookSuiteFileManager {
 	}
 	
 	
+	
+	
+	public static void delete(String directory, String filename){
+		File file = new File(directory, filename);
+		if (!file.exists())
+			return;
+		file.delete();
+	}
 	
 	
 }
