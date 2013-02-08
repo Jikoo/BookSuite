@@ -33,7 +33,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 		} catch (Exception e) {
 		}
 		getServer().getPluginManager().registerEvents(this, this);
-		getCommand("makebook").setExecutor(new BookSuiteCommandExecutor(this));
+		getCommand("book").setExecutor(new BookSuiteCommandExecutor(this));
 		getLogger().info("BookSuite v"+version+" enabled!");
 	}
 
@@ -117,16 +117,31 @@ public class BookSuite extends JavaPlugin implements Listener{
 			Block blockUp = clicked.getRelative(BlockFace.UP);
 
 
-			if (is.getType().equals(Material.WRITTEN_BOOK) && clicked.getType().equals(Material.WORKBENCH)){
-				BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
-				if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
-
-					BookMeta bm = (BookMeta) is.getItemMeta();
-					if (press.checkCopyPermission(bm.getAuthor()) && canObtainBook(p))
-						press.operatePress();
-					event.setCancelled(true);
+			if (is.getType().equals(Material.WRITTEN_BOOK))
+				//if clicking a workbench, check to see if it is a press and act accordingly
+				if(clicked.getType().equals(Material.WORKBENCH)){
+					BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
+					if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
+	
+						BookMeta bm = (BookMeta) is.getItemMeta();
+						if (press.checkCopyPermission(bm.getAuthor()) && canObtainBook(p))
+							press.operatePress();
+						event.setCancelled(true);
+					}
+				} else if (clicked.getType().equals(Material.SPONGE)){
+					if(p.hasPermission("booksuite.block.erase")||!usePermissions){
+						BookMeta bm = (BookMeta) is.getItemMeta();
+						if(bm.getAuthor()==p.getDisplayName())
+							BookSuiteFunctions.unsign(p);
+						else if (p.hasPermission("booksuite.block.erase.other")||(!usePermissions&&p.isOp()))
+								BookSuiteFunctions.unsign(p);
+						else p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
+						event.setCancelled(true);
+					} else if (!p.hasPermission("booksuite.denynowarn.erase")){
+						p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use erasers.");
+						event.setCancelled(true);
+					}
 				}
-			}
 			
 			
 			
@@ -152,7 +167,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 					if(new BookSuiteMailExecutor(this, p, event).loadMail())
 						event.setCancelled(true);
 				}
-				else if (p.hasPermission("booksuite.mail.send"))
+				else if (p.hasPermission("booksuite.mail.send")&&bm.getTitle().equalsIgnoreCase("package"))
 					if (new BookSuiteMailExecutor(this, p, event).sendMail())
 						event.setCancelled(true);
 			}

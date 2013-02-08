@@ -69,7 +69,7 @@ public class BookSuitePrintingPress {
 		return false;
 	}
 	public boolean denyUseage(){
-		if (p.hasPermission("booksuite.copy.deny.nowarn"))
+		if (p.hasPermission("booksuite.denynowarn.press"))
 			return true;
 		return false;
 	}

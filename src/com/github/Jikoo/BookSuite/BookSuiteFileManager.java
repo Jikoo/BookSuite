@@ -22,7 +22,7 @@ public class BookSuiteFileManager {
 		
 		try {
 			Scanner s;
-			if (type.equalsIgnoreCase("url")){
+			if (type.equalsIgnoreCase("url")||type.equalsIgnoreCase("u")){
 				URL u = new URL(file);
 				s = new Scanner(u.openStream());
 			} else s = new Scanner(new File(location, file));
@@ -108,7 +108,7 @@ public class BookSuiteFileManager {
 			return is;
 		}
 		catch(Exception ex) {
-			im.setDisplayName("Item file error! Accept my condolences.");
+			im.setDisplayName("Item file error! My condolences.");
 			is.setItemMeta(im);
 			return is;
 		}
@@ -216,7 +216,14 @@ public class BookSuiteFileManager {
 			File indexFile = new File(directory, "index.bsm");
 			FileWriter index = new FileWriter(indexFile);;
 			if (indexFile.exists()) index.append(appendText+"\n");
-			else index.write(appendText+"\n");
+			else {
+				if(indexFile.mkdirs())
+					index.write(appendText+"\n");
+				else {
+					index.close();
+					return false;
+				}
+			}
 			index.close();
 			return true;
 		} catch (Exception e) {

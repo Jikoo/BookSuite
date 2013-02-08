@@ -33,7 +33,9 @@ Event event;
 	public boolean sendMail(){
 		bm = (BookMeta) p.getItemInHand().getItemMeta();
 		p.sendMessage("Debug: Checking perms");
-		if (p.getName()==bm.getAuthor()&&bm.getTitle().equalsIgnoreCase("package")&&p.hasPermission("booksuite.mail.send")){
+		if (p.getName()!=bm.getAuthor())
+			p.sendMessage(ChatColor.DARK_RED+p.getName()+", you shouldn't be trying to send letters for "+bm.getAuthor()+"...");
+		else{
 			p.sendMessage("Debug: Parsing mail");
 			parseSendingData();
 			p.sendMessage("Debug: Parsed: title "+title+", to "+to+", item "+itemMetaName);
@@ -46,29 +48,30 @@ Event event;
 			p.sendMessage("Debug: making new bookmeta");
 			for (int i=2; i<=bm.getPageCount(); i++)
 				newBook.addPage(bm.getPage(i));
-			if (itemMetaName!=""){
+			if (itemMetaName!=null&&itemMetaName!=""){
 				p.sendMessage("Debug: Checking for item");
 				newBook.setTitle("Package: "+title);
 				newBook.addPage("To: "+to+"\nAttached:\n"+itemMetaName);
-				for (ItemStack is:inv.getContents())
-					if (is.hasItemMeta())
-						if(is.getItemMeta().hasDisplayName())
-							if (is.getItemMeta().getDisplayName().equalsIgnoreCase(itemMetaName)){
-								removeThis = is;
-								playerHasItem = true;
-								p.sendMessage("Debug: Have item!");
-							}
+				int i=0;
+				for (ItemStack is:inv.getContents()){
+					i++;
+					if (is!=null){
+						p.sendMessage("Debug: iteration "+i+" itemstack is "+is.getType().toString());
+						if (is.hasItemMeta())
+							if(is.getItemMeta().hasDisplayName())
+								if (is.getItemMeta().getDisplayName().equalsIgnoreCase(itemMetaName)){
+									removeThis = is;
+									playerHasItem = true;
+									p.sendMessage("Debug: Have item!");
+								}
+					} else p.sendMessage("Iteration "+i+" null");
+				}
 			} else newBook.setTitle(title);
-			
+			p.sendMessage("mail has item: "+mailHasItemAttached+" player has item specified: "+playerHasItem);
 			
 			if (mailHasItemAttached && !playerHasItem){
 				p.sendMessage(ChatColor.DARK_RED+"Error: no such named item, please check spelling.");
-				ItemStack unsign = p.getItemInHand();
-				BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
-				unsignMeta.setAuthor(null);
-				unsignMeta.setTitle(null);
-				unsign.setItemMeta(unsignMeta);
-				unsign.setType(Material.BOOK_AND_QUILL);
+				BookSuiteFunctions.unsign(p);
 				return false;
 			}
 			
@@ -134,20 +137,17 @@ Event event;
 
 
 	public void parseSendingData(){
+		mailHasItemAttached = false;
 		String[] pageData = bm.getPage(1).split("\n");
-		title = pageData[0];
-		title.replaceFirst("\\A.*([Pp]ackage|[Tt]itle):\\s*", "");
-		title.replaceAll("\\W", "");
-		to = pageData[1];
-		to.replaceFirst("\\A.*[Tt]o:\\s*", "");
-		to.replaceAll("\\W", "");
-		itemMetaName = pageData[2];
-		if (itemMetaName!=null){
-			itemMetaName.replaceFirst("\\A.*([Ii]tem|[Aa]ttach):\\s*", "");
-			if(itemMetaName.equalsIgnoreCase("n/a")||itemMetaName.equalsIgnoreCase("none")||itemMetaName.equalsIgnoreCase("nothing"))
-				itemMetaName="";
-			if(itemMetaName!="") mailHasItemAttached = true;
+		title = pageData[0].replaceFirst("\\A.*([Pp]ackage|[Tt]itle):\\s*", "").replaceAll("\\W", "");
+		to = pageData[1].replaceFirst("\\A.*[Tt]o:\\s*", "").replaceAll("\\W", "");
+		if (pageData[2]!=null){
+			pageData[2] = pageData[2].replaceFirst("\\A.*([Ii]tem|[Aa]ttach):\\s*", "");
+			if(pageData[2].equalsIgnoreCase("n/a")||pageData[2].equalsIgnoreCase("none")||pageData[2].equalsIgnoreCase("nothing"))
+				pageData[2]="";
+			if(pageData[2]!="") mailHasItemAttached = true;
 		}
+		itemMetaName = pageData[2];
 	}
 	public String parseReceivingData(String lastpage){
 		String toItem = lastpage.replace("To: ", "").replace("Item: ", "");

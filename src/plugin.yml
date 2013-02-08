@@ -2,22 +2,31 @@ name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
 version: 3.0.0
-author: Adam Gunn (PlanarWarp)  Ted Meyer (tmathmeyer)
+author: Adam Gunn (PlanarWarp/Jikoo)  Ted Meyer (tmathmeyer)
 
 permissions:
-    booksuite.*:
+    booksuite.admin:
         description: Everything bookish and sweet!
         children:
-            booksuite.book.free: true
+            booksuite.free: true
             booksuite.copy.other: true
-            booksuite.command.makebook: true
+            booksuite.command.admin: true
+            booksuite.mail.admin: true
+            booksuite.block.erase.other: true
+    booksuite.standard:
+        description: Average Joe's permissions.
+        children:
+            booksuite.copy.self: true
+            booksuite.command: true
+            booksuite.command.eraser: true
+            booksuite.block.erase: true
             booksuite.mail.send: true
             booksuite.mail.receive: true
-            booksuite.mail.all: true
             booksuite.mail.attach: true
-            booksuite.mail.attach.self: true
+
     booksuite.free:
         description: No cost associated with getting a book!
+
     booksuite.mail.send:
         description: Send mail with a right click!
     booksuite.mail.all:
@@ -28,25 +37,60 @@ permissions:
         description: send items with mail!
     booksuite.mail.attach.self:
         description: mail self items - Enable with caution, can be used as a personal enderchest with no space limit.
+    booksuite.mail.admin:
+        description: all mail
+        children:
+            booksuite.mail.send: true
+            booksuite.mail.receive: true
+            booksuite.mail.all: true
+            booksuite.mail.attach: true
+            booksuite.mail.attach.self: true
+
     booksuite.copy.self:
         description: copy own books
         children:
-            booksuite.copy.deny: false
-            booksuite.copy.deny.nowarn: false
+            booksuite.denynowarn.press: false
     booksuite.copy.other:
         description: copy all books
         children:
             booksuite.copy.self: true
-    booksuite.copy.deny:
-        description: Deny book copying, send deny message
-        children:
-            booksuite.copy.deny.nowarn: false
-    booksuite.copy.deny.nowarn:
+
+    booksuite.denynowarn.press:
         description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
-    booksuite.command.makebook:
+    booksuite.denynowarn.erase:
+        description: right click sponge with book does not notify if lacking unsign perms
+
+    booksuite.block.erase:
+        description: erase own books
+    booksuite.block.erase.other:
+        description: erase others' books
+        children:
+            booksuite.block.erase: true
+
+    booksuite.command.export:
+        description: make a file from book
+    booksuite.command.import:
         description: make a book from file
+    booksuite.command.unsign:
+        description: unsign book
+    booksuite.command.author:
+        description: change author
+    booksuite.command.title:
+        description: change title
+    booksuite.command.eraser:
+        description: get eraser block
+    booksuite.command.admin:
+        description: all commands
+        children:
+            booksuite.command: true
+            booksuite.command.export: true
+            booksuite.command.import: true
+            booksuite.command.unsign: true
+            booksuite.command.author: true
+            booksuite.command.title: true
+            booksuite.command.eraser: true
+
 commands:
-   makebook:
-      description: makes a book from markuptextfile
-      permission: booksuite.command.makebook
-      permission-message: You don't have <permission>
+   book:
+      description: booksuite universal command
+      permission: booksuite.command
