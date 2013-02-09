@@ -29,21 +29,26 @@ permissions:
 
     booksuite.mail.send:
         description: Send mail with a right click!
-    booksuite.mail.all:
-        description: Global mailing!
+    booksuite.mail.send.other:
+        description: Mail packages as anyone
+        children:
+            booksuite.mail.send: true
+    booksuite.mail.global:
+        description: TODO Mail every player with a mailbox and every online player with perms - no item attachments.
     booksuite.mail.receive:
         description: can check/receive non-global (personal) mail
     booksuite.mail.attach:
         description: send items with mail!
     booksuite.mail.attach.self:
         description: mail self items - Enable with caution, can be used as a personal enderchest with no space limit.
+        children:
+            booksuite.mail.attach: true
     booksuite.mail.admin:
         description: all mail
         children:
-            booksuite.mail.send: true
+            booksuite.mail.send.other: true
             booksuite.mail.receive: true
             booksuite.mail.all: true
-            booksuite.mail.attach: true
             booksuite.mail.attach.self: true
 
     booksuite.copy.self:
@@ -71,6 +76,10 @@ permissions:
         description: make a file from book
     booksuite.command.import:
         description: make a book from file
+    booksuite.command.import.other:
+        description: import a book with an author other than themself
+        children:
+            booksuite.command.import: true
     booksuite.command.unsign:
         description: unsign book
     booksuite.command.author:
@@ -84,7 +93,7 @@ permissions:
         children:
             booksuite.command: true
             booksuite.command.export: true
-            booksuite.command.import: true
+            booksuite.command.import.other: true
             booksuite.command.unsign: true
             booksuite.command.author: true
             booksuite.command.title: true

@@ -2,13 +2,16 @@ package com.github.Jikoo.BookSuite;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,16 +19,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class BookSuiteFileManager {
 	
 	
-	public static BookMeta makeBookMetaFromText(String file, String location, String type){
+	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		
 		
 		try {
 			Scanner s;
-			if (type.equalsIgnoreCase("url")||type.equalsIgnoreCase("u")){
+			if (isURL){
 				URL u = new URL(file);
 				s = new Scanner(u.openStream());
-			} else s = new Scanner(new File(location, file));
+			} else s = new Scanner(new File(location, file+".book"));
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();
@@ -33,7 +36,7 @@ public class BookSuiteFileManager {
 				if (line.length()>=2 && line.substring(0, 2).equals("//")){
 					//do nothing, this line is a book comment
 				}
-				else if (line.contains("<author>")){
+				else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other"))){
 					text.setAuthor(line.replaceAll("<author>", "").replaceAll("</author>", ""));
 				}
 				else if (line.contains("<title>")){
@@ -50,6 +53,8 @@ public class BookSuiteFileManager {
 				}
 			}
 			s.close();
+			if (!text.hasAuthor())
+				text.setAuthor(p.getName());
 			return text;
 		}
 		catch(Exception ex) {
@@ -121,7 +126,15 @@ public class BookSuiteFileManager {
 	public static boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename){
 		
 		try {
-			File bookFile = new File(directory, filename);
+			File bookLocation = new File(directory);
+			if (!bookLocation.exists())
+				bookLocation.mkdirs();
+			File bookFile = new File(bookLocation, filename+".book");
+			if(!bookFile.exists()){
+				bookFile.createNewFile();
+			}
+			else
+				throw new FileAlreadyExistsException(bookFile.getAbsolutePath());
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<author>"+bm.getAuthor()+"</author>\n");
 			file.append("<title>"+bm.getTitle()+"</title>\n");
@@ -130,8 +143,13 @@ public class BookSuiteFileManager {
 			file.close();
 			return true;
 		}
-		catch(Exception e) {
+		catch(FileAlreadyExistsException fe){
 			return false;
+		}
+		catch(IOException e) {
+			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromBookMeta: "+e);
+			e.printStackTrace();
+			return true;
 		}
 	}
 	
@@ -140,8 +158,16 @@ public class BookSuiteFileManager {
 	
 	public static boolean makeFileFromItemStack(ItemStack is, String directory, String filename){
 		try {
-			File bookFile = new File(directory, filename+".item");
-			FileWriter file = new FileWriter(bookFile);
+			File itemLocation = new File(directory);
+			if (!itemLocation.exists())
+				itemLocation.mkdirs();
+			File itemFile = new File(itemLocation, filename+".item");
+			if(!itemFile.exists()){
+				itemFile.createNewFile();
+			}
+			else
+				throw new FileAlreadyExistsException(itemFile.getAbsolutePath());
+			FileWriter file = new FileWriter(itemFile);
 			file.write("<Type>"+is.getType().name()+"</Type>\n");
 			file.append("<Amount>"+is.getAmount()+"</Amount>");
 			file.append("<Durability>"+is.getDurability()+"</Durability>\n");
@@ -167,8 +193,13 @@ public class BookSuiteFileManager {
 			file.close();
 			return true;
 		}
-		catch(Exception e) {
+		catch(FileAlreadyExistsException fe){
 			return false;
+		}
+		catch(IOException e) {
+			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromItemStack: "+e);
+			e.printStackTrace();
+			return true;
 		}
 	}
 	
@@ -213,20 +244,25 @@ public class BookSuiteFileManager {
 	
 	public static boolean appendMailIndex(String directory, String appendText){
 		try {
-			File indexFile = new File(directory, "index.bsm");
-			FileWriter index = new FileWriter(indexFile);;
-			if (indexFile.exists()) index.append(appendText+"\n");
+			File indexLocation = new File(directory);
+			if (!indexLocation.exists())
+				indexLocation.mkdirs();
+			File indexFile = new File(indexLocation, "index.bsm");
+			FileWriter index;
+			if (indexFile.exists()){
+				index = new FileWriter(indexFile);
+				index.append(appendText+"\n");
+			}
 			else {
-				if(indexFile.mkdirs())
-					index.write(appendText+"\n");
-				else {
-					index.close();
-					return false;
-				}
+				indexFile.createNewFile();
+				index = new FileWriter(indexFile);
+				index.write(appendText+"\n");
 			}
 			index.close();
 			return true;
-		} catch (Exception e) {
+		} catch (IOException e) {
+			System.err.println("[BookSuite] BookSuiteFileManager.appendMailIndex: "+e);
+			e.printStackTrace();
 			return false;
 		}
 		

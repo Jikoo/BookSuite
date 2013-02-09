@@ -22,8 +22,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 	String version = "3.0.0";
 	Boolean usePermissions;
 	String neededSupplies = "";
-
-
+	
+	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
@@ -36,20 +36,20 @@ public class BookSuite extends JavaPlugin implements Listener{
 		getCommand("book").setExecutor(new BookSuiteCommandExecutor(this));
 		getLogger().info("BookSuite v"+version+" enabled!");
 	}
-
-
-
-
-
+	
+	
+	
+	
+	
 	@Override
 	public void onDisable() {
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
-
-
-
-
-
+	
+	
+	
+	
+	
 	/**
 	 * checks if the player has the supplies needed
 	 * 
@@ -63,11 +63,11 @@ public class BookSuite extends JavaPlugin implements Listener{
 		else neededSupplies = "a book and an ink sack";
 		return false;
 	}
-
-
-
-
-
+	
+	
+	
+	
+	
 	/**
 	 * master method for checking if the player can obtain the books
 	 *
@@ -76,7 +76,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 	 */
 	public boolean canObtainBook(Player p){
 		Inventory inv = p.getInventory();
-
+		
 		if (p.hasPermission("booksuite.free") || p.getGameMode().equals(GameMode.CREATIVE) || (!usePermissions && p.isOp())){
 			if (inv.firstEmpty()==-1){
 				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
@@ -84,7 +84,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 			}
 			return true;
 		}
-
+		
 		if (hasSupplies(inv)){
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.BOOK, 1));
@@ -96,7 +96,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 			}
 			return true;
 		}
-
+		
 		p.sendMessage(ChatColor.DARK_RED+"To create a book, you need "+neededSupplies+".");
 		return false;
 	}
@@ -115,14 +115,14 @@ public class BookSuite extends JavaPlugin implements Listener{
 			ItemStack is = p.getItemInHand();
 			Block clicked = event.getClickedBlock();
 			Block blockUp = clicked.getRelative(BlockFace.UP);
-
-
+			
+			
 			if (is.getType().equals(Material.WRITTEN_BOOK))
 				//if clicking a workbench, check to see if it is a press and act accordingly
 				if(clicked.getType().equals(Material.WORKBENCH)){
 					BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
 					if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
-	
+						
 						BookMeta bm = (BookMeta) is.getItemMeta();
 						if (press.checkCopyPermission(bm.getAuthor()) && canObtainBook(p))
 							press.operatePress();
@@ -150,30 +150,27 @@ public class BookSuite extends JavaPlugin implements Listener{
 				if (blockUp.getType().equals(Material.SIGN)) {
 					Sign sign = (Sign) blockUp;
 					if (sign.getLine(0).equals(ChatColor.DARK_RED+"No sign line can contain this string.")){//rudimentary example
-						p.openInventory(BookSuiteMailExecutor.getMailBoxInv(p, this));
+						p.openInventory(BookSuiteMailExecutor.getMailBoxInv(p, this.getDataFolder().getPath()));
 						event.setCancelled(true);
 					}
 				} 
 			
 		}
-
-
+		
+		
 		// this is for taking a "package/envelope" that contains a "gift" and opening it into your inventory.
 		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){
-					if(new BookSuiteMailExecutor(this, p, event).loadMail())
+					if(BookSuiteMailExecutor.loadMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 				}
 				else if (p.hasPermission("booksuite.mail.send")&&bm.getTitle().equalsIgnoreCase("package"))
-					if (new BookSuiteMailExecutor(this, p, event).sendMail())
+					if (BookSuiteMailExecutor.sendMail(p, bm, this.getDataFolder().getPath(), usePermissions))
 						event.setCancelled(true);
 			}
-			
 		}
-		
-
 	}
 }

@@ -88,13 +88,22 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//command: /book <u(rl)|f(ile)> <args> - attempt to import a book from location args[2]
-		if (args.length == 3&&(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("url")||args[0].equalsIgnoreCase("file"))){
-			if (p.hasPermission("booksuite.command.import")||!plugin.usePermissions){
+		if (args.length == 2){
+			boolean validImport = false;
+			boolean isURL=false;
+			if (args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("f"))
+				validImport=true;
+			else if(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")){
+				validImport=true;
+				isURL=true;
+			}
+				
+			if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
 				if (!plugin.canObtainBook(p)) return true;
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(args[2], plugin.getDataFolder()+"/SavedBooks/", args[1]));
+				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", isURL));
 				if (!newbook.hasItemMeta()){
-					p.sendMessage(ChatColor.DARK_RED+"Error reading book file.");
+					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
 				}
 				else p.getInventory().addItem(newbook);
 				return true;
@@ -106,10 +115,14 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		//command: /book <e(xport)|s(ave)> <filename> - attempt to save book in hand to file
 		if (args.length == 2&&(args[0].equalsIgnoreCase("e")||args[0].equalsIgnoreCase("export")||args[0].equalsIgnoreCase("s")||args[0].equalsIgnoreCase("save"))){
 			if (p.hasPermission("booksuite.command.export")||!plugin.usePermissions){
-				if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
+				if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
 					p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to export it!");
+					return true;
+				}
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				BookSuiteFileManager.makeFileFromBookMeta(bm, plugin.getDataFolder()+"/SavedBooks/", args[1]);
+				if(BookSuiteFileManager.makeFileFromBookMeta(bm, plugin.getDataFolder()+"/SavedBooks/", args[1]))
+					p.sendMessage(ChatColor.DARK_GREEN+"Book saved successfully!");
+				else p.sendMessage(ChatColor.DARK_RED+"A book by this name already exists!");
 				return true;
 			}
 		}
@@ -118,7 +131,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//if no commands match, print out help based on permissions
-		p.sendMessage(ChatColor.DARK_BLUE+"B"+ChatColor.AQUA+"ook"+ChatColor.DARK_BLUE+"S"+ChatColor.AQUA+"uite "+ChatColor.DARK_BLUE+"v"+ChatColor.AQUA+plugin.version+ChatColor.DARK_GREEN+" usage:");
+		p.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" usage:");
 		if(p.hasPermission("booksuite.copy.self")||!plugin.usePermissions){
 			p.sendMessage(ChatColor.DARK_GREEN+"Right click a "+ChatColor.DARK_BLUE+"\"printing press\""+ChatColor.DARK_GREEN+" to copy a book.");
 			p.sendMessage(ChatColor.DARK_GREEN+"A "+ChatColor.DARK_BLUE+"\"printing press\""+ChatColor.DARK_GREEN+" is made by placing inverted stairs over a crafting table.");
