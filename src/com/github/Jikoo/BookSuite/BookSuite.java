@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -170,6 +171,40 @@ public class BookSuite extends JavaPlugin implements Listener{
 				else if (p.hasPermission("booksuite.mail.send")&&bm.getTitle().equalsIgnoreCase("package"))
 					if (BookSuiteMailExecutor.sendMail(p, bm, this.getDataFolder().getPath(), usePermissions))
 						event.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onInventoryClick (InventoryClickEvent event){
+		Player p = (Player) event.getWhoClicked();
+		Inventory i = event.getInventory();
+		//Is it a mailbox? If true, cancel all clicks, handle from there.
+		if (i.getTitle().equals(p.getName()+"'s MailBox")){
+			event.setCancelled(true);
+			if (event.getCurrentItem()==null){
+				return;
+			} else {
+				if (p.getInventory().firstEmpty()!=-1){
+					if (event.getCurrentItem().getType().equals(Material.WRITTEN_BOOK))
+						p.getInventory().addItem(event.getCurrentItem().clone());
+						event.getInventory().remove(event.getCurrentItem());
+						BookMeta bm = (BookMeta) event.getCurrentItem().getItemMeta();
+						BookSuiteFileManager.removeMail(this.getDataFolder()+"/Mail/"+p.getName()+"/", bm.getTitle().replaceAll("Package: ", ""));
+						p.updateInventory();
+				} else {
+					p.sendMessage(ChatColor.DARK_RED+"You need to free up space to withdraw mail!");
+					p.closeInventory();
+				}
+			}
+		}
+		//if the player clicks own inventory while viewing their mailbox, cancel + send update
+		if (i.equals(p.getInventory())){
+			if (p.getOpenInventory()!=null){
+				if (p.getOpenInventory().getTitle().equals(p.getName()+"'s MailBox")){
+					event.setCancelled(true);
+					p.updateInventory();
+				}
 			}
 		}
 	}

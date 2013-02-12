@@ -39,6 +39,7 @@ public class BookSuiteMailExecutor {
 								if (is.getItemMeta().getDisplayName().equalsIgnoreCase(sendingData[2])){
 									removeThis = is;
 									playerHasItem = true;
+									break;
 								}
 			} else newBook.setTitle(sendingData[0]);
 			
@@ -67,7 +68,10 @@ public class BookSuiteMailExecutor {
 						p.sendMessage(ChatColor.DARK_GREEN+"Mail sent successfully!");
 						return true;
 					}
-				} else p.sendMessage(ChatColor.DARK_RED+"Error: "+sendingData[1]+" already has a book by that name in their mailbox.");
+				} else {
+					p.sendMessage(ChatColor.DARK_RED+"Error: "+sendingData[1]+" already has a book by that name in their mailbox.");
+					BookSuiteFunctions.unsign(p);
+				}
 			} else p.sendMessage(ChatColor.DARK_RED+"Error writing mail index!");
 		}
 		return false;
@@ -98,18 +102,23 @@ public class BookSuiteMailExecutor {
 	
 	
 	public static Inventory getMailBoxInv(Player p, String pluginDataFolder){
-		Inventory mailbox =  Bukkit.createInventory(p, 2, p.getDisplayName()+"'s MailBox");
-		Scanner s = new Scanner(pluginDataFolder+"/Mail/index.bsm");
-		while (s.hasNext()){
-			if (mailbox.firstEmpty()!=-1){
-				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-				is.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, s.nextLine()+".book",pluginDataFolder+"/Mail/"+p.getName()+"/Books/", true));
-				mailbox.addItem(is);
-				//TODO delete + remove - on inventory close, though. foreach isempty add to int[] removeEntry for 0 to <27 if s.hasnext foreach int in removeEntry if == i s.don'taddline
-			}
+		Inventory mailbox =  Bukkit.createInventory(p, 2, p.getName()+"'s MailBox");
+		
+		Scanner s;
+		try {
+			s = new Scanner(pluginDataFolder+"/Mail/"+p.getName()+"/index.bsm");
+			while (s.hasNext()){
+				if (mailbox.firstEmpty()!=-1){
+					ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
+					is.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, s.nextLine()+".book",pluginDataFolder+"/Mail/"+p.getName()+"/Books/", true));
+					mailbox.addItem(is);
+				}
 			
 		}
 		s.close();
+		} catch (Exception e) {
+			p.sendMessage(ChatColor.DARK_RED+"You have not receved any mail yet.");
+		}
 		return mailbox;
 	}
 

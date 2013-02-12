@@ -1,6 +1,8 @@
+3.0.0a4
+	+ mailing completed, untested. TODO remove the index and instead just list files. Easier.
 3.0.0a3
 	= mailing debugging
-	+ import/export file from server debugging
+	+ import/export file from server actually work
 	+ player now must be the author of the package to send or have permissions booksuite.mail.send.other or be op with usePermissions false
 	- unused class
 	+ added minimal error debug lines

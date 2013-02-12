@@ -4,3 +4,6 @@ config file:
     - support other costs (leather, 3 pages, ink)
 
 standalone editor for the books (with automatic uploading!)
+
+
+Don't use the crappy mail index at all, it was a stupid idea. Whatever though, working version > nothing.

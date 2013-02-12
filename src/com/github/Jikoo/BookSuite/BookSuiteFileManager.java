@@ -1,6 +1,7 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -261,12 +262,49 @@ public class BookSuiteFileManager {
 			index.close();
 			return true;
 		} catch (IOException e) {
-			System.err.println("[BookSuite] BookSuiteFileManager.appendMailIndex: "+e);
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "+e);
 			e.printStackTrace();
+			System.err.println("[BookSuite] End error report.");
 			return false;
 		}
 		
 		
+	}
+	
+	
+	public static boolean removeMail(String directory, String mail){
+		try {
+			File indexFile = new File(directory, "index.bsm");
+			if (!indexFile.exists())
+				return false;
+			Scanner s = new Scanner(indexFile);
+			String indexContents="";
+			
+			while (s.hasNextLine()){
+				if(!s.nextLine().equals(mail)){
+					indexContents+=s.nextLine()+"";
+					
+				}
+			}
+			s.close();
+			FileWriter writer = new FileWriter(indexFile);
+			writer.write(indexContents);
+			writer.close();
+			delete(directory, mail+".book");
+		} catch (FileNotFoundException e) {
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.removeMailAndIndex: "+e);
+			e.printStackTrace();
+			System.err.println("[BookSuite] End error report.");
+		} catch (IOException e) {
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "+e);
+			e.printStackTrace();
+			System.err.println("[BookSuite] End error report.");
+		return false;
+	}
+		
+		
+		
+		return true;
 	}
 	
 	
