@@ -99,12 +99,12 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			}
 				
 			if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
-				if (!plugin.canObtainBook(p)) return true;
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", isURL));
+				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", isURL, plugin.usePermissions));
 				if (!newbook.hasItemMeta()){
 					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
 				}
+				else if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
 				else p.getInventory().addItem(newbook);
 				return true;
 			}
@@ -131,7 +131,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//if no commands match, print out help based on permissions
-		p.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" usage:");
+		p.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" enabled!");
 		if(p.hasPermission("booksuite.copy.self")||!plugin.usePermissions){
 			p.sendMessage(ChatColor.DARK_GREEN+"Right click a "+ChatColor.DARK_BLUE+"\"printing press\""+ChatColor.DARK_GREEN+" to copy a book.");
 			p.sendMessage(ChatColor.DARK_GREEN+"A "+ChatColor.DARK_BLUE+"\"printing press\""+ChatColor.DARK_GREEN+" is made by placing inverted stairs over a crafting table.");

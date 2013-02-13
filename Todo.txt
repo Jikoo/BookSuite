@@ -6,4 +6,7 @@ config file:
 standalone editor for the books (with automatic uploading!)
 
 
-Don't use the crappy mail index at all, it was a stupid idea. Whatever though, working version > nothing.
+store config as object, pass config to all objects/methods that will need it
+
+method for ops to check others' mail - useful if players can mail to a collective complaints box, etc.
+The rebellion must be crushed at all costs.

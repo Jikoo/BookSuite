@@ -74,20 +74,32 @@ permissions:
 
     booksuite.command.export:
         description: make a file from book
+        children:
+            booksuite.command: true
     booksuite.command.import:
         description: make a book from file
+        children:
+            booksuite.command: true
     booksuite.command.import.other:
         description: import a book with an author other than themself
         children:
             booksuite.command.import: true
     booksuite.command.unsign:
         description: unsign book
+        children:
+            booksuite.command: true
     booksuite.command.author:
         description: change author
+        children:
+            booksuite.command: true
     booksuite.command.title:
         description: change title
+        children:
+            booksuite.command: true
     booksuite.command.eraser:
         description: get eraser block
+        children:
+            booksuite.command: true
     booksuite.command.admin:
         description: all commands
         children:

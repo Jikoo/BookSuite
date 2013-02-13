@@ -20,7 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class BookSuiteFileManager {
 	
 	
-	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL){
+	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL, boolean usePermissions){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		
 		
@@ -37,7 +37,7 @@ public class BookSuiteFileManager {
 				if (line.length()>=2 && line.substring(0, 2).equals("//")){
 					//do nothing, this line is a book comment
 				}
-				else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other"))){
+				else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other")||(!usePermissions&&p.isOp()))){
 					text.setAuthor(line.replaceAll("<author>", "").replaceAll("</author>", ""));
 				}
 				else if (line.contains("<title>")){
@@ -208,35 +208,35 @@ public class BookSuiteFileManager {
 	
 	
 	public static String parseBookText(String text){
-		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "ï¿½o");
-		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "ï¿½l");
-		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "ï¿½n");
-		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "ï¿½m");
-		text = text.replaceAll("(<|\\[)m(agic)?(>|\\])", "ï¿½k");
+		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "§o");
+		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
+		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
+		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "§m");
+		text = text.replaceAll("(<|\\[)m(agic)?(>|\\])", "§k");
 		
 		text = text.replaceAll("(<|\\[)color=", "<");
- 		text = text.replaceAll("(<|\\[)black(>|\\])", "ï¿½0");
-		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", "ï¿½1");
-		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", "ï¿½2");
-		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", "ï¿½3");
-		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", "ï¿½4");
-		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", "ï¿½5");
-		text = text.replaceAll("(<|\\[)gold(>|\\])", "ï¿½6");
-		text = text.replaceAll("(<|\\[)gr(e|a)y(>|\\])", "ï¿½7");
-		text = text.replaceAll("(<|\\[)dark_?grey(>|\\])", "ï¿½8");
-		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", "ï¿½9");
-		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", "ï¿½a");
-		text = text.replaceAll("(<|\\[)aqua(>|\\])", "ï¿½b");
-		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", "ï¿½c");
-		text = text.replaceAll("(<|\\[)pink(>|\\])", "ï¿½d");
-		text = text.replaceAll("(<|\\[)yellow(>|\\])", "ï¿½e");
-		text = text.replaceAll("(<|\\[)white(>|\\])", "ï¿½f");
+ 		text = text.replaceAll("(<|\\[)black(>|\\])", "§0");
+		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", "§1");
+		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", "§2");
+		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", "§3");
+		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", "§4");
+		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", "§5");
+		text = text.replaceAll("(<|\\[)gold(>|\\])", "§6");
+		text = text.replaceAll("(<|\\[)gr(e|a)y(>|\\])", "§7");
+		text = text.replaceAll("(<|\\[)dark_?grey(>|\\])", "§8");
+		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", "§9");
+		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", "§a");
+		text = text.replaceAll("(<|\\[)aqua(>|\\])", "§b");
+		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", "§c");
+		text = text.replaceAll("(<|\\[)pink(>|\\])", "§d");
+		text = text.replaceAll("(<|\\[)yellow(>|\\])", "§e");
+		text = text.replaceAll("(<|\\[)white(>|\\])", "§f");
 		
-		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format)(>|\\])", "ï¿½r");
-		text = text.replaceAll("(<|\\[)/color(>|\\])", "ï¿½0");
+		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format)(>|\\])", "§r");
+		text = text.replaceAll("(<|\\[)/color(>|\\])", "§0");
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
-		text = text.replaceAll("(ï¿½r)+", "ï¿½r");
+		text = text.replaceAll("(§r)+", "§r");
 		return text;
 	}
 	

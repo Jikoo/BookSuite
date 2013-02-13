@@ -1,7 +1,6 @@
 package com.github.Jikoo.BookSuite;
 
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -46,61 +45,6 @@ public class BookSuite extends JavaPlugin implements Listener{
 	public void onDisable() {
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
-	
-	
-	
-	
-	
-	/**
-	 * checks if the player has the supplies needed
-	 * 
-	 * @param inv the inventory of the player
-	 * @return whether the player has the supplies needed to copy the book
-	 */
-	public boolean hasSupplies(Inventory inv){
-		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)) return true;
-		if (inv.contains(Material.BOOK)) neededSupplies = "an ink sack";
-		else if (inv.contains(Material.INK_SACK)) neededSupplies = "a book";
-		else neededSupplies = "a book and an ink sack";
-		return false;
-	}
-	
-	
-	
-	
-	
-	/**
-	 * master method for checking if the player can obtain the books
-	 *
-	 * @param p the player attempting to obtain the book
-	 * @return whether the player can obtain the book
-	 */
-	public boolean canObtainBook(Player p){
-		Inventory inv = p.getInventory();
-		
-		if (p.hasPermission("booksuite.free") || p.getGameMode().equals(GameMode.CREATIVE) || (!usePermissions && p.isOp())){
-			if (inv.firstEmpty()==-1){
-				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
-				return false;
-			}
-			return true;
-		}
-		
-		if (hasSupplies(inv)){
-			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
-			inv.removeItem(new ItemStack(Material.BOOK, 1));
-			if (inv.firstEmpty()==-1){
-				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
-				inv.addItem(new ItemStack(Material.INK_SACK, 1));
-				inv.addItem(new ItemStack(Material.BOOK, 1));
-				return false;
-			}
-			return true;
-		}
-		
-		p.sendMessage(ChatColor.DARK_RED+"To create a book, you need "+neededSupplies+".");
-		return false;
-	}
 
 
 	/**
@@ -125,7 +69,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 					if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
 						
 						BookMeta bm = (BookMeta) is.getItemMeta();
-						if (press.checkCopyPermission(bm.getAuthor()) && canObtainBook(p))
+						if (press.checkCopyPermission(bm.getAuthor()) && BookSuiteFunctions.canObtainBook(p, usePermissions))
 							press.operatePress();
 						event.setCancelled(true);
 					}

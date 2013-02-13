@@ -110,7 +110,7 @@ public class BookSuiteMailExecutor {
 			while (s.hasNext()){
 				if (mailbox.firstEmpty()!=-1){
 					ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-					is.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, s.nextLine()+".book",pluginDataFolder+"/Mail/"+p.getName()+"/Books/", true));
+					is.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, s.nextLine()+".book",pluginDataFolder+"/Mail/"+p.getName()+"/Books/", false, true));
 					mailbox.addItem(is);
 				}
 			
