@@ -61,11 +61,13 @@ public class BookSuitePrintingPress {
 			else
 				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
 		}
-		else if (p.isOp())
-			return true;
-		else if (a.equals(p.getName()))
-			return true;
-		else p.sendMessage(ChatColor.DARK_RED+"Only ops can copy others' books.");
+		else {
+			if(p.isOp())
+				return true;
+			else if (a.equals(p.getName()))
+				return true;
+			else p.sendMessage(ChatColor.DARK_RED+"Only ops can copy others' books.");
+		}
 		return false;
 	}
 	public boolean denyUseage(){

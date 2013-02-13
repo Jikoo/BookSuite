@@ -76,7 +76,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 				} else if (clicked.getType().equals(Material.SPONGE)){
 					if(p.hasPermission("booksuite.block.erase")||!usePermissions){
 						BookMeta bm = (BookMeta) is.getItemMeta();
-						if(bm.getAuthor()==p.getDisplayName())
+						if(bm.getAuthor().equalsIgnoreCase(p.getDisplayName()))
 							BookSuiteFunctions.unsign(p);
 						else if (p.hasPermission("booksuite.block.erase.other")||(!usePermissions&&p.isOp()))
 								BookSuiteFunctions.unsign(p);

@@ -78,8 +78,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 					if (i!=(args.length-1))
 						newTitle+=args[i]+" ";
 					else newTitle+=args[i];
-				if(BookSuiteFunctions.setAuthor(p, newTitle))
-					p.sendMessage(ChatColor.DARK_GREEN+"Author changed!");
+				if(BookSuiteFunctions.setTitle(p, newTitle))
+					p.sendMessage(ChatColor.DARK_GREEN+"Title changed!");
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}

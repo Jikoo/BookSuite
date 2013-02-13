@@ -1,3 +1,9 @@
+;3.0.0pre1
+:bugfixing
+:- properly check if player is the author of a book
+:- /book t now actually sets the title, not the author. Whoops.
+:- copying a book using paper and leather instead of an unwritten book no longer breaks if inventory has empty slots
+:- copying other via press now checks usePermissions if player is op but lacks booksuite.copy.other
 ;3.0.0a5
 :fix whoopsies regarding the §'s
 :supplies check is now with other misc. functions
@@ -6,7 +12,7 @@
 :change wording of /book command message in case user has no permissions aside from book.command
 :allow ops to import books not by self with usePermissions false
 ;3.0.0a4
-:mailing completed, untested.
+:--mailing completed, untested.-- mailing still buggy as hell :D
 ;3.0.0a3
 :mailing debugging
 :import/export file from server actually work

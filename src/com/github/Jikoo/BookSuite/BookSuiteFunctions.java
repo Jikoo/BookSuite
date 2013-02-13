@@ -74,8 +74,9 @@ public class BookSuiteFunctions {
 		else if (inv.contains(Material.INK_SACK)){
 			if(inv.contains(Material.PAPER)&&inv.contains(Material.LEATHER)){
 				for (ItemStack i:inv.getContents()){
-					if (i.getType().equals(Material.PAPER)&&i.getAmount()>2)
-						return "uncrafted";
+					if (i!=null)
+						if (i.getType().equals(Material.PAPER)&&i.getAmount()>2)
+							return "uncrafted";
 				}
 				
 				
