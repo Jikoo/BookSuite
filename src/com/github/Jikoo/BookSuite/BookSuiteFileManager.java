@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -26,31 +27,38 @@ public class BookSuiteFileManager {
 		
 		try {
 			Scanner s;
+			boolean isBookText = true;
 			if (isURL){
+				isBookText = false;
 				URL u = new URL(file);
 				s = new Scanner(u.openStream());
 			} else s = new Scanner(new File(location, file+".book"));
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();
-				
-				if (line.length()>=2 && line.substring(0, 2).equals("//")){
-					//do nothing, this line is a book comment
-				}
-				else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other")||(!usePermissions&&p.isOp()))){
-					text.setAuthor(line.replaceAll("<author>", "").replaceAll("</author>", ""));
-				}
-				else if (line.contains("<title>")){
-					text.setTitle(line.replaceAll("<title>", "").replaceAll("</title>", ""));
-				}
-				else if(line.contains("<page>")){
-					page = "";
-				}
-				else if (line.contains("</page>")){
-					text.addPage(parseBookText(page));
-				}
-				else{
-					page+=line+"<n>";
+				if(line.contains("<book>")){
+					isBookText = true;
+				} else if(line.contains("</book>")){
+					isBookText = false;
+				} else if (isBookText){
+					if (line.length()>=2 && line.substring(0, 2).equals("//")){
+						//do nothing, this line is a book comment
+					}
+					else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other")||(!usePermissions&&p.isOp()))){
+						text.setAuthor(line.replaceAll("<author>", "").replaceAll("</author>", ""));
+					}
+					else if (line.contains("<title>")){
+						text.setTitle(line.replaceAll("<title>", "").replaceAll("</title>", ""));
+					}
+					else if(line.contains("<page>")){
+						page = "";
+					}
+					else if (line.contains("</page>")){
+						text.addPage(parseBookText(page));
+					}
+					else{
+						page+=line+"<n>";
+					}
 				}
 			}
 			s.close();
@@ -137,10 +145,12 @@ public class BookSuiteFileManager {
 			else
 				throw new FileAlreadyExistsException(bookFile.getAbsolutePath());
 			FileWriter file = new FileWriter(bookFile);
-			file.write("<author>"+bm.getAuthor()+"</author>\n");
+			file.write("<book>\n");
+			file.append("<author>"+bm.getAuthor()+"</author>\n");
 			file.append("<title>"+bm.getTitle()+"</title>\n");
 			for (int i=1; i<=bm.getPageCount(); i++)
 				file.append("<page>\n"+bm.getPage(i)+"\n</page>\n");
+			file.append("</book>");
 			file.close();
 			return true;
 		}
@@ -212,7 +222,7 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
 		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
 		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "§m");
-		text = text.replaceAll("(<|\\[)m(agic)?(>|\\])", "§k");
+		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?))(>|\\])", "§k");
 		
 		text = text.replaceAll("(<|\\[)color=", "<");
  		text = text.replaceAll("(<|\\[)black(>|\\])", "§0");
@@ -222,8 +232,8 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", "§4");
 		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", "§5");
 		text = text.replaceAll("(<|\\[)gold(>|\\])", "§6");
-		text = text.replaceAll("(<|\\[)gr(e|a)y(>|\\])", "§7");
-		text = text.replaceAll("(<|\\[)dark_?grey(>|\\])", "§8");
+		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", "§7");
+		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", "§8");
 		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", "§9");
 		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", "§a");
 		text = text.replaceAll("(<|\\[)aqua(>|\\])", "§b");
@@ -232,7 +242,7 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(<|\\[)yellow(>|\\])", "§e");
 		text = text.replaceAll("(<|\\[)white(>|\\])", "§f");
 		
-		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format)(>|\\])", "§r");
+		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])", "§r");
 		text = text.replaceAll("(<|\\[)/color(>|\\])", "§0");
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
@@ -318,5 +328,32 @@ public class BookSuiteFileManager {
 		file.delete();
 	}
 	
-	
+	public static void listBookFilesIn(String directory, Player p){
+		File file = new File(directory);
+		if (!file.exists()){
+			p.sendMessage(ChatColor.DARK_RED+"No books have been saved yet.");
+			file.mkdirs();
+			return;
+		}
+		File[] fileList = file.listFiles();
+		if (fileList==null){
+			p.sendMessage(ChatColor.DARK_RED+"No books found.");
+			return;
+		}
+		String[] bookList = {""};
+		int i = 0;
+		for (File bookFile : fileList){
+			if (bookFile.getName().contains(".book")){
+				bookList[i] = bookFile.getName().replace(".book", "");
+				i++;
+			}
+		}
+		if (bookList.length==1&&bookList[0].equals("")){
+			p.sendMessage(ChatColor.DARK_RED+"No books found.");
+		} else {
+			for (String book : bookList){
+				p.sendMessage(ChatColor.DARK_GREEN+book);
+			}
+		}
+	}
 }

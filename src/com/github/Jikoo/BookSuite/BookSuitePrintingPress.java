@@ -82,7 +82,7 @@ public class BookSuitePrintingPress {
 		revertBlockPause(blockUp);
 		p.getInventory().addItem(is.clone());
 		p.updateInventory();
-		p.sendMessage(ChatColor.DARK_GREEN+"Book copied!");
+		p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
 	}
 
 

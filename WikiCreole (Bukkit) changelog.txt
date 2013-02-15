@@ -1,3 +1,9 @@
+;3.0.0pre2
+:assign correct default perms with booksuite.standard :V
+:/book d(elete) - default op
+:/book l(ist) - default true. TODO add hidden or perm-based book importing
+:more regex: <obf(uscate(d))> official name of "magic" text
+:support for pastebin and other such sites attempted with <book> and </book>
 ;3.0.0pre1
 :bugfixing
 :- properly check if player is the author of a book

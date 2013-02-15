@@ -1,3 +1,9 @@
+3.0.0a6
+	+ assign correct default perms with booksuite.standard :V
+	+ /book d(elete) - default op
+	+ /book l(ist) - default true. TODO add hidden or perm-based book importing
+	+ more regex: <obf(uscate(d))> official name of "magic" text
+	+ support for pastebin and other such sites attempted with <book> and </book>
 3.0.0a5
 	= fix whoopsies regarding the §'s
 	+ supplies check is now with other misc. functions
@@ -6,7 +12,7 @@
 	= change wording of /book command message in case user has no permissions aside from book.command
 	+ allow ops to import books not by self with usePermissions false
 3.0.0a4
-	+ mailing completed, untested. TODO remove the index and instead just list files. Easier.
+	+ ---mailing completed, untested.-- mailing still buggy as hell :D
 3.0.0a3
 	= mailing debugging
 	+ import/export file from server actually work

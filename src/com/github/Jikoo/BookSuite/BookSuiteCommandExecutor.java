@@ -29,7 +29,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//command: /book e - try to give them a sponge
-		if (args.length==1&&(args[0].equalsIgnoreCase("eraser")||args[0].equalsIgnoreCase("e"))){
+		if (args.length==1&&(args[0].equalsIgnoreCase("e")||args[0].equalsIgnoreCase("eraser"))){
 			if (p.hasPermission("booksuite.command.eraser")||!plugin.usePermissions){
 				if(p.getInventory().firstEmpty()!=-1)
 					if (!p.getInventory().contains(Material.SPONGE)){
@@ -44,7 +44,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//command: /book u - attempt to unsign book
-		if (args.length==1&&(args[0].equalsIgnoreCase("unsign")||args[0].equalsIgnoreCase("u"))){
+		if (args.length==1&&(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("unsign"))){
 			if (p.hasPermission("booksuite.command.unsign")||(!plugin.usePermissions&&p.isOp())){
 				if(BookSuiteFunctions.unsign(p))
 					p.sendMessage(ChatColor.DARK_GREEN+"Book unsigned!");
@@ -86,12 +86,20 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		}
 		
 		
+		//command: /book l(ist) - list all files in /SavedBooks/
+		if (args.length == 1&&(args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("list"))){
+			if (p.hasPermission("booksuite.command.list")||!plugin.usePermissions){
+				BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
+				return true;
+			}
+		}
+		
 		
 		//command: /book <u(rl)|f(ile)> <args> - attempt to import a book from location args[2]
 		if (args.length == 2){
 			boolean validImport = false;
 			boolean isURL=false;
-			if (args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("f"))
+			if (args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file"))
 				validImport=true;
 			else if(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")){
 				validImport=true;
@@ -123,6 +131,15 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				if(BookSuiteFileManager.makeFileFromBookMeta(bm, plugin.getDataFolder()+"/SavedBooks/", args[1]))
 					p.sendMessage(ChatColor.DARK_GREEN+"Book saved successfully!");
 				else p.sendMessage(ChatColor.DARK_RED+"A book by this name already exists!");
+				return true;
+			}
+		}
+		
+		//command: /book <d(elete)> <filename> - attempt to delete file
+		if (args.length == 2&&(args[0].equalsIgnoreCase("d")||args[0].equalsIgnoreCase("delete"))){
+			if (p.hasPermission("booksuite.command.delete")||(!plugin.usePermissions&&p.isOp())){
+				BookSuiteFileManager.delete(plugin.getDataFolder()+"/SavedBooks/", args[1]);
+				p.sendMessage(ChatColor.DARK_GREEN+"Deleted!");
 				return true;
 			}
 		}

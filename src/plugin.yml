@@ -19,6 +19,9 @@ permissions:
             booksuite.copy.self: true
             booksuite.command: true
             booksuite.command.eraser: true
+            booksuite.command.list: true
+            booksuite.command.import: true
+            booksuite.command.export: true
             booksuite.block.erase: true
             booksuite.mail.send: true
             booksuite.mail.receive: true
@@ -100,6 +103,14 @@ permissions:
         description: get eraser block
         children:
             booksuite.command: true
+    booksuite.command.list:
+        description: list all .book files in /SavedBooks/
+        children:
+            booksuite.command: true
+    booksuite.command.delete:
+        description: Delete a book from /SavedBooks/
+        children:
+            booksuite.command: true
     booksuite.command.admin:
         description: all commands
         children:
@@ -110,6 +121,8 @@ permissions:
             booksuite.command.author: true
             booksuite.command.title: true
             booksuite.command.eraser: true
+            booksuite.command.list: true
+            booksuite.command.delete: true
 
 commands:
    book:
