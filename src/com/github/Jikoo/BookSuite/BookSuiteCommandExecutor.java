@@ -95,9 +95,22 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//command: /book l(ist) - list all files in /SavedBooks/
-		if (args.length == 1&&(args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("list"))){
+		if (args.length >= 1&&(args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("list") ||args[0].equalsIgnoreCase("ls"))){ //added ls, like the bash command :D
 			if (p.hasPermission("booksuite.command.list")||!plugin.usePermissions){
-				BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
+				if (args.length==1)BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
+				if (args.length>1){
+					if (args[1].equalsIgnoreCase("a") || args[1].equalsIgnoreCase("author")){
+						String[] authors = new String[args.length-2];
+						for(int i = 2; i < args.length; i++){
+							authors[i-2] = args[i]; 
+						}
+						try {
+							BookSuiteFileManager.listBookFilesByAuthor(plugin.getDataFolder()+"/SavedBooks/", p, authors);
+						} catch (Exception e) {
+							
+						}
+					}
+				}
 				return true;
 			}
 			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
