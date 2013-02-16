@@ -40,6 +40,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				return true;
 			}
+			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			return false;
 		}
 		
 		
@@ -51,6 +53,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
+			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			return false;
 		}
 		
 		
@@ -67,6 +71,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
+			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			return false;
 		}
 		
 		
@@ -83,6 +89,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
+			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			return false;
 		}
 		
 		
@@ -92,6 +100,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
 				return true;
 			}
+			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			return false;
 		}
 		
 		

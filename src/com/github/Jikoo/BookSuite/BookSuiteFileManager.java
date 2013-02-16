@@ -344,7 +344,7 @@ public class BookSuiteFileManager {
 		int i = 0;
 		for (File bookFile : fileList){
 			if (bookFile.getName().contains(".book")){
-				bookList[i] = bookFile.getName().replace(".book", "");
+				bookList[i] = bookFile.getName().replace(".book", "").replace(".txt", "");
 				i++;
 			}
 		}
