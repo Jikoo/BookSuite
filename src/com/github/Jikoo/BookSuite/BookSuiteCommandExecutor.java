@@ -40,7 +40,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
 			return false;
 		}
 		
@@ -53,7 +53,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
 			return false;
 		}
 		
@@ -71,7 +71,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
 			return false;
 		}
 		
@@ -89,7 +89,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
 			return false;
 		}
 		
@@ -111,18 +111,17 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 						}
 					}
 				}
-				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"you do not have permission to use that command!");
+			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
 			return false;
 		}
 		
 		
-		//command: /book <u(rl)|f(ile)> <args> - attempt to import a book from location args[2]
+		//command: /book <u(rl)|f(ile)|l(oad)> <args> - attempt to import a book from location args[2] - only possible command conflict is if book
 		if (args.length == 2){
 			boolean validImport = false;
 			boolean isURL=false;
-			if (args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file"))
+			if (args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("load"))
 				validImport=true;
 			else if(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")){
 				validImport=true;
@@ -132,7 +131,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
 				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", isURL, plugin.usePermissions));
-				if (!newbook.hasItemMeta()){
+				if(!newbook.hasItemMeta()){
 					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
 				}
 				else if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
@@ -192,6 +191,10 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			p.sendMessage(ChatColor.AQUA+"/book <u(rl)|f(ile)> <url|filename>"+ChatColor.DARK_GREEN+" - import a book from file or url.");
 		if(p.hasPermission("booksuite.command.export")||!plugin.usePermissions)
 			p.sendMessage(ChatColor.AQUA+"/book <e(xport)|s(ave)> <filename>"+ChatColor.DARK_GREEN+" - export held book to a file.");
+		if(p.hasPermission("booksuite.command.list")||!plugin.usePermissions)
+			p.sendMessage(ChatColor.AQUA+"/book l(ist) (a(uthor) <authors separated by spaces>)"+ChatColor.DARK_GREEN+" - list all books or books by specified author(s).");
+		if(p.hasPermission("booksuite.command.delete")||(!plugin.usePermissions&&p.isOp()))
+			p.sendMessage(ChatColor.AQUA+"/book d(elete) <file>"+ChatColor.DARK_GREEN+" - delete specified book.");
 		return true;
 	}
 	

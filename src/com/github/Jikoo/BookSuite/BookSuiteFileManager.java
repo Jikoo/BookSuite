@@ -59,9 +59,12 @@ public class BookSuiteFileManager {
 				String line = s.nextLine();
 				if(line.contains("<book>")){
 					isBookText = true;
-				} else if(line.contains("</book>")){
-					isBookText = false;
-				} else if (isBookText){
+					line = line.replace("<book>", "");
+				}
+				if (isBookText){
+					if(line.contains("</book>")){
+						break;
+					}
 					if (line.length()>=2 && line.substring(0, 2).equals("//")){
 						//do nothing, this line is a book comment
 					}
@@ -88,6 +91,9 @@ public class BookSuiteFileManager {
 			return text;
 		}
 		catch(Exception ex) {
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.makeBookMetaFromText: "+ex);
+			ex.printStackTrace();
+			System.err.println("[BookSuite] End error report.");
 			return null;
 		}
 	}
@@ -185,6 +191,7 @@ public class BookSuiteFileManager {
 		catch(Exception e) {
 			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromBookMeta: "+e);
 			e.printStackTrace();
+			System.err.println("[BookSuite] End error report.");
 			return true;
 		}
 	}
@@ -235,6 +242,7 @@ public class BookSuiteFileManager {
 		catch(IOException e) {
 			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromItemStack: "+e);
 			e.printStackTrace();
+			System.err.println("[BookSuite] End error report.");
 			return true;
 		}
 	}
@@ -247,7 +255,7 @@ public class BookSuiteFileManager {
 		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
 		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
 		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "§m");
-		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?))(>|\\])", "§k");
+		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])", "§k");
 		
 		text = text.replaceAll("(<|\\[)color=", "<");
  		text = text.replaceAll("(<|\\[)black(>|\\])", "§0");

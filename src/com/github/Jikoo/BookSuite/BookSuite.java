@@ -63,6 +63,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 			
 			
 			if (is.getType().equals(Material.WRITTEN_BOOK))
+				if(!is.hasItemMeta())
+					return;
 				//if clicking a workbench, check to see if it is a press and act accordingly
 				if(clicked.getType().equals(Material.WORKBENCH)){
 					BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
@@ -107,6 +109,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
+				if(!p.getItemInHand().hasItemMeta())
+					return;
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){
 					if(BookSuiteMailExecutor.loadMail(p, bm, this.getDataFolder().getPath()))
