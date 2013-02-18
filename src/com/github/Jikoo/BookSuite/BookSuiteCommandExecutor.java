@@ -1,6 +1,7 @@
 package com.github.Jikoo.BookSuite;
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -98,7 +99,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		if (args.length >= 1&&(args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("list") ||args[0].equalsIgnoreCase("ls"))){ //added ls, like the bash command :D
 			if (p.hasPermission("booksuite.command.list")||!plugin.usePermissions){
 				if (args.length==1)BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
-				if (args.length>1){
+				if (args.length>2){
 					if (args[1].equalsIgnoreCase("a") || args[1].equalsIgnoreCase("author")){
 						String[] authors = new String[args.length-2];
 						for(int i = 2; i < args.length; i++){
@@ -124,11 +125,13 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			if (args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("load"))
 				validImport=true;
 			else if(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")){
-				validImport=true;
 				isURL=true;
 			}
-				
-			if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
+			if (isURL && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
+				if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
+				else asyncBookImport(p, args [1]);
+			}
+			else if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
 				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", isURL, plugin.usePermissions));
 				if(!newbook.hasItemMeta()){
@@ -198,5 +201,58 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		return true;
 	}
 	
+	
+	
+	
+	
+	public class getStreamBook implements Runnable{
+		Player p;
+		String url;
+		getStreamBook(Player p, String s){
+			this.p=p;
+			url=s;
+		}
+		public void run() {
+			BookMeta bm = BookSuiteFileManager.makeBookMetaFromText(p, url, plugin.getDataFolder()+"/SavedBooks/", true, plugin.usePermissions);
+			syncBookImport(p, bm);
+		}
+	}
+	public void asyncBookImport(Player p, String s){
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s), 0L);
+	}
+	public class giveStreamBook implements Runnable{
+		Player p;
+		BookMeta bm;
+		giveStreamBook(Player p, BookMeta bm){
+			this.p=p;
+			this.bm=bm;
+		}
+		public void run() {
+			if (bm!=null){
+				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
+				is.setItemMeta(bm);
+				if(p.getInventory().firstEmpty()!=-1){
+					p.getInventory().addItem(is);
+				} else {
+					p.getWorld().dropItem(p.getLocation(), is);
+				}
+			}
+			else {
+				p.sendMessage(ChatColor.DARK_RED+"Error reading from URL.");
+				if(p.getInventory().firstEmpty()>0){
+					p.getInventory().addItem(new ItemStack(Material.INK_SACK, 1));
+					p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
+				} else {
+					p.sendMessage(ChatColor.DARK_RED+"Dropped book supplies at your feet.");
+					p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.INK_SACK, 1));
+					p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.BOOK, 1));
+				}
+			}
+		}
+	}
+	
+	public void syncBookImport(Player p, BookMeta bm){
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, bm), 0L);
+	}
 	
 }
