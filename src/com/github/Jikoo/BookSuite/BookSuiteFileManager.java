@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,19 +43,16 @@ public class BookSuiteFileManager {
 	
 	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL, boolean usePermissions){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
-		
+		boolean isBookText=false;
+		if (!isURL)
+			isBookText=true;
 		
 		try {
-			Scanner s;
-			boolean isBookText = true;
-			if (isURL){
-				isBookText = false;
-				URL u = new URL(file);
-				s = new Scanner(u.openStream());
-			} else s = new Scanner(new File(location, file+".book"));
+			Scanner s = new Scanner(new File(location, file+".book"));
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();
+				System.out.println(line);
 				if(line.contains("<book>")){
 					isBookText = true;
 					line = line.replace("<book>", "");

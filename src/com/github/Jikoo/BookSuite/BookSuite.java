@@ -63,7 +63,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 			
 			
 			if (is.getType().equals(Material.WRITTEN_BOOK))
-				if(!is.hasItemMeta())
+				if(!is.hasItemMeta()||is.getItemMeta()==null)
 					return;
 				//if clicking a workbench, check to see if it is a press and act accordingly
 				if(clicked.getType().equals(Material.WORKBENCH)){

@@ -1,6 +1,13 @@
 package com.github.Jikoo.BookSuite;
 
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Scanner;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -133,7 +140,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			}
 			else if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", isURL, plugin.usePermissions));
+				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", !isURL, plugin.usePermissions));
 				if(!newbook.hasItemMeta()){
 					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
 				}
@@ -207,14 +214,37 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 	
 	public class getStreamBook implements Runnable{
 		Player p;
-		String url;
+		URL url;
 		getStreamBook(Player p, String s){
 			this.p=p;
-			url=s;
+			try {
+				url=new URL(s);
+			} catch (MalformedURLException e) {
+			}
 		}
 		public void run() {
-			BookMeta bm = BookSuiteFileManager.makeBookMetaFromText(p, url, plugin.getDataFolder()+"/SavedBooks/", true, plugin.usePermissions);
-			syncBookImport(p, bm);
+			File dir = new File(plugin.getDataFolder()+"/temp/");
+			if (!dir.exists())
+				dir.mkdirs();
+			for (int i=1; i<=5; i++){
+				if (!new File(dir, "temp"+i).exists()){
+					File tempFile = new File(dir, "temp"+i);
+					try {
+						Scanner urlInput = new Scanner(url.openStream());
+						FileWriter tempWriter = new FileWriter(tempFile);
+						while (urlInput.hasNextLine()){
+							tempWriter.append(urlInput.nextLine());
+						}
+						urlInput.close();
+						tempWriter.close();
+					} catch (IOException e) {
+						return;
+					}
+					syncBookImport(p, i);
+					return;
+				} else if (i==5)
+					syncBookImport(p, -1);
+			}
 		}
 	}
 	public void asyncBookImport(Player p, String s){
@@ -222,12 +252,18 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 	}
 	public class giveStreamBook implements Runnable{
 		Player p;
-		BookMeta bm;
-		giveStreamBook(Player p, BookMeta bm){
+		int temp;
+		giveStreamBook(Player p, int temp){
 			this.p=p;
-			this.bm=bm;
+			this.temp=temp;
 		}
 		public void run() {
+			if (temp==-1){
+				p.sendMessage(ChatColor.DARK_RED+"Too many books are being imported at this time, please try again later.");
+				return;
+			}
+			BookMeta bm = BookSuiteFileManager.makeBookMetaFromText(p, "temp"+temp, plugin.getDataFolder()+"/temp/", true, plugin.usePermissions);
+			BookSuiteFileManager.delete(plugin.getDataFolder()+"/temp/", "temp"+temp);
 			if (bm!=null){
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				is.setItemMeta(bm);
@@ -251,8 +287,8 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		}
 	}
 	
-	public void syncBookImport(Player p, BookMeta bm){
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, bm), 0L);
+	public void syncBookImport(Player p, int temp){
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp), 0L);
 	}
 	
 }
