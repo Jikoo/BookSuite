@@ -51,7 +51,7 @@ permissions:
         children:
             booksuite.mail.send.other: true
             booksuite.mail.receive: true
-            booksuite.mail.all: true
+            booksuite.mail.global: true
             booksuite.mail.attach.self: true
 
     booksuite.copy.self:

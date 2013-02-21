@@ -3,7 +3,6 @@ package com.github.Jikoo.BookSuite;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
@@ -127,25 +126,19 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		//command: /book <u(rl)|f(ile)|l(oad)> <args> - attempt to import a book from location args[2] - only possible command conflict is if book
 		if (args.length == 2){
-			boolean validImport = false;
-			boolean isURL=false;
-			if (args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("load"))
-				validImport=true;
-			else if(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")){
-				isURL=true;
-			}
-			if (isURL && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
-				if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
-				else asyncBookImport(p, args [1]);
-			}
-			else if (validImport && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
+			if ((args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("load")) && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", !isURL, plugin.usePermissions));
+				newbook.setItemMeta(BookSuiteFileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", true, plugin.usePermissions));
 				if(!newbook.hasItemMeta()){
 					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
 				}
 				else if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
 				else p.getInventory().addItem(newbook);
+				return true;
+			}
+			else if((args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")) && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
+				if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
+				else asyncBookImport(p, args[1]);
 				return true;
 			}
 		}
@@ -226,10 +219,12 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			File dir = new File(plugin.getDataFolder()+"/temp/");
 			if (!dir.exists())
 				dir.mkdirs();
+			File tempFile;
 			for (int i=1; i<=5; i++){
-				if (!new File(dir, "temp"+i).exists()){
-					File tempFile = new File(dir, "temp"+i);
+				tempFile = new File(dir, "temp"+i+".book");
+				if (!tempFile.exists()){
 					try {
+						tempFile.createNewFile();
 						Scanner urlInput = new Scanner(url.openStream());
 						FileWriter tempWriter = new FileWriter(tempFile);
 						while (urlInput.hasNextLine()){
@@ -237,7 +232,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 						}
 						urlInput.close();
 						tempWriter.close();
-					} catch (IOException e) {
+					} catch (Exception e) {
 						return;
 					}
 					syncBookImport(p, i);
@@ -263,7 +258,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				return;
 			}
 			BookMeta bm = BookSuiteFileManager.makeBookMetaFromText(p, "temp"+temp, plugin.getDataFolder()+"/temp/", true, plugin.usePermissions);
-			BookSuiteFileManager.delete(plugin.getDataFolder()+"/temp/", "temp"+temp);
+			BookSuiteFileManager.delete(plugin.getDataFolder()+"/temp/", "temp"+temp+".book");
 			if (bm!=null){
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				is.setItemMeta(bm);
