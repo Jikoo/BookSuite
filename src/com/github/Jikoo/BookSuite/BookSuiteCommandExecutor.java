@@ -230,7 +230,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 						Scanner urlInput = new Scanner(url.openStream());
 						FileWriter tempWriter = new FileWriter(tempFile);
 						while (urlInput.hasNextLine()){
-							tempWriter.append(urlInput.nextLine());
+							tempWriter.append(urlInput.nextLine()+"\n");
 						}
 						urlInput.close();
 						tempWriter.close();
