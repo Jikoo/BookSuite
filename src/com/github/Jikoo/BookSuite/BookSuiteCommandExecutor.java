@@ -138,7 +138,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			}
 			else if((args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url")) && (p.hasPermission("booksuite.command.import")||!plugin.usePermissions)){
 				if (!BookSuiteFunctions.canObtainBook(p, plugin.usePermissions)) return true;
-				else asyncBookImport(p, args[1]);
+				else asyncBookImport(p.getName(), args[1], plugin.getDataFolder().getPath());
 				return true;
 			}
 		}
@@ -206,17 +206,19 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 	
 	
 	public class getStreamBook implements Runnable{
-		Player p;
+		String p;
 		URL url;
-		getStreamBook(Player p, String s){
+		String loc;
+		getStreamBook(String p, String s, String dir){
 			this.p=p;
+			loc=dir;
 			try {
 				url=new URL(s);
 			} catch (MalformedURLException e) {
 			}
 		}
 		public void run() {
-			File dir = new File(plugin.getDataFolder()+"/temp/");
+			File dir = new File(loc+"/temp/");
 			if (!dir.exists())
 				dir.mkdirs();
 			File tempFile;
@@ -242,14 +244,14 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 			}
 		}
 	}
-	public void asyncBookImport(Player p, String s){
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s), 0L);
+	public void asyncBookImport(String p, String s, String dir){
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir), 0L);
 	}
 	public class giveStreamBook implements Runnable{
 		Player p;
 		int temp;
-		giveStreamBook(Player p, int temp){
-			this.p=p;
+		giveStreamBook(String p, int temp){
+			this.p=plugin.getServer().getPlayer(p);
 			this.temp=temp;
 		}
 		public void run() {
@@ -282,7 +284,7 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		}
 	}
 	
-	public void syncBookImport(Player p, int temp){
+	public void syncBookImport(String p, int temp){
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp), 0L);
 	}
 	

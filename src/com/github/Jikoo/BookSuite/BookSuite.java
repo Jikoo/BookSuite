@@ -109,7 +109,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
-				if(!p.getItemInHand().hasItemMeta())
+				if(!p.getItemInHand().hasItemMeta()||p.getItemInHand().getItemMeta()==null)
 					return;
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){
