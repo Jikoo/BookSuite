@@ -29,27 +29,10 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)){
 			sender.sendMessage(ChatColor.DARK_RED+"No commands in BookSuite v"+plugin.version+" can be run from the console.");
-			return false;
+			return true;
 		}
 		
 		Player p = (Player) sender;
-		
-		
-		//command: /book e - try to give them a sponge
-		if (args.length==1&&(args[0].equalsIgnoreCase("e")||args[0].equalsIgnoreCase("eraser"))){
-			if (p.hasPermission("booksuite.command.eraser")||!plugin.usePermissions){
-				if(p.getInventory().firstEmpty()!=-1)
-					if (!p.getInventory().contains(Material.SPONGE)){
-						p.getInventory().addItem(new ItemStack(Material.SPONGE, 1));
-						p.updateInventory();
-					}
-					else p.sendMessage(ChatColor.DARK_RED+"You already have an eraser!");
-				else p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
-				return true;
-			}
-			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
-			return false;
-		}
 		
 		
 		//command: /book u - attempt to unsign book
@@ -60,8 +43,6 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
-			return false;
 		}
 		
 		
@@ -78,8 +59,6 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
-			return false;
 		}
 		
 		
@@ -96,16 +75,16 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
-			return false;
 		}
 		
 		
 		//command: /book l(ist) - list all files in /SavedBooks/
 		if (args.length >= 1&&(args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("list") ||args[0].equalsIgnoreCase("ls"))){ //added ls, like the bash command :D
 			if (p.hasPermission("booksuite.command.list")||!plugin.usePermissions){
-				if (args.length==1)BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
-				if (args.length>2){
+				if (args.length==1){
+					BookSuiteFileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
+					return true;
+				} else if (args.length>2){
 					if (args[1].equalsIgnoreCase("a") || args[1].equalsIgnoreCase("author")){
 						String[] authors = new String[args.length-2];
 						for(int i = 2; i < args.length; i++){
@@ -117,10 +96,9 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 							
 						}
 					}
+					return true;
 				}
 			}
-			else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use that command!");
-			return false;
 		}
 		
 		
@@ -173,16 +151,14 @@ public class BookSuiteCommandExecutor implements CommandExecutor{
 		
 		
 		//if no commands match, print out help based on permissions
-		p.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" enabled!");
+		p.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" is enabled!");
 		if(p.hasPermission("booksuite.copy.self")||!plugin.usePermissions){
 			p.sendMessage(ChatColor.DARK_GREEN+"Right click a "+ChatColor.DARK_BLUE+"\"printing press\""+ChatColor.DARK_GREEN+" to copy a book.");
 			p.sendMessage(ChatColor.DARK_GREEN+"A "+ChatColor.DARK_BLUE+"\"printing press\""+ChatColor.DARK_GREEN+" is made by placing inverted stairs over a crafting table.");
 		}
 		if(p.hasPermission("booksuite.block.erase")||!plugin.usePermissions){
 			p.sendMessage(ChatColor.DARK_GREEN+"Right click an \"eraser\" to unsign a book.");
-			p.sendMessage(ChatColor.DARK_GREEN+"An "+ChatColor.DARK_BLUE+"\"eraser\""+ChatColor.DARK_GREEN+" is a sponge.");
-			if(p.hasPermission("booksuite.command.eraser")||!plugin.usePermissions)
-				p.sendMessage(ChatColor.AQUA+"/book e(raser)"+ChatColor.DARK_GREEN+" - get an eraser.");
+			p.sendMessage(ChatColor.DARK_GREEN+"An "+ChatColor.DARK_BLUE+"\"eraser\""+ChatColor.DARK_GREEN+" is a cauldron with water in it.");
 		}
 		if(p.hasPermission("booksuite.command.author")||(!plugin.usePermissions&&p.isOp()))
 			p.sendMessage(ChatColor.AQUA+"/book a(uthor) <new author>"+ChatColor.DARK_GREEN+" - change author of book in hand.");

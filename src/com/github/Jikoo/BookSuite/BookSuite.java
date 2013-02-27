@@ -1,6 +1,9 @@
 package com.github.Jikoo.BookSuite;
 
+import java.io.File;
+
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -32,6 +35,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 			usePermissions = fc.getBoolean("usePermissions");
 		} catch (Exception e) {
 		}
+		if(new File(getDataFolder(), "temp").exists())
+			BookSuiteFileManager.delete(getDataFolder().getPath(), "temp");
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("book").setExecutor(new BookSuiteCommandExecutor(this));
 		getLogger().info("BookSuite v"+version+" enabled!");
@@ -43,6 +48,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 	
 	@Override
 	public void onDisable() {
+		if(new File(getDataFolder(), "temp").exists())
+			BookSuiteFileManager.delete(getDataFolder().getPath(), "temp");
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
 
@@ -62,8 +69,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 			Block blockUp = clicked.getRelative(BlockFace.UP);
 			
 			
-			if (is.getType().equals(Material.WRITTEN_BOOK))
-				if(!is.hasItemMeta()||is.getItemMeta()==null)
+			if (is.getType().equals(Material.WRITTEN_BOOK)){
+				if(!(is.hasItemMeta()||is.getItemMeta()!=null))
 					return;
 				//if clicking a workbench, check to see if it is a press and act accordingly
 				if(clicked.getType().equals(Material.WORKBENCH)){
@@ -75,13 +82,35 @@ public class BookSuite extends JavaPlugin implements Listener{
 							press.operatePress();
 						event.setCancelled(true);
 					}
-				} else if (clicked.getType().equals(Material.SPONGE)){
-					if(p.hasPermission("booksuite.block.erase")||!usePermissions){
-						BookMeta bm = (BookMeta) is.getItemMeta();
-						if(bm.getAuthor().equalsIgnoreCase(p.getDisplayName()))
-							BookSuiteFunctions.unsign(p);
-						else if (p.hasPermission("booksuite.block.erase.other")||(!usePermissions&&p.isOp()))
+				} else if (clicked.getType().equals(Material.CAULDRON)){
+					BookMeta bm = (BookMeta) is.getItemMeta();
+					if(!usePermissions){
+						event.setCancelled(true);
+						p.closeInventory();
+						if (!p.isOp()){
+							if (clicked.getData()<1)
+								p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
+							else if(!bm.getAuthor().equalsIgnoreCase(p.getDisplayName()))
+								p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
+							else {
 								BookSuiteFunctions.unsign(p);
+								if(!p.getGameMode().equals(GameMode.CREATIVE))
+									clicked.setData((byte) (clicked.getData()-1));
+							}
+						} else BookSuiteFunctions.unsign(p);
+					} else if(p.hasPermission("booksuite.block.erase")){
+						if (clicked.getData()<1&&!p.getGameMode().equals(GameMode.CREATIVE)&&!p.hasPermission("booksuite.block.erase.free"))
+							p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
+						else if(bm.getAuthor().equalsIgnoreCase(p.getDisplayName())){
+							BookSuiteFunctions.unsign(p);
+							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
+								clicked.setData((byte) (clicked.getData()-1));
+						}
+						else if (p.hasPermission("booksuite.block.erase.other")){
+							BookSuiteFunctions.unsign(p);
+							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
+								clicked.setData((byte) (clicked.getData()-1));
+						}
 						else p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
 						event.setCancelled(true);
 					} else if (!p.hasPermission("booksuite.denynowarn.erase")){
@@ -89,6 +118,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 						event.setCancelled(true);
 					}
 				}
+			}
 			
 			
 			
@@ -109,7 +139,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
-				if(!p.getItemInHand().hasItemMeta()||p.getItemInHand().getItemMeta()==null)
+				if(!(p.getItemInHand().hasItemMeta()||p.getItemInHand().getItemMeta()!=null))
 					return;
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){

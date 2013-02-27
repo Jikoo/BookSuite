@@ -1,8 +1,12 @@
 ;3.0.0pre2
+:Eraser changed to cauldron
+:eraser command removed; cauldrons are craftable
+:cauldron consumes water if lacking permission, not an op, or not in creative.
 :read books from URL async instead of on main thread
 :assign correct default perms with booksuite.standard :V
 :/book d(elete) - default op
 :/book l(ist) - default true. TODO add hidden or perm-based book importing
+:/book l(oad) <file> - alias for /book f(ile), does not conflict with /book l(ist)
 :more regex: <obf(uscate(d))> official name of "magic" text
 :support for pastebin and other such sites attempted with <book> and </book>
 ;3.0.0pre1

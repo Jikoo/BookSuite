@@ -1,3 +1,8 @@
+3.0.0a7
+	= Eraser changed to cauldron
+	- eraser command removed; cauldrons are craftable
+	+ cauldron consumes water if lacking permission, not an op, or not in creative.
+	+ clean up any remaining temp files on enable/disable
 3.0.0a6
 	+ read books from URL async instead of on main thread
 	+ assign correct default perms with booksuite.standard :V

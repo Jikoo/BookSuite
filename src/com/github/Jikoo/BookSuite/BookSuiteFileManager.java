@@ -48,7 +48,9 @@ public class BookSuiteFileManager {
 			isBookText=true;
 		
 		try {
-			Scanner s = new Scanner(new File(location, file+".book"));
+			Scanner s;
+			if(file.contains(".")) s = new Scanner(new File(location, file));
+			else s = new Scanner(new File(location, file+".book"));
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();

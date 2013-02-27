@@ -21,7 +21,7 @@ public class BookSuiteFunctions {
 	public static boolean canObtainBook(Player p, boolean usePermissions){
 		Inventory inv = p.getInventory();
 		
-		if (p.hasPermission("booksuite.free") || p.getGameMode().equals(GameMode.CREATIVE) || (!usePermissions && p.isOp())){
+		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE) || (!usePermissions && p.isOp())){
 			if (inv.firstEmpty()==-1){
 				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				return false;

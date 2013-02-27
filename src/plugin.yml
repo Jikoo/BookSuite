@@ -18,7 +18,6 @@ permissions:
         children:
             booksuite.copy.self: true
             booksuite.command: true
-            booksuite.command.eraser: true
             booksuite.command.list: true
             booksuite.command.import: true
             booksuite.command.export: true
@@ -28,7 +27,12 @@ permissions:
             booksuite.mail.attach: true
 
     booksuite.free:
-        description: No cost associated with getting a book!
+        description: No cost associated with anything!
+        children:
+            booksuite.book.free: true
+            booksuite.block.erase.free: true
+    booksuite.book.free:
+        description: copy and create books for free
 
     booksuite.mail.send:
         description: Send mail with a right click!
@@ -74,6 +78,8 @@ permissions:
         description: erase others' books
         children:
             booksuite.block.erase: true
+    booksuite.block.erase.free:
+        description: don't use water from cauldron when erasing a book
 
     booksuite.command.export:
         description: make a file from book
@@ -87,20 +93,12 @@ permissions:
         description: import a book with an author other than themself
         children:
             booksuite.command.import: true
-    booksuite.command.unsign:
-        description: unsign book
-        children:
-            booksuite.command: true
     booksuite.command.author:
         description: change author
         children:
             booksuite.command: true
     booksuite.command.title:
         description: change title
-        children:
-            booksuite.command: true
-    booksuite.command.eraser:
-        description: get eraser block
         children:
             booksuite.command: true
     booksuite.command.list:
@@ -120,7 +118,6 @@ permissions:
             booksuite.command.unsign: true
             booksuite.command.author: true
             booksuite.command.title: true
-            booksuite.command.eraser: true
             booksuite.command.list: true
             booksuite.command.delete: true
 
