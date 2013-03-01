@@ -1,3 +1,6 @@
+;3.0.0pre3
+:removed a line that spammed on importing a book
+:added initial pastebin and bukkit paste support!
 ;3.0.0pre2
 :Eraser changed to cauldron
 :eraser command removed; cauldrons are craftable

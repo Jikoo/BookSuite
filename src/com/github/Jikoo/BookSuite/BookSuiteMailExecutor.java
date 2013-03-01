@@ -142,4 +142,12 @@ public class BookSuiteMailExecutor {
 		
 		return toItem;
 	}
+
+
+
+
+	public static void WriteMailContents(Inventory inventory) {
+		// TODO Auto-generated method stub
+		
+	}
 }

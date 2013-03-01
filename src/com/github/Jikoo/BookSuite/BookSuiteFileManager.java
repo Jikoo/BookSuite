@@ -54,7 +54,17 @@ public class BookSuiteFileManager {
 			String page = "";
 			while(s.hasNext()){
 				String line = s.nextLine();
-				System.out.println(line);
+				
+				//pastebin support section
+				if(location.contains("temp")){
+					line=line.replaceAll("(<li class=\").*(\">)", "").replace("</li>", "");
+					line=line.replaceAll("(<div class=\").*(\">)", "").replace("</div>", "");
+					line=line.replace("&lt;", "<").replace("&gt;", ">");
+					line=line.replace("&nbsp", "<n>");
+					line=line.replace("ยง", "ง");
+				}
+				
+				
 				if(line.contains("<book>")){
 					isBookText = true;
 					line = line.replace("<book>", "");
@@ -67,10 +77,10 @@ public class BookSuiteFileManager {
 						//do nothing, this line is a book comment
 					}
 					else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other")||(!usePermissions&&p.isOp()))){
-						text.setAuthor(line.replaceAll("<author>", "").replaceAll("</author>", ""));
+						text.setAuthor(line.replace("<author>", "").replace("</author>", ""));
 					}
 					else if (line.contains("<title>")){
-						text.setTitle(line.replaceAll("<title>", "").replaceAll("</title>", ""));
+						text.setTitle(line.replace("<title>", "").replace("</title>", "").replace("<br>", ""));
 					}
 					else if(line.contains("<page>")){
 						page = "";

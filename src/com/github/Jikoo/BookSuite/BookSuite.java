@@ -13,9 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -154,36 +153,10 @@ public class BookSuite extends JavaPlugin implements Listener{
 	}
 	
 	@EventHandler
-	public void onInventoryClick (InventoryClickEvent event){
-		Player p = (Player) event.getWhoClicked();
-		Inventory i = event.getInventory();
+	public void onInventoryClick (InventoryCloseEvent event){
 		//Is it a mailbox? If true, cancel all clicks, handle from there.
-		if (i.getTitle().equals(p.getName()+"'s MailBox")){
-			event.setCancelled(true);
-			if (event.getCurrentItem()==null){
-				return;
-			} else {
-				if (p.getInventory().firstEmpty()!=-1){
-					if (event.getCurrentItem().getType().equals(Material.WRITTEN_BOOK))
-						p.getInventory().addItem(event.getCurrentItem().clone());
-						event.getInventory().remove(event.getCurrentItem());
-						BookMeta bm = (BookMeta) event.getCurrentItem().getItemMeta();
-						BookSuiteFileManager.removeMail(this.getDataFolder()+"/Mail/"+p.getName()+"/", bm.getTitle().replaceAll("Package: ", ""));
-						p.updateInventory();
-				} else {
-					p.sendMessage(ChatColor.DARK_RED+"You need to free up space to withdraw mail!");
-					p.closeInventory();
-				}
-			}
-		}
-		//if the player clicks own inventory while viewing their mailbox, cancel + send update
-		if (i.equals(p.getInventory())){
-			if (p.getOpenInventory()!=null){
-				if (p.getOpenInventory().getTitle().equals(p.getName()+"'s MailBox")){
-					event.setCancelled(true);
-					p.updateInventory();
-				}
-			}
+		if (event.getInventory().getTitle().contains("'s MailBox")){
+			BookSuiteMailExecutor.WriteMailContents(event.getInventory());
 		}
 	}
 }
