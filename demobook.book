@@ -24,6 +24,7 @@
 //  			  *       5px
 //basically, this means you can have 19 standard characters in a line and still have some punctuation at the end
 
+<book>
 <title>The Lusty Argonian Maid, Volume 2</title>
 
 
@@ -92,3 +93,4 @@
 
 End of Act VII, Scene II
 </page>
+</book>
