@@ -1,1 +1,22 @@
-usePermissions: false
+###PERMISSIONS###
+# If changing external permissions from false to true,
+# a full server restart is recommended to slightly
+# improve memory usage.
+use-external-permissions: true
+
+###ALIASES###
+# Aliases are names people are allowed to sign books with
+# and authors whose books they can unsign.
+#
+# Modes:
+# none
+#     - Vanilla book signing behavior
+# default
+#     - Players sign books as their display name/nick name
+#     - Players can unsign books by their display name or login name
+# multi
+#     - Players sign books as their set alias (defaults to display name)
+#     - Players can unsign books by any of their aliases
+#     - Aliases can be added with /book alias add <alias>
+#     - Aliases can be set (used for signing) with /book alias <alias>
+alias-mode: default

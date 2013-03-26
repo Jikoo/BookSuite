@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,25 +18,33 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
+
 
 public class BookSuite extends JavaPlugin implements Listener{
 	String version = "3.0.0";
-	Boolean usePermissions;
-	String neededSupplies = "";
-	
+	PermissionsListener perms;
+	Alias aliases;
 	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
-		FileConfiguration fc = getConfig();
 		try {
-			usePermissions = fc.getBoolean("usePermissions");
+			boolean externalPermissions = getConfig().getBoolean("use-external-permissions");
+			if(!externalPermissions){
+				perms = new PermissionsListener(this);
+				getServer().getPluginManager().registerEvents(perms, this);
+				getCommand("op").setExecutor(perms);
+				getCommand("deop").setExecutor(perms);
+				
+			}
 		} catch (Exception e) {
+			
 		}
 		if(new File(getDataFolder(), "temp").exists())
-			BookSuiteFileManager.delete(getDataFolder().getPath(), "temp");
+			FileManager.delete(getDataFolder().getPath(), "temp");
 		getServer().getPluginManager().registerEvents(this, this);
-		getCommand("book").setExecutor(new BookSuiteCommandExecutor(this));
+		getCommand("book").setExecutor(new CommandHandler(this));
 		getLogger().info("BookSuite v"+version+" enabled!");
 	}
 	
@@ -48,7 +55,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 	@Override
 	public void onDisable() {
 		if(new File(getDataFolder(), "temp").exists())
-			BookSuiteFileManager.delete(getDataFolder().getPath(), "temp");
+			FileManager.delete(getDataFolder().getPath(), "temp");
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
 
@@ -73,40 +80,27 @@ public class BookSuite extends JavaPlugin implements Listener{
 					return;
 				//if clicking a workbench, check to see if it is a press and act accordingly
 				if(clicked.getType().equals(Material.WORKBENCH)){
-					BookSuitePrintingPress press = new BookSuitePrintingPress(this, p, is, blockUp);
-					if (BookSuitePrintingPress.isInvertedStairs(blockUp) && !press.denyUseage()){
+					if (PrintingPress.isInvertedStairs(blockUp)){
+						PrintingPress press = new PrintingPress(this, p, is, blockUp);
+						if(!press.denyUseage()){
 						
-						BookMeta bm = (BookMeta) is.getItemMeta();
-						if (press.checkCopyPermission(bm.getAuthor()) && BookSuiteFunctions.canObtainBook(p, usePermissions))
-							press.operatePress();
-						event.setCancelled(true);
+							BookMeta bm = (BookMeta) is.getItemMeta();
+							if (press.checkCopyPermission(bm.getAuthor()) && Functions.canObtainBook(p))
+								press.operatePress();
+							event.setCancelled(true);
+						}
 					}
 				} else if (clicked.getType().equals(Material.CAULDRON)){
-					BookMeta bm = (BookMeta) is.getItemMeta();
-					if(!usePermissions){
-						event.setCancelled(true);
-						p.closeInventory();
-						if (!p.isOp()){
-							if (clicked.getData()<1)
-								p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
-							else if(!bm.getAuthor().equalsIgnoreCase(p.getDisplayName()))
-								p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
-							else {
-								BookSuiteFunctions.unsign(p);
-								if(!p.getGameMode().equals(GameMode.CREATIVE))
-									clicked.setData((byte) (clicked.getData()-1));
-							}
-						} else BookSuiteFunctions.unsign(p);
-					} else if(p.hasPermission("booksuite.block.erase")){
+					BookMeta bm = (BookMeta) is.getItemMeta();if(p.hasPermission("booksuite.block.erase")){
 						if (clicked.getData()<1&&!p.getGameMode().equals(GameMode.CREATIVE)&&!p.hasPermission("booksuite.block.erase.free"))
 							p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
 						else if(bm.getAuthor().equalsIgnoreCase(p.getDisplayName())){
-							BookSuiteFunctions.unsign(p);
+							Functions.unsign(p);
 							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
 								clicked.setData((byte) (clicked.getData()-1));
 						}
 						else if (p.hasPermission("booksuite.block.erase.other")){
-							BookSuiteFunctions.unsign(p);
+							Functions.unsign(p);
 							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
 								clicked.setData((byte) (clicked.getData()-1));
 						}
@@ -126,7 +120,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 				if (blockUp.getType().equals(Material.SIGN)) {
 					Sign sign = (Sign) blockUp;
 					if (sign.getLine(0).equals(ChatColor.DARK_RED+"No sign line can contain this string.")){//rudimentary example
-						p.openInventory(BookSuiteMailExecutor.getMailBoxInv(p, this.getDataFolder().getPath()));
+						p.openInventory(MailExecutor.getMailBoxInv(p, this.getDataFolder().getPath()));
 						event.setCancelled(true);
 					}
 				} 
@@ -142,21 +136,21 @@ public class BookSuite extends JavaPlugin implements Listener{
 					return;
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){
-					if(BookSuiteMailExecutor.loadMail(p, bm, this.getDataFolder().getPath()))
+					if(MailExecutor.loadMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 				}
 				else if (p.hasPermission("booksuite.mail.send")&&bm.getTitle().equalsIgnoreCase("package"))
-					if (BookSuiteMailExecutor.sendMail(p, bm, this.getDataFolder().getPath(), usePermissions))
+					if (MailExecutor.sendMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 			}
 		}
 	}
 	
 	@EventHandler
-	public void onInventoryClick (InventoryCloseEvent event){
+	public void onInventoryClose (InventoryCloseEvent event){
 		//Is it a mailbox? If true, cancel all clicks, handle from there.
 		if (event.getInventory().getTitle().contains("'s MailBox")){
-			BookSuiteMailExecutor.WriteMailContents(event.getInventory());
+			MailExecutor.WriteMailContents(event.getInventory());
 		}
 	}
 }

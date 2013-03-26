@@ -1,16 +1,11 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -22,26 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class BookSuiteFileManager {
+public class FileManager {
 	
-	private static HashMap<String, String> books = new HashMap<String, String>(); //maps book Title to book Author
-	
-	private static void writeBookIndexToFile(File f) throws Exception{
-		if (! f.exists()) f.createNewFile();
-		FileOutputStream fos = new FileOutputStream(f);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(books);
-		oos.close();
-	}
-	
-	public static void readBookIndexFromFile(File f) throws Exception{
-		ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(f));
-		books = (HashMap<String, String>) objIn.readObject();
-		objIn.close();
-	}
-	
-	
-	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL, boolean usePermissions){
+	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		boolean isBookText=false;
 		if (!isURL)
@@ -76,7 +54,7 @@ public class BookSuiteFileManager {
 					if (line.length()>=2 && line.substring(0, 2).equals("//")){
 						//do nothing, this line is a book comment
 					}
-					else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other")||(!usePermissions&&p.isOp()))){
+					else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other"))){
 						text.setAuthor(line.replace("<author>", "").replace("</author>", ""));
 					}
 					else if (line.contains("<title>")){
@@ -187,10 +165,6 @@ public class BookSuiteFileManager {
 				file.append("<page>\n"+bm.getPage(i)+"\n</page>\n");
 			file.append("</book>");
 			file.close();
-			
-			
-			books.put(bm.getTitle(), bm.getAuthor());
-			writeBookIndexToFile(new File(bookLocation, "books.index"));
 			return true;
 		}
 		catch(FileAlreadyExistsException fe){
@@ -398,39 +372,4 @@ public class BookSuiteFileManager {
 		}
 	}
 	
-	public static void listBookFilesByAuthor(String directory, Player p, String[] authors) throws Exception{
-		File file = new File(directory);
-		BookSuiteFileManager.readBookIndexFromFile(new File(file, "book.index"));
-		
-		
-		if (!file.exists()){
-			p.sendMessage(ChatColor.DARK_RED+"No books have been saved yet.");
-			file.mkdirs();
-			return;
-		}
-		File[] fileList = file.listFiles();
-		if (fileList==null){
-			p.sendMessage(ChatColor.DARK_RED+"No books found.");
-			return;
-		}
-		String[] bookList = new String[fileList.length];
-		int i = 0;
-		for (File bookFile : fileList){
-			if (bookFile.getName().contains(".book")){
-				bookList[i] = bookFile.getName().replace(".book", "").replace(".txt", "");
-				i++;
-			}
-		}
-		
-		
-		for(String a : authors){
-			String book = a+": ";
-			for(String s : bookList){
-				book+=s+",";
-			}
-			book.substring(0, book.length()-2);
-			p.sendMessage(ChatColor.DARK_GREEN+book);
-		}
-			
-	}
 }

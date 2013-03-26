@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
-public class BookSuitePrintingPress {
+public class PrintingPress {
 	
 	BookSuite plugin;
 	Player p;
@@ -17,7 +17,7 @@ public class BookSuitePrintingPress {
 	BlockState originalBlock;
 	
 	
-	public BookSuitePrintingPress (BookSuite plugin, Player p, ItemStack is, Block blockUp) {
+	public PrintingPress (BookSuite plugin, Player p, ItemStack is, Block blockUp) {
 		this.plugin = plugin;
 		this.p = p;
 		this.is = is;
@@ -36,7 +36,7 @@ public class BookSuitePrintingPress {
 	 * @return whether the block is an inverted stair
 	 */
 	public static boolean isInvertedStairs(Block b){
-		int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136};
+		int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
 		for(int i: acceptable)
 			if (i==b.getTypeId())return b.getData()>3;
 		return false;
@@ -51,23 +51,14 @@ public class BookSuitePrintingPress {
 	 * @return
 	 */
 	public boolean checkCopyPermission(String a){
-		if (plugin.usePermissions){
-			if (p.hasPermission("booksuite.copy.other"))
-				return true;
-			if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
-				return true;
-			else if (p.hasPermission("booksuite.copy.self"))
-				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
-			else
-				p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
-		}
-		else {
-			if(p.isOp())
-				return true;
-			else if (a.equals(p.getName()))
-				return true;
-			else p.sendMessage(ChatColor.DARK_RED+"Only ops can copy others' books.");
-		}
+		if (p.hasPermission("booksuite.copy.other"))
+			return true;
+		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
+			return true;
+		else if (p.hasPermission("booksuite.copy.self"))
+			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
+		else
+			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
 		return false;
 	}
 	public boolean denyUseage(){
@@ -120,6 +111,9 @@ public class BookSuitePrintingPress {
 
 		else if (b.getTypeId() == 136)//JUNGLE_WOOD_STAIRS
 			b.setTypeIdAndData(126, (byte) 3, false);//WOOD_STEP
+
+		else if (b.getTypeId() == 156)//Quartz stairs
+			b.setTypeIdAndData(44, (byte) 7, false);//STEP
 	}
 
 

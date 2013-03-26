@@ -109,6 +109,53 @@ permissions:
         description: Delete a book from /SavedBooks/
         children:
             booksuite.command: true
+    booksuite.command.reload:
+        description: reload the plugin
+        children:
+            booksuite.command: true
+    booksuite.command.alias.add:
+        description: add alias to self
+        children:
+            booksuite.command: true
+    booksuite.command.alias.set:
+        description: set active alias
+        children:
+            booksuite.command: true
+    booksuite.command.alias.delete:
+        description: delete alias from self
+        children:
+            booksuite.command: true
+    booksuite.command.alias.list:
+        description: list all registered aliases
+        children:
+            booksuite.command: true
+    booksuite.command.alias.add.other:
+        description: add alias to specified player
+        children:
+            booksuite.command: true
+    booksuite.command.alias.set.other:
+        description: set active alias of specified player
+        children:
+            booksuite.command: true
+    booksuite.command.alias.delete.other:
+        description: remove alias from specified player
+        children:
+            booksuite.command: true
+    booksuite.command.alias.list:
+        description: list all registered aliases of specified player
+        children:
+            booksuite.command: true
+    booksuite.command.alias:
+        description: permission for all alias-related commands
+        children:
+            booksuite.command.alias.add: true
+            booksuite.command.alias.set: true
+            booksuite.command.alias.delete: true
+            booksuite.command.alias.list: true
+            booksuite.command.alias.add.other: true
+            booksuite.command.alias.set.other: true
+            booksuite.command.alias.delete.other: true
+            booksuite.command.alias.list.other: true
     booksuite.command.admin:
         description: all commands
         children:
@@ -120,6 +167,8 @@ permissions:
             booksuite.command.title: true
             booksuite.command.list: true
             booksuite.command.delete: true
+            booksuite.command.reload: true
+            booksuite.command.alias: true
 
 commands:
    book:

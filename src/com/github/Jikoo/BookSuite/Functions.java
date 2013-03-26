@@ -1,5 +1,7 @@
 package com.github.Jikoo.BookSuite;
 
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -8,7 +10,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class BookSuiteFunctions {
+public class Functions {
 	
 	
 	
@@ -18,17 +20,17 @@ public class BookSuiteFunctions {
 	 * @param p the player attempting to obtain the book
 	 * @return whether the player can obtain the book
 	 */
-	public static boolean canObtainBook(Player p, boolean usePermissions){
+	public static boolean canObtainBook(Player p){
 		Inventory inv = p.getInventory();
 		
-		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE) || (!usePermissions && p.isOp())){
+		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)){
 			if (inv.firstEmpty()==-1){
 				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 				return false;
 			}
 			return true;
 		}
-		String supplies = checkSupplies(inv);
+		String supplies = checkBookSupplies(inv);
 		if (supplies.equals("crafted")){
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.BOOK, 1));
@@ -67,7 +69,7 @@ public class BookSuiteFunctions {
 	 * @param inv the inventory of the player
 	 * @return whether the player has the supplies needed to copy the book
 	 */
-	public static String checkSupplies(Inventory inv){
+	public static String checkBookSupplies(Inventory inv){
 		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)){
 			return "crafted";
 		}
@@ -78,8 +80,6 @@ public class BookSuiteFunctions {
 						if (i.getType().equals(Material.PAPER)&&i.getAmount()>2)
 							return "uncrafted";
 				}
-				
-				
 			}
 			return "a book";
 		}
@@ -127,5 +127,4 @@ public class BookSuiteFunctions {
 		book.setItemMeta(bookMeta);
 		return true;
 	}
-
 }
