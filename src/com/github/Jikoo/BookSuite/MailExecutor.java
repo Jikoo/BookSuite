@@ -12,8 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 public class MailExecutor {
+	Functions functions = new Functions();
+	FileManager filemanager = new FileManager();
 	
-	public static boolean sendMail(Player p, BookMeta bm, String pluginDataFolder){
+	public boolean sendMail(Player p, BookMeta bm, String pluginDataFolder){
 		bm = (BookMeta) p.getItemInHand().getItemMeta();
 		if (!p.getName().equals(bm.getAuthor())&&!p.hasPermission("booksuite.mail.send.other"))
 			p.sendMessage(ChatColor.DARK_RED+p.getName()+", you shouldn't be trying to send letters for "+bm.getAuthor()+"...");
@@ -45,32 +47,32 @@ public class MailExecutor {
 			
 			if (mailHasItemAttached && !playerHasItem){
 				p.sendMessage(ChatColor.DARK_RED+"Error: no such named item, please check spelling.");
-				Functions.unsign(p);
+				functions.unsign(p);
 				return false;
 			}
 			
 			
-			if(FileManager.appendMailIndex(pluginDataFolder+"/Mail/"+sendingData[1]+"/", sendingData[0])){
+			if(filemanager.appendMailIndex(pluginDataFolder+"/Mail/"+sendingData[1]+"/", sendingData[0])){
 				if(new File(pluginDataFolder+"/Mail/"+sendingData[1]+"/Books/", sendingData[0]).exists()){
 					if (mailHasItemAttached && playerHasItem){
-						if(FileManager.makeFileFromItemStack(removeThis, pluginDataFolder+"/Mail/"+sendingData[1]+"/Items/", sendingData[2]))
+						if(filemanager.makeFileFromItemStack(removeThis, pluginDataFolder+"/Mail/"+sendingData[1]+"/Items/", sendingData[2]))
 							inv.remove(removeThis);
 						else{
 							p.sendMessage(ChatColor.DARK_RED+"Error: "+sendingData[1]+" already has an item by that name in their mailbox.");
-							Functions.unsign(p);
+							functions.unsign(p);
 							return false;
 						}
 					}
 					
 					
-					if(FileManager.makeFileFromBookMeta(newBook, pluginDataFolder+"/Mail/"+sendingData[1]+"/Books/", sendingData[0])){
+					if(filemanager.makeFileFromBookMeta(newBook, pluginDataFolder+"/Mail/"+sendingData[1]+"/Books/", sendingData[0])){
 						inv.remove(p.getItemInHand());
 						p.sendMessage(ChatColor.DARK_GREEN+"Mail sent successfully!");
 						return true;
 					}
 				} else {
 					p.sendMessage(ChatColor.DARK_RED+"Error: "+sendingData[1]+" already has a book by that name in their mailbox.");
-					Functions.unsign(p);
+					functions.unsign(p);
 				}
 			} else p.sendMessage(ChatColor.DARK_RED+"Error writing mail index!");
 		}
@@ -80,15 +82,15 @@ public class MailExecutor {
 	
 	
 	
-	public static boolean loadMail(Player p, BookMeta bm, String pluginDataFolder){
+	public boolean loadMail(Player p, BookMeta bm, String pluginDataFolder){
 		bm = (BookMeta) p.getItemInHand().getItemMeta();
 		String[] checks = bm.getPage(bm.getPageCount()).replace("To: ", "").replace("Attached:\n", "").split("\n");
 		if (p.getName()==checks[0]){
 			if(p.getInventory().firstEmpty()!= -1){
 				bm.setTitle(bm.getTitle().replace("Package: ", ""));
 				bm.setPage(bm.getPageCount(), "Attached:\n"+checks[1]);
-				FileManager.makeItemStackFromFile(pluginDataFolder+"/Mail/"+p.getName()+"/Items/", checks[1]);
-				FileManager.delete(pluginDataFolder+"/Mail/"+p.getName()+"/Items/", checks[1]);
+				filemanager.makeItemStackFromFile(pluginDataFolder+"/Mail/"+p.getName()+"/Items/", checks[1]);
+				filemanager.delete(pluginDataFolder+"/Mail/"+p.getName()+"/Items/", checks[1]);
 				return true;
 			}
 			p.sendMessage(ChatColor.DARK_RED+"You do not have space to unpack this book.");
@@ -101,7 +103,7 @@ public class MailExecutor {
 	
 	
 	
-	public static Inventory getMailBoxInv(Player p, String pluginDataFolder){
+	public Inventory getMailBoxInv(Player p, String pluginDataFolder){
 		Inventory mailbox =  Bukkit.createInventory(p, 2, p.getName()+"'s MailBox");
 		
 		Scanner s;
@@ -110,7 +112,7 @@ public class MailExecutor {
 			while (s.hasNext()){
 				if (mailbox.firstEmpty()!=-1){
 					ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-					is.setItemMeta(FileManager.makeBookMetaFromText(p, s.nextLine()+".book",pluginDataFolder+"/Mail/"+p.getName()+"/Books/", false));
+					is.setItemMeta(filemanager.makeBookMetaFromText(p, s.nextLine()+".book",pluginDataFolder+"/Mail/"+p.getName()+"/Books/", false));
 					mailbox.addItem(is);
 				}
 			
@@ -125,7 +127,7 @@ public class MailExecutor {
 
 
 
-	public static String[] parseSendingData(String firstPage){
+	public String[] parseSendingData(String firstPage){
 		String[] pageData = firstPage.split("\n");
 		pageData[0] = pageData[0].replaceFirst("\\A.*([Pp]ackage|[Tt]itle):\\s*", "").replaceAll("\\W", "");
 		pageData[1] = pageData[1].replaceFirst("\\A.*[Tt]o:\\s*", "").replaceAll("\\W", "");
@@ -146,7 +148,7 @@ public class MailExecutor {
 
 
 
-	public static void WriteMailContents(Inventory inventory) {
+	public void WriteMailContents(Inventory inventory) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -25,6 +25,9 @@ public class BookSuite extends JavaPlugin implements Listener{
 	String version = "3.0.0";
 	PermissionsListener perms;
 	Alias aliases;
+	Functions functions = new Functions();
+	FileManager filemanager = new FileManager();
+	MailExecutor mail = new MailExecutor();
 	
 	@Override
 	public void onEnable() {
@@ -42,7 +45,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 			
 		}
 		if(new File(getDataFolder(), "temp").exists())
-			FileManager.delete(getDataFolder().getPath(), "temp");
+			filemanager.delete(getDataFolder().getPath(), "temp");
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("book").setExecutor(new CommandHandler(this));
 		getLogger().info("BookSuite v"+version+" enabled!");
@@ -55,7 +58,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 	@Override
 	public void onDisable() {
 		if(new File(getDataFolder(), "temp").exists())
-			FileManager.delete(getDataFolder().getPath(), "temp");
+			filemanager.delete(getDataFolder().getPath(), "temp");
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
 
@@ -75,32 +78,46 @@ public class BookSuite extends JavaPlugin implements Listener{
 			Block blockUp = clicked.getRelative(BlockFace.UP);
 			
 			
-			if (is.getType().equals(Material.WRITTEN_BOOK)){
-				if(!(is.hasItemMeta()||is.getItemMeta()!=null))
-					return;
-				//if clicking a workbench, check to see if it is a press and act accordingly
-				if(clicked.getType().equals(Material.WORKBENCH)){
-					if (PrintingPress.isInvertedStairs(blockUp)){
-						PrintingPress press = new PrintingPress(this, p, is, blockUp);
-						if(!press.denyUseage()){
-						
-							BookMeta bm = (BookMeta) is.getItemMeta();
-							if (press.checkCopyPermission(bm.getAuthor()) && Functions.canObtainBook(p))
+			
+			//if clicking a workbench, check to see if it is a press and act accordingly
+			if(clicked.getType().equals(Material.WORKBENCH)){
+				if (PrintingPress.isInvertedStairs(blockUp)){
+					PrintingPress press = new PrintingPress(this, p, is, blockUp);
+					if(!press.denyUseage()){
+						if (is.getType().equals(Material.MAP)){
+							if(functions.canObtainMap(p))
 								press.operatePress();
+							event.setCancelled(true);
+						} else if(!(is.hasItemMeta()||is.getItemMeta()!=null)){
+							return;
+						} else if (is.getType().equals(Material.WRITTEN_BOOK)){
+							BookMeta bm = (BookMeta) is.getItemMeta();
+							if (press.checkCopyPermission(bm.getAuthor()) && functions.canObtainBook(p))
+								press.operatePress();
+							event.setCancelled(true);
+						} else if (is.getType().equals(Material.BOOK_AND_QUILL)){
+							if(p.hasPermission("booksuite.copy.unsigned")){
+								if(functions.canObtainBook(p))
+									press.operatePress();
+							} else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy unsigned books!");
 							event.setCancelled(true);
 						}
 					}
-				} else if (clicked.getType().equals(Material.CAULDRON)){
+				}
+			} else if (is.getType().equals(Material.WRITTEN_BOOK)){
+				if(!(is.hasItemMeta()||is.getItemMeta()!=null))
+					return;
+				if (clicked.getType().equals(Material.CAULDRON)){
 					BookMeta bm = (BookMeta) is.getItemMeta();if(p.hasPermission("booksuite.block.erase")){
 						if (clicked.getData()<1&&!p.getGameMode().equals(GameMode.CREATIVE)&&!p.hasPermission("booksuite.block.erase.free"))
 							p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
 						else if(bm.getAuthor().equalsIgnoreCase(p.getDisplayName())){
-							Functions.unsign(p);
+							functions.unsign(p);
 							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
 								clicked.setData((byte) (clicked.getData()-1));
 						}
 						else if (p.hasPermission("booksuite.block.erase.other")){
-							Functions.unsign(p);
+							functions.unsign(p);
 							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
 								clicked.setData((byte) (clicked.getData()-1));
 						}
@@ -120,7 +137,7 @@ public class BookSuite extends JavaPlugin implements Listener{
 				if (blockUp.getType().equals(Material.SIGN)) {
 					Sign sign = (Sign) blockUp;
 					if (sign.getLine(0).equals(ChatColor.DARK_RED+"No sign line can contain this string.")){//rudimentary example
-						p.openInventory(MailExecutor.getMailBoxInv(p, this.getDataFolder().getPath()));
+						p.openInventory(mail.getMailBoxInv(p, this.getDataFolder().getPath()));
 						event.setCancelled(true);
 					}
 				} 
@@ -136,11 +153,11 @@ public class BookSuite extends JavaPlugin implements Listener{
 					return;
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 				if (bm.getTitle().contains("Package: ")){
-					if(MailExecutor.loadMail(p, bm, this.getDataFolder().getPath()))
+					if(mail.loadMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 				}
 				else if (p.hasPermission("booksuite.mail.send")&&bm.getTitle().equalsIgnoreCase("package"))
-					if (MailExecutor.sendMail(p, bm, this.getDataFolder().getPath()))
+					if (mail.sendMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 			}
 		}
@@ -148,9 +165,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 	
 	@EventHandler
 	public void onInventoryClose (InventoryCloseEvent event){
-		//Is it a mailbox? If true, cancel all clicks, handle from there.
 		if (event.getInventory().getTitle().contains("'s MailBox")){
-			MailExecutor.WriteMailContents(event.getInventory());
+			mail.WriteMailContents(event.getInventory());
 		}
 	}
 }

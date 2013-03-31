@@ -17,6 +17,8 @@ permissions:
         description: Average Joe's permissions.
         children:
             booksuite.copy.self: true
+            booksuite.copy.unsigned: true
+            booksuite.copy.map: true
             booksuite.command: true
             booksuite.command.list: true
             booksuite.command.import: true
@@ -66,6 +68,16 @@ permissions:
         description: copy all books
         children:
             booksuite.copy.self: true
+    booksuite.copy.unsigned:
+        description: copy unsigned books
+    booksuite.copy.map:
+        description: copy maps
+    booksuite.copy.admin:
+        description: copy everything copiable
+        children:
+            booksuite.copy.other: true
+            booksuite.copy.unsigned: true
+            booksuite.copy.map: true
 
     booksuite.denynowarn.press:
         description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.

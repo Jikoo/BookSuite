@@ -1,4 +1,15 @@
 3.0.0a8
+	+ added commands for book and quill editing:
+		+ /book addpage <number> [optional page text]
+		+ /book delpage <number>
+	+ alias groundwork done for when book editing event is added
+	+ complete rework of handling permissionless setup
+	+ support for nether quartz stairs in presses
+	+ more copiables: map + book and quill
+	+ reload command, /book reload
+	- removed per-author book search - was generally problematic
+	= renamed all classes - prefixing them with BookSuite is rather redundant
+3.0.0a8
 	+ basic pastebin support (just some more regex)
 3.0.0a7
 	= Eraser changed to cauldron

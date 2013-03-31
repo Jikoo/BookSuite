@@ -1,6 +1,6 @@
 package com.github.Jikoo.BookSuite;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -20,7 +20,7 @@ public class Functions {
 	 * @param p the player attempting to obtain the book
 	 * @return whether the player can obtain the book
 	 */
-	public static boolean canObtainBook(Player p){
+	public boolean canObtainBook(Player p){
 		Inventory inv = p.getInventory();
 		
 		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)){
@@ -69,17 +69,13 @@ public class Functions {
 	 * @param inv the inventory of the player
 	 * @return whether the player has the supplies needed to copy the book
 	 */
-	public static String checkBookSupplies(Inventory inv){
+	public String checkBookSupplies(Inventory inv){
 		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)){
 			return "crafted";
 		}
 		else if (inv.contains(Material.INK_SACK)){
-			if(inv.contains(Material.PAPER)&&inv.contains(Material.LEATHER)){
-				for (ItemStack i:inv.getContents()){
-					if (i!=null)
-						if (i.getType().equals(Material.PAPER)&&i.getAmount()>2)
-							return "uncrafted";
-				}
+			if(inv.contains(new ItemStack(Material.PAPER, 3))&&inv.contains(Material.LEATHER)){
+				return "uncrafted";
 			}
 			return "a book";
 		}
@@ -93,7 +89,7 @@ public class Functions {
 	
 	
 	
-	public static boolean unsign(Player p){
+	public boolean unsign(Player p){
 		ItemStack unsign = p.getItemInHand();
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
 			return false;
@@ -107,7 +103,7 @@ public class Functions {
 	
 	
 	
-	public static boolean setAuthor(Player p, String newAuthor){
+	public boolean setAuthor(Player p, String newAuthor){
 		ItemStack book = p.getItemInHand();
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
 			return false;
@@ -118,13 +114,74 @@ public class Functions {
 	}
 	
 	
-	public static boolean setTitle(Player p, String newTitle){
-		ItemStack book = p.getItemInHand();
+	public boolean setTitle(Player p, String newTitle){
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
 			return false;
+		ItemStack book = p.getItemInHand();
 		BookMeta bookMeta = (BookMeta) book.getItemMeta();
 		bookMeta.setTitle(newTitle);
 		book.setItemMeta(bookMeta);
 		return true;
+	}
+	
+	
+	public boolean insertPageAt(Player p, int page, String text){
+		if(!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL))
+			return false;
+		ItemStack book = p.getItemInHand();
+		BookMeta bm = (BookMeta)book.getItemMeta();
+		List<String> pages = bm.getPages();
+		try {
+			pages.add(page-1, text);
+		} catch (IndexOutOfBoundsException e) {
+			p.sendMessage(ChatColor.DARK_RED+"Please enter a number between 1 and "+(bm.getPageCount()-1)+".");
+		}
+		bm.setPages(pages);
+		book.setItemMeta(bm);
+		return true;
+	}
+	
+	public boolean deletePageAt(Player p, int page){
+		if (p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL))
+			return false;
+		ItemStack book = p.getItemInHand();
+		BookMeta bm = (BookMeta)book.getItemMeta();
+		List<String> pages = bm.getPages();
+		try {
+			pages.remove(page-1);
+		} catch (IndexOutOfBoundsException e) {
+			p.sendMessage(ChatColor.DARK_RED+"Please enter a valid page number.");
+		}
+		bm.setPages(pages);
+		book.setItemMeta(bm);
+		
+		return true;
+	}
+
+
+
+	public boolean canObtainMap(Player p) {
+		if(p.hasPermission("booksuite.copy.map")){
+			Inventory inv = p.getInventory();
+			if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)){
+				if (inv.firstEmpty()==-1){
+					p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+					return false;
+				} else return true;
+			} else if(inv.contains(new ItemStack(Material.PAPER, 9))){
+				inv.remove(new ItemStack(Material.PAPER, 9));
+				if(inv.firstEmpty()==-1){
+					inv.addItem(new ItemStack(Material.PAPER, 9));
+					p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+					return false;
+				} else return true;
+			} else {
+				p.sendMessage(ChatColor.DARK_RED+"You need 9 paper to copy a map.");
+				return false;
+			}
+		} else {
+			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy maps.");
+			return false;
+		}
 	}
 }

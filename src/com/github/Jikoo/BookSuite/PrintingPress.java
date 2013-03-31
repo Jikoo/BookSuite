@@ -28,7 +28,6 @@ public class PrintingPress {
 
 
 
-
 	/**
 	 * tests if a given block is an inverted stair block
 	 * 
@@ -41,7 +40,6 @@ public class PrintingPress {
 			if (i==b.getTypeId())return b.getData()>3;
 		return false;
 	}
-
 
 
 
@@ -61,11 +59,17 @@ public class PrintingPress {
 			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
 		return false;
 	}
+
+
+
+
 	public boolean denyUseage(){
 		if (p.hasPermission("booksuite.denynowarn.press"))
 			return true;
 		return false;
 	}
+
+
 
 
 	public void operatePress(){
@@ -130,4 +134,3 @@ public class PrintingPress {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new revertBlock(b), 20L);
 	}
 }
-	

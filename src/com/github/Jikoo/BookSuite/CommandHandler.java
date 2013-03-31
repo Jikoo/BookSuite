@@ -51,7 +51,7 @@ public class CommandHandler implements CommandExecutor{
 			}
 			
 			if(new File(plugin.getDataFolder(), "temp").exists())
-				FileManager.delete(plugin.getDataFolder().getPath(), "temp");
+				plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
 			return true;
 		}
 		
@@ -73,10 +73,10 @@ public class CommandHandler implements CommandExecutor{
 		if (args.length==1&&(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("unsign"))){
 			if (p.hasPermission("booksuite.command.unsign")){
 				if(plugin.aliases.getAliases(p).contains(((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())){
-					if(Functions.unsign(p))
+					if(plugin.functions.unsign(p))
 						p.sendMessage(ChatColor.DARK_GREEN+"Book unsigned!");
 				} else if(p.hasPermission("booksuite.command.unsign.other")){
-					if(Functions.unsign(p))
+					if(plugin.functions.unsign(p))
 						p.sendMessage(ChatColor.DARK_GREEN+"Book unsigned!");
 				} else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
@@ -92,7 +92,7 @@ public class CommandHandler implements CommandExecutor{
 					if (i!=(args.length-1))
 						newAuthor+=args[i]+" ";
 					else newAuthor+=args[i];
-				if(Functions.setAuthor(p, newAuthor))
+				if(plugin.functions.setAuthor(p, newAuthor))
 					p.sendMessage(ChatColor.DARK_GREEN+"Author changed!");
 				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
@@ -109,7 +109,7 @@ public class CommandHandler implements CommandExecutor{
 						if (i!=(args.length-1))
 							newTitle+=args[i]+" ";
 						else newTitle+=args[i];
-					if(Functions.setTitle(p, newTitle))
+					if(plugin.functions.setTitle(p, newTitle))
 						p.sendMessage(ChatColor.DARK_GREEN+"Title changed!");
 				} else if(p.hasPermission("booksuite.command.title.other")){
 					String newTitle = "";
@@ -117,7 +117,7 @@ public class CommandHandler implements CommandExecutor{
 						if (i!=(args.length-1))
 							newTitle+=args[i]+" ";
 						else newTitle+=args[i];
-					if(Functions.setTitle(p, newTitle))
+					if(plugin.functions.setTitle(p, newTitle))
 						p.sendMessage(ChatColor.DARK_GREEN+"Title changed!");
 				} else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
 				return true;
@@ -129,7 +129,7 @@ public class CommandHandler implements CommandExecutor{
 		if (args.length == 1&&(args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("list") ||args[0].equalsIgnoreCase("ls"))){ //added ls, like the bash command :D
 			if (p.hasPermission("booksuite.command.list")){
 				if (args.length==1){
-					FileManager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
+					plugin.filemanager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
 					return true;
 				}
 			}
@@ -140,16 +140,16 @@ public class CommandHandler implements CommandExecutor{
 		if (args.length == 2){
 			if ((args[0].equalsIgnoreCase("f")||args[0].equalsIgnoreCase("file")||args[0].equalsIgnoreCase("l")||args[0].equalsIgnoreCase("load"))&&p.hasPermission("booksuite.command.import")){
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(FileManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", true));
+				newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", true));
 				if(!newbook.hasItemMeta()){
 					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
 				}
-				else if (!Functions.canObtainBook(p)) return true;
+				else if (!plugin.functions.canObtainBook(p)) return true;
 				else p.getInventory().addItem(newbook);
 				return true;
 			}
 			else if((args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("url"))&&(p.hasPermission("booksuite.command.import"))){
-				if (!Functions.canObtainBook(p)) return true;
+				if (!plugin.functions.canObtainBook(p)) return true;
 				else asyncBookImport(p.getName(), args[1], plugin.getDataFolder().getPath());
 				return true;
 			}
@@ -165,7 +165,7 @@ public class CommandHandler implements CommandExecutor{
 					return true;
 				}
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				if(FileManager.makeFileFromBookMeta(bm, plugin.getDataFolder()+"/SavedBooks/", args[1]))
+				if(plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder()+"/SavedBooks/", args[1]))
 					p.sendMessage(ChatColor.DARK_GREEN+"Book saved successfully!");
 				else {
 					p.sendMessage(ChatColor.DARK_RED+"A book by this name already exists!");
@@ -181,7 +181,7 @@ public class CommandHandler implements CommandExecutor{
 		//command: /book <d(elete)> <filename> - attempt to delete file
 		if (args.length == 2&&(args[0].equalsIgnoreCase("d")||args[0].equalsIgnoreCase("delete"))){
 			if (p.hasPermission("booksuite.command.delete")){
-				FileManager.delete(plugin.getDataFolder()+"/SavedBooks/", args[1]);
+				plugin.filemanager.delete(plugin.getDataFolder()+"/SavedBooks/", args[1]);
 				p.sendMessage(ChatColor.DARK_GREEN+"Deleted!");
 				return true;
 			}
@@ -196,8 +196,8 @@ public class CommandHandler implements CommandExecutor{
 					p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book overwrite an existing book!");
 					return true;
 				} else {
-					FileManager.delete(plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName()));
-					if(FileManager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName())))
+					plugin.filemanager.delete(plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName()));
+					if(plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName())))
 						p.sendMessage(ChatColor.DARK_GREEN+"Book saved successfully!");
 					overwritable.remove(p.getName());
 				}
@@ -292,6 +292,7 @@ public class CommandHandler implements CommandExecutor{
 	public class giveStreamBook implements Runnable{
 		Player p;
 		int temp;
+		FileManager fm = new FileManager();
 		giveStreamBook(String p, int temp){
 			this.p=plugin.getServer().getPlayer(p);
 			this.temp=temp;
@@ -301,8 +302,8 @@ public class CommandHandler implements CommandExecutor{
 				p.sendMessage(ChatColor.DARK_RED+"Too many books are being imported at this time, please try again later.");
 				return;
 			}
-			BookMeta bm = FileManager.makeBookMetaFromText(p, "temp"+temp, plugin.getDataFolder()+"/temp/", true);
-			FileManager.delete(plugin.getDataFolder()+"/temp/", "temp"+temp+".book");
+			BookMeta bm = fm.makeBookMetaFromText(p, "temp"+temp, plugin.getDataFolder()+"/temp/", true);
+			fm.delete(plugin.getDataFolder()+"/temp/", "temp"+temp+".book");
 			if (bm!=null){
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				is.setItemMeta(bm);
@@ -330,21 +331,19 @@ public class CommandHandler implements CommandExecutor{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp), 0L);
 	}
 	public class overwriteTimer implements Runnable{
-		CommandHandler bsce;
 		Player p;
-		overwriteTimer(CommandHandler bsce, Player p){
-			this.bsce=bsce;
+		overwriteTimer(Player p){
 			this.p=p;
 		}
 		public void run() {
-			if(bsce.overwritable.containsKey(p.getName())){
-				bsce.overwritable.remove(p.getName());
+			if(overwritable.containsKey(p.getName())){
+				overwritable.remove(p.getName());
 				p.sendMessage(ChatColor.DARK_RED+"Overwrite time expired!");
 			}
 		}
 	}
 	
 	public void syncOverwriteTimer(Player p){
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new overwriteTimer(this, p), 200L);
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new overwriteTimer(p), 200L);
 	}
 }

@@ -19,7 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class FileManager {
 	
-	public static BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL){
+	public BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL){
 		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		boolean isBookText=false;
 		if (!isURL)
@@ -87,7 +87,7 @@ public class FileManager {
 	
 	
 	
-	public static ItemStack makeItemStackFromFile(String directory, String filename){
+	public ItemStack makeItemStackFromFile(String directory, String filename){
 		ItemStack is = new ItemStack (3, 1);
 		ItemMeta im = is.getItemMeta();
 		try {
@@ -145,7 +145,7 @@ public class FileManager {
 	
 	
 	
-	public static boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename){
+	public boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename){
 		
 		try {
 			File bookLocation = new File(directory);
@@ -181,7 +181,7 @@ public class FileManager {
 	
 	
 	
-	public static boolean makeFileFromItemStack(ItemStack is, String directory, String filename){
+	public boolean makeFileFromItemStack(ItemStack is, String directory, String filename){
 		try {
 			File itemLocation = new File(directory);
 			if (!itemLocation.exists())
@@ -232,7 +232,7 @@ public class FileManager {
 	
 	
 	
-	public static String parseBookText(String text){
+	public String parseBookText(String text){
 		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "§o");
 		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
 		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
@@ -268,7 +268,7 @@ public class FileManager {
 	
 	
 	
-	public static boolean appendMailIndex(String directory, String appendText){
+	public boolean appendMailIndex(String directory, String appendText){
 		try {
 			File indexLocation = new File(directory);
 			if (!indexLocation.exists())
@@ -297,7 +297,7 @@ public class FileManager {
 	}
 	
 	
-	public static boolean removeMail(String directory, String mail){
+	public boolean removeMail(String directory, String mail){
 		try {
 			File indexFile = new File(directory, "index.bsm");
 			if (!indexFile.exists())
@@ -325,25 +325,22 @@ public class FileManager {
 			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "+e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
-		return false;
-	}
-		
-		
-		
+			return false;
+		}
 		return true;
 	}
 	
 	
 	
 	
-	public static void delete(String directory, String filename){
+	public void delete(String directory, String filename){
 		File file = new File(directory, filename);
 		if (!file.exists())
 			return;
 		file.delete();
 	}
 	
-	public static void listBookFilesIn(String directory, Player p){
+	public void listBookFilesIn(String directory, Player p){
 		File file = new File(directory);
 		if (!file.exists()){
 			p.sendMessage(ChatColor.DARK_RED+"No books have been saved yet.");

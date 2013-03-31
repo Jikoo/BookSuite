@@ -1,3 +1,15 @@
+;3.0.0pre4
+:added commands for book and quill editing:
+:- /book addpage <number> [optional page text]
+:- /book delpage <number>
+:alias groundwork done for when book editing event is added
+:complete rework of handling permissionless setup
+:added support for nether quartz stairs in presses
+:added more copiables: map + book and quill
+:added a reload command, /book reload
+:fix minor memory leaks on reload
+:removed per-author book search - was generally problematic
+:renamed all classes - prefixing them with BookSuite is rather redundant
 ;3.0.0pre3
 :removed a line that spammed on importing a book
 :added initial pastebin and bukkit paste support!

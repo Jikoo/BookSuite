@@ -11,12 +11,17 @@ import org.bukkit.entity.Player;
 
 public class Alias {
 	
-	FileConfiguration aliasYML;
+	FileConfiguration aliasYML = new YamlConfiguration();
 	String aliasType;
 	BookSuite plugin;
 	
 	public Alias(BookSuite plugin){
 		this.plugin=plugin;
+		reload();
+	}
+	
+	
+	public void reload(){
 		aliasType = plugin.getConfig().getString("alias-mode");
 		if(aliasType.equals("multi")){
 			File aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
@@ -33,11 +38,29 @@ public class Alias {
 	}
 	
 	
-	
-	public void reloadAliases(){
-		//do this when it isn't 3am ok
-		
+	public boolean addAlias(String pName, String newAlias){
+		if(aliasYML.getStringList(pName).contains(newAlias))
+			return false;
+		aliasYML.set(pName, aliasYML.getStringList(pName).add(newAlias));
+		return true;
 	}
+	
+	
+	public void addAliasToTarget(Player p, Player target, String newAlias, boolean warn){
+		if(!aliasType.equals("multi")){
+			p.sendMessage(ChatColor.DARK_RED+"Additional aliases are not allowed in the configuration. Please contact your server administrator.");
+			return;
+		}
+		if(!addAlias(target.getName(), newAlias)){
+			p.sendMessage(ChatColor.DARK_RED+target.getName()+" already has the alias "+newAlias);
+			return;
+		} else {
+			p.sendMessage(ChatColor.DARK_GREEN+"Added alias \""+newAlias+"\" to "+target.getName());
+			if(warn)
+				target.sendMessage(ChatColor.DARK_GREEN+p.getName()+" added "+newAlias+" to your list of aliases!");
+		}
+	}
+	
 	
 	
 	public ArrayList<String> getAliases(Player p){
@@ -55,8 +78,6 @@ public class Alias {
 				break;
 			default: break;
 		}
-		
-		
 		return aliases;
 	}
 
