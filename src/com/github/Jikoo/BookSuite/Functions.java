@@ -125,32 +125,46 @@ public class Functions {
 	}
 	
 	
-	public boolean insertPageAt(Player p, int page, String text){
-		if(!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL))
+	public boolean insertPageAt(Player p, String pageNumber, String text){
+		if(!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)){
+			p.sendMessage(ChatColor.DARK_RED+"You must be holding a book and quill to use this command!");
 			return false;
+		}
 		ItemStack book = p.getItemInHand();
 		BookMeta bm = (BookMeta)book.getItemMeta();
 		List<String> pages = bm.getPages();
 		try {
+			int page = Integer.parseInt(pageNumber);
 			pages.add(page-1, text);
+		} catch (NumberFormatException e1) {
+			p.sendMessage(ChatColor.DARK_RED+"Correct usage is \"/book addpage <page number> [optional page text]\"");
+			return false;
 		} catch (IndexOutOfBoundsException e) {
 			p.sendMessage(ChatColor.DARK_RED+"Please enter a number between 1 and "+(bm.getPageCount()-1)+".");
+			return false;
 		}
 		bm.setPages(pages);
 		book.setItemMeta(bm);
 		return true;
 	}
 	
-	public boolean deletePageAt(Player p, int page){
-		if (p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL))
+	public boolean deletePageAt(Player p, String pageNumber){
+		if (p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)){
+			p.sendMessage(ChatColor.DARK_RED+"You must be holding a book and quill to use this command!");
 			return false;
+		}
 		ItemStack book = p.getItemInHand();
 		BookMeta bm = (BookMeta)book.getItemMeta();
 		List<String> pages = bm.getPages();
 		try {
+			int page = Integer.parseInt(pageNumber);
 			pages.remove(page-1);
+		} catch (NumberFormatException e1) {
+			p.sendMessage(ChatColor.DARK_RED+"Correct usage is \"/book delpage <page number>\"");
+			return false;
 		} catch (IndexOutOfBoundsException e) {
-			p.sendMessage(ChatColor.DARK_RED+"Please enter a valid page number.");
+			p.sendMessage(ChatColor.DARK_RED+"Please enter a number between 1 and "+(bm.getPageCount()-1)+".");
+			return false;
 		}
 		bm.setPages(pages);
 		book.setItemMeta(bm);

@@ -68,6 +68,29 @@ public class CommandHandler implements CommandExecutor{
 		Player p = (Player) sender;
 		
 		
+		if(args.length>=2&&args[0].equalsIgnoreCase("addpage")){
+			if(p.hasPermission("booksuite.command.edit")){
+				String text = "";
+				for (int i=2; i<args.length; i++){
+					if (i!=(args.length-1))
+						text += args[i]+" ";
+					else text += args[i];
+				}
+				if(plugin.functions.insertPageAt(p, args[1], text))
+					p.sendMessage(ChatColor.DARK_GREEN+"Page added!");
+			}
+		}
+		
+		
+		
+		if(args.length==2&&args[0].equalsIgnoreCase("delpage")){
+			if(p.hasPermission("booksuite.command.edit")){
+				if(plugin.functions.deletePageAt(p, args[1]))
+					p.sendMessage(ChatColor.DARK_GREEN+"Page deleted!");
+			}
+		}
+		
+		
 		
 		//command: /book u - attempt to unsign book
 		if (args.length==1&&(args[0].equalsIgnoreCase("u")||args[0].equalsIgnoreCase("unsign"))){
