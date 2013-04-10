@@ -119,13 +119,9 @@ public class PrintingPress {
 			if(b.getType().equals(changedBlock.getType())) {
 				b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock.getData().getData(), false);
 			} else {
-				Player[] plist = Bukkit.getOnlinePlayers();
-				for (int i = 0; i < plist.length; i++){
-					if (plist[i].getName().equals(p.getName())) {
-						plist[i].sendMessage(ChatColor.DARK_RED+"The press you used appears to have broken.");
-						return;
-					}
-				}
+				Player owner = Bukkit.getPlayerExact(p.getName());
+				if (owner != null)
+					owner.sendMessage(ChatColor.DARK_RED+"The press you used appears to have broken.");
 			}
 		}
 	}
