@@ -19,9 +19,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class FileManager {
 	
-	public BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL){
-		BookMeta text = (BookMeta)new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
-		boolean isBookText=false;
+	public BookMeta makeBookMetaFromText(Player p, String file, String location, boolean isURL) {
+		BookMeta text = (BookMeta) new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
+		boolean isBookText = false;
 		if (!isURL)
 			isBookText=true;
 		
@@ -30,11 +30,11 @@ public class FileManager {
 			if(file.contains(".")) s = new Scanner(new File(location, file));
 			else s = new Scanner(new File(location, file+".book"));
 			String page = "";
-			while(s.hasNext()){
+			while(s.hasNext()) {
 				String line = s.nextLine();
 				
 				//pastebin support section
-				if(location.contains("temp")){
+				if (location.contains("temp")) {
 					line=line.replaceAll("(<li class=\").*(\">)", "").replace("</li>", "");
 					line=line.replaceAll("(<div class=\").*(\">)", "").replace("</div>", "");
 					line=line.replace("&lt;", "<").replace("&gt;", ">");
@@ -43,30 +43,30 @@ public class FileManager {
 				}
 				
 				
-				if(line.contains("<book>")){
+				if (line.contains("<book>")) {
 					isBookText = true;
 					line = line.replace("<book>", "");
 				}
 				if (isBookText){
-					if(line.contains("</book>")){
+					if(line.contains("</book>")) {
 						break;
 					}
-					if (line.length()>=2 && line.substring(0, 2).equals("//")){
+					if (line.length()>=2 && line.substring(0, 2).equals("//")) {
 						//do nothing, this line is a book comment
 					}
-					else if (line.contains("<author>")&&(!isURL||p.hasPermission("booksuite.command.import.other"))){
+					else if (line.contains("<author>") && (!isURL || p.hasPermission("booksuite.command.import.other"))) {
 						text.setAuthor(line.replace("<author>", "").replace("</author>", ""));
 					}
-					else if (line.contains("<title>")){
+					else if (line.contains("<title>")) {
 						text.setTitle(line.replace("<title>", "").replace("</title>", "").replace("<br>", ""));
 					}
-					else if(line.contains("<page>")){
+					else if(line.contains("<page>")) {
 						page = "";
 					}
-					else if (line.contains("</page>")){
+					else if (line.contains("</page>")) {
 						text.addPage(parseBookText(page));
 					}
-					else{
+					else {
 						page+=line+"<n>";
 					}
 				}
@@ -75,8 +75,7 @@ public class FileManager {
 			if (!text.hasAuthor())
 				text.setAuthor(p.getName());
 			return text;
-		}
-		catch(Exception ex) {
+		} catch (Exception ex) {
 			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.makeBookMetaFromText: "+ex);
 			ex.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
@@ -87,7 +86,7 @@ public class FileManager {
 	
 	
 	
-	public ItemStack makeItemStackFromFile(String directory, String filename){
+	public ItemStack makeItemStackFromFile(String directory, String filename) {
 		ItemStack is = new ItemStack (3, 1);
 		ItemMeta im = is.getItemMeta();
 		try {
@@ -95,46 +94,36 @@ public class FileManager {
 			Scanner s = new Scanner(itemFile);
 			List<String> lore = new ArrayList<String>();
 			boolean handlingEnchants = false;
-			while(s.hasNext()){
+			while(s.hasNext()) {
 				String line = s.nextLine();
 				
-				if (line.contains("<TypeID>")){
+				if (line.contains("<TypeID>")) {
 					is.setType(Material.matchMaterial(line.replaceAll("<Type>", "").replaceAll("</Type>", "")));
-				}
-				else if (line.contains("<Amount>")){
+				} else if (line.contains("<Amount>")) {
 					is.setAmount(Integer.parseInt(line.replaceAll("<Amount>", "").replaceAll("</Amount>", "")));
-				}
-				else if (line.contains("<Durability>")){
+				} else if (line.contains("<Durability>")) {
 					is.setDurability((short)Integer.parseInt(line.replaceAll("<Durability>", "").replaceAll("</Durability>", "")));
-				}
-				else if(line.contains("<Lore>")){
+				} else if(line.contains("<Lore>")) {
 					lore.clear();
-				}
-				else if (line.contains("</Lore>")){
+				} else if (line.contains("</Lore>")) {
 					im.setLore(lore);
-				}
-				else if (line.contains("<DisplayName>")){
+				} else if (line.contains("<DisplayName>")) {
 					im.setDisplayName(line.replaceAll("<DisplayName>", "").replaceAll("</DisplayName>", ""));
-				}
-				else if(line.contains("<Enchantments>")){
+				} else if(line.contains("<Enchantments>")) {
 					handlingEnchants = true;
-				}
-				else if(line.contains("</Enchantments>")){
+				} else if(line.contains("</Enchantments>")) {
 					break;
-				}
-				else if (handlingEnchants){
+				} else if (handlingEnchants) {
 					String[] enchant = line.split(":");
 					im.addEnchant(Enchantment.getById(Integer.parseInt(enchant[0])), Integer.parseInt(enchant[1]), true);
-				}
-				else{
+				} else {
 					lore.add(line);
 				}
 			}
 			s.close();
 			is.setItemMeta(im);
 			return is;
-		}
-		catch(Exception ex) {
+		} catch(Exception ex) {
 			im.setDisplayName("Item file error! My condolences.");
 			is.setItemMeta(im);
 			return is;
@@ -145,32 +134,28 @@ public class FileManager {
 	
 	
 	
-	public boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename){
+	public boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename, boolean overwrite) {
 		
 		try {
 			File bookLocation = new File(directory);
 			if (!bookLocation.exists())
 				bookLocation.mkdirs();
 			File bookFile = new File(bookLocation, filename+".book");
-			if(!bookFile.exists()){
+			if (!bookFile.exists()){
 				bookFile.createNewFile();
-			}
-			else
-				throw new FileAlreadyExistsException(bookFile.getAbsolutePath());
+			} else if (!overwrite) throw new FileAlreadyExistsException(bookFile.getAbsolutePath());
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<book>\n");
 			file.append("<author>"+bm.getAuthor()+"</author>\n");
 			file.append("<title>"+bm.getTitle()+"</title>\n");
-			for (int i=1; i<=bm.getPageCount(); i++)
+			for (int i = 1; i <= bm.getPageCount(); i++)
 				file.append("<page>\n"+bm.getPage(i)+"\n</page>\n");
 			file.append("</book>");
 			file.close();
 			return true;
-		}
-		catch(FileAlreadyExistsException fe){
+		} catch(FileAlreadyExistsException fe) {
 			return false;
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromBookMeta: "+e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
@@ -181,35 +166,35 @@ public class FileManager {
 	
 	
 	
-	public boolean makeFileFromItemStack(ItemStack is, String directory, String filename){
+	public boolean makeFileFromItemStack(ItemStack is, String directory, String filename) {
 		try {
 			File itemLocation = new File(directory);
 			if (!itemLocation.exists())
 				itemLocation.mkdirs();
 			File itemFile = new File(itemLocation, filename+".item");
-			if(!itemFile.exists()){
+			if(!itemFile.exists()) {
 				itemFile.createNewFile();
 			}
 			else
 				throw new FileAlreadyExistsException(itemFile.getAbsolutePath());
 			FileWriter file = new FileWriter(itemFile);
-			file.write("<Type>"+is.getType().name()+"</Type>\n");
-			file.append("<Amount>"+is.getAmount()+"</Amount>");
-			file.append("<Durability>"+is.getDurability()+"</Durability>\n");
-			if(is.hasItemMeta()){
+			file.write("<Type>" + is.getType().name() + "</Type>\n");
+			file.append("<Amount>" + is.getAmount() + "</Amount>");
+			file.append("<Durability>"+ is.getDurability() + "</Durability>\n");
+			if(is.hasItemMeta()) {
 				ItemMeta im = is.getItemMeta();
 				if (im.hasDisplayName())
-					file.append("<DisplayName>"+im.getDisplayName()+"</DisplayName>\n");
-				if (im.hasLore()){
+					file.append("<DisplayName>" + im.getDisplayName() + "</DisplayName>\n");
+				if (im.hasLore()) {
 					List<String> loreList = im.getLore();
 					file.append("<Lore>\n");
-					for(int i=0; i< loreList.size(); i++)
+					for(int i = 0; i < loreList.size(); i++)
 						file.append(loreList.get(i)+"\n");
 					file.append("</Lore>\n");
 				}
-				if (im.hasEnchants()){
+				if (im.hasEnchants()) {
 					file.append("<Enchantments>\n");
-					for (Enchantment e:Enchantment.values()){
+					for (Enchantment e:Enchantment.values()) {
 						file.append(e.getId()+":"+im.getEnchantLevel(e)+"\n");
 					}
 					file.append("</Enchantments>");
@@ -217,11 +202,9 @@ public class FileManager {
 			}
 			file.close();
 			return true;
-		}
-		catch(FileAlreadyExistsException fe){
+		} catch(FileAlreadyExistsException fe) {
 			return false;
-		}
-		catch(IOException e) {
+		} catch(IOException e) {
 			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromItemStack: "+e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
@@ -232,7 +215,7 @@ public class FileManager {
 	
 	
 	
-	public String parseBookText(String text){
+	public String parseBookText(String text) {
 		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "§o");
 		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
 		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
@@ -268,7 +251,7 @@ public class FileManager {
 	
 	
 	
-	public boolean appendMailIndex(String directory, String appendText){
+	public boolean appendMailIndex(String directory, String appendText) {
 		try {
 			File indexLocation = new File(directory);
 			if (!indexLocation.exists())
@@ -277,12 +260,11 @@ public class FileManager {
 			FileWriter index;
 			if (indexFile.exists()){
 				index = new FileWriter(indexFile);
-				index.append(appendText+"\n");
-			}
-			else {
+				index.append(appendText + "\n");
+			} else {
 				indexFile.createNewFile();
 				index = new FileWriter(indexFile);
-				index.write(appendText+"\n");
+				index.write(appendText + "\n");
 			}
 			index.close();
 			return true;
@@ -297,7 +279,7 @@ public class FileManager {
 	}
 	
 	
-	public boolean removeMail(String directory, String mail){
+	public boolean removeMail(String directory, String mail) {
 		try {
 			File indexFile = new File(directory, "index.bsm");
 			if (!indexFile.exists())
@@ -305,10 +287,10 @@ public class FileManager {
 			Scanner s = new Scanner(indexFile);
 			String indexContents="";
 			
-			while (s.hasNextLine()){
+			while (s.hasNextLine()) {
 				String line = s.nextLine();
-				if(!line.equals(mail)){
-					indexContents+=line+"\n";
+				if(!line.equals(mail)) {
+					indexContents += line + "\n";
 					
 				}
 			}
@@ -333,34 +315,34 @@ public class FileManager {
 	
 	
 	
-	public void delete(String directory, String filename){
+	public boolean delete(String directory, String filename) {
 		File file = new File(directory, filename);
 		if (!file.exists())
-			return;
-		file.delete();
+			return false;
+		return file.delete();
 	}
 	
-	public void listBookFilesIn(String directory, Player p){
+	public void listBookFilesIn(String directory, Player p) {
 		File file = new File(directory);
-		if (!file.exists()){
+		if (!file.exists()) {
 			p.sendMessage(ChatColor.DARK_RED+"No books have been saved yet.");
 			file.mkdirs();
 			return;
 		}
 		File[] fileList = file.listFiles();
-		if (fileList==null){
+		if (fileList==null) {
 			p.sendMessage(ChatColor.DARK_RED+"No books found.");
 			return;
 		}
 		String[] bookList = new String[fileList.length];
 		int i = 0;
-		for (File bookFile : fileList){
-			if (bookFile.getName().contains(".book")){
-				bookList[i] = bookFile.getName().replace(".book", "").replace(".txt", "");
+		for (File bookFile : fileList) {
+			if (bookFile.getName().contains(".book")) {
+				bookList[i] = bookFile.getName().replace(".book", "");
 				i++;
 			}
 		}
-		if (bookList.length==1&&bookList[0].equals("")){
+		if (bookList.length==1&&bookList[0].equals("")) {
 			p.sendMessage(ChatColor.DARK_RED+"No books found.");
 		} else {
 			for (String book : bookList){
@@ -368,5 +350,4 @@ public class FileManager {
 			}
 		}
 	}
-	
 }

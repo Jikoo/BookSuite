@@ -1,50 +1,70 @@
 package com.github.Jikoo.BookSuite.permissions;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 
 import com.github.Jikoo.BookSuite.BookSuite;
 
-public class PermissionsListener implements Listener, CommandExecutor {
+public class PermissionsListener implements Listener {
 	Permissions permissions = new Permissions();
 	boolean enabled = false;
 	BookSuite plugin;
 
-	// Events: join, quit, kick, op, deop
+
 	public PermissionsListener(BookSuite plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler
 	public void onLogin(PlayerJoinEvent event) {
-		if (!enabled)
+		syncImplementPermissions(event.getPlayer());
+	}
+
+	@EventHandler
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event){
+		if(event.isCancelled())
 			return;
-		if (event.getPlayer().isOp()) {
-			permissions.addOpPermissions(event.getPlayer());
-		} else {
-			permissions.addDefaultPermissions(event.getPlayer());
+		if(event.getMessage().toLowerCase().contains("op")){
+			String[] command = event.getMessage().toLowerCase().split(" ");
+			if (command.length==2){
+				if (command[0].equals("/op") || command[0].equals("/deop")){
+					//While vanilla would use getPlayerExact, we need to compensate for autofill from plugins
+					Player p = Bukkit.getPlayer(command[1]);
+					if (p != null)
+						syncOpPermissionsCheck(p, p.isOp());
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onConsoleCommand(ServerCommandEvent event){
+		if(event.getCommand().toLowerCase().contains("op")) {
+			String[] command = event.getCommand().toLowerCase().split(" ");
+			if (command.length == 2 && (command[0].equals("op") || command[0].equals("deop"))){
+				Player p = Bukkit.getPlayer(command[1]);
+				if (p != null)
+					syncOpPermissionsCheck(p, p.isOp());
+			}
 		}
 	}
 
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
-		if (enabled)
-			permissions.removePermissions(event.getPlayer());
+		permissions.removePermissions(event.getPlayer().getName());
 	}
 
 	@EventHandler
 	public void onKick(PlayerKickEvent event) {
-		if (enabled)
-			permissions.removePermissions(event.getPlayer());
+		permissions.removePermissions(event.getPlayer().getName());
 	}
 
 	public boolean isEnabled() {
@@ -53,6 +73,22 @@ public class PermissionsListener implements Listener, CommandExecutor {
 
 	public void enable() {
 		enabled = true;
+		registerListeners();
+		registerOnlinePlayers();
+	}
+
+	public void disable() {
+		enabled = false;
+		permissions.removeAllPermissions();
+		HandlerList.unregisterAll(this);
+	}
+
+	public void registerListeners() {
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
+
+	public void registerOnlinePlayers() {
+		permissions.removeAllPermissions();
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (p.isOp()) {
 				permissions.addOpPermissions(p);
@@ -62,24 +98,31 @@ public class PermissionsListener implements Listener, CommandExecutor {
 		}
 	}
 
-	public void disable() {
-		enabled = false;
-		permissions.removeAllPermissions();
-		HandlerList.unregisterAll(this);
-	}
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
-		if (args.length != 1)
-			return true;
-		if (cmd.getName().equals("op")) {
-			if (!Bukkit.getPlayerExact(args[0]).isOp()) {
 
+	public class implementPermissions implements Runnable {
+		Player p;
+
+		implementPermissions(Player p) {
+			this.p = p;
+		}
+
+		public void run() {
+			if (p.isOp()) {
+				permissions.removePermissions(p.getName());
+				permissions.addOpPermissions(p);
+			} else {
+				permissions.removePermissions(p.getName());
+				permissions.addDefaultPermissions(p);
 			}
 		}
-		return true;
 	}
+
+	public void syncImplementPermissions(Player p) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new implementPermissions(p), 0L);
+	}
+
+
 
 	public class opPermissionsCheck implements Runnable {
 		Player p;
@@ -87,12 +130,13 @@ public class PermissionsListener implements Listener, CommandExecutor {
 
 		opPermissionsCheck(Player p, boolean wasOp) {
 			this.p = p;
+			this.wasOp = wasOp;
 		}
 
 		public void run() {
 			if (wasOp) {
 				if (!p.isOp()) {
-					permissions.removePermissions(p);
+					permissions.removePermissions(p.getName());
 					permissions.addDefaultPermissions(p);
 				}
 			} else {
@@ -104,9 +148,6 @@ public class PermissionsListener implements Listener, CommandExecutor {
 	}
 
 	public void syncOpPermissionsCheck(Player p, boolean wasOp) {
-		Bukkit.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(plugin,
-						new opPermissionsCheck(p, wasOp), 0L);
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new opPermissionsCheck(p, wasOp), 1L);
 	}
 }

@@ -15,6 +15,7 @@ public class PrintingPress {
 	ItemStack is;
 	Block blockUp;
 	BlockState originalBlock;
+	BlockState changedBlock;
 	
 	
 	public PrintingPress (BookSuite plugin, Player p, ItemStack is, Block blockUp) {
@@ -29,26 +30,10 @@ public class PrintingPress {
 
 
 	/**
-	 * tests if a given block is an inverted stair block
-	 * 
-	 * @param b the block to be tested
-	 * @return whether the block is an inverted stair
-	 */
-	public static boolean isInvertedStairs(Block b){
-		int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
-		for(int i: acceptable)
-			if (i==b.getTypeId())return b.getData()>3;
-		return false;
-	}
-
-
-
-
-	/**
 	 * @param a
 	 * @return
 	 */
-	public boolean checkCopyPermission(String a){
+	public boolean checkCopyPermission(String a) {
 		if (p.hasPermission("booksuite.copy.other"))
 			return true;
 		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
@@ -63,7 +48,7 @@ public class PrintingPress {
 
 
 
-	public boolean denyUseage(){
+	public boolean denyUseage() {
 		if (p.hasPermission("booksuite.denynowarn.press"))
 			return true;
 		return false;
@@ -72,10 +57,12 @@ public class PrintingPress {
 
 
 
-	public void operatePress(){
+	public void operatePress() {
 		changeStairBlock(blockUp);
 		revertBlockPause(blockUp);
-		p.getInventory().addItem(is.clone());
+		ItemStack duplicate = is.clone();
+		duplicate.setAmount(1);
+		p.getInventory().addItem(duplicate);
 		p.updateInventory();
 		p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
 	}
@@ -88,7 +75,7 @@ public class PrintingPress {
 	 * 
 	 * @param b the stair block to be transformed
 	 */
-	public void changeStairBlock(Block b){
+	public void changeStairBlock(Block b) {
 		if (b.getTypeId() == 53)//WOOD_STAIRS
 			b.setTypeIdAndData(126, (byte) 0, false);//WOOD_STEP
 
@@ -118,19 +105,31 @@ public class PrintingPress {
 
 		else if (b.getTypeId() == 156)//Quartz stairs
 			b.setTypeIdAndData(44, (byte) 7, false);//STEP
+		
+		changedBlock = b.getState();
 	}
 
 
-	public class revertBlock implements Runnable{
+	public class revertBlock implements Runnable {
 		Block b;
-		revertBlock(Block block){
+		revertBlock(Block block) {
 			b = block;
 		}
 		public void run() {
-			b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock.getData().getData(), false);
+			if(b.getType().equals(changedBlock.getType())) {
+				b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock.getData().getData(), false);
+			} else {
+				Player[] plist = Bukkit.getOnlinePlayers();
+				for (int i = 0; i < plist.length; i++){
+					if (plist[i].getName().equals(p.getName())) {
+						plist[i].sendMessage(ChatColor.DARK_RED+"The press you used appears to have broken.");
+						return;
+					}
+				}
+			}
 		}
 	}
-	public void revertBlockPause(Block b){
+	public void revertBlockPause(Block b) {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new revertBlock(b), 20L);
 	}
 }

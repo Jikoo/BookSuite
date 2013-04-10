@@ -21,10 +21,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 
 
-public class BookSuite extends JavaPlugin implements Listener{
+public class BookSuite extends JavaPlugin implements Listener {
 	String version = "3.0.0";
 	PermissionsListener perms;
-	Alias aliases;
 	Functions functions = new Functions();
 	FileManager filemanager = new FileManager();
 	MailExecutor mail = new MailExecutor();
@@ -33,18 +32,16 @@ public class BookSuite extends JavaPlugin implements Listener{
 	public void onEnable() {
 		saveDefaultConfig();
 		try {
-			boolean externalPermissions = getConfig().getBoolean("use-external-permissions");
-			if(!externalPermissions){
+			boolean inbuiltPermissions = getConfig().getBoolean("use-inbuilt-permissions");
+			if (inbuiltPermissions) {
 				perms = new PermissionsListener(this);
 				getServer().getPluginManager().registerEvents(perms, this);
-				getCommand("op").setExecutor(perms);
-				getCommand("deop").setExecutor(perms);
 				
 			}
 		} catch (Exception e) {
 			
 		}
-		if(new File(getDataFolder(), "temp").exists())
+		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("book").setExecutor(new CommandHandler(this));
@@ -57,8 +54,9 @@ public class BookSuite extends JavaPlugin implements Listener{
 	
 	@Override
 	public void onDisable() {
-		if(new File(getDataFolder(), "temp").exists())
+		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
+		perms = null;
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
 
@@ -69,8 +67,8 @@ public class BookSuite extends JavaPlugin implements Listener{
 	 * @param event world triggered event
 	 */
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event){
-		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 
 			Player p = event.getPlayer();
 			ItemStack is = p.getItemInHand();
@@ -80,50 +78,58 @@ public class BookSuite extends JavaPlugin implements Listener{
 			
 			
 			//if clicking a workbench, check to see if it is a press and act accordingly
-			if(clicked.getType().equals(Material.WORKBENCH)){
-				if (PrintingPress.isInvertedStairs(blockUp)){
+			if (clicked.getType().equals(Material.WORKBENCH)) {
+				if (functions.isInvertedStairs(blockUp)) {
 					PrintingPress press = new PrintingPress(this, p, is, blockUp);
-					if(!press.denyUseage()){
-						if (is.getType().equals(Material.MAP)){
-							if(functions.canObtainMap(p))
+					if (!press.denyUseage()) {
+						if (is.getType().equals(Material.MAP)) {
+							if (functions.canObtainMap(p))
 								press.operatePress();
 							event.setCancelled(true);
-						} else if(!(is.hasItemMeta()||is.getItemMeta()!=null)){
+						} else if (!(is.hasItemMeta() || is.getItemMeta()!=null)) {
 							return;
-						} else if (is.getType().equals(Material.WRITTEN_BOOK)){
+						} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
 							BookMeta bm = (BookMeta) is.getItemMeta();
 							if (press.checkCopyPermission(bm.getAuthor()) && functions.canObtainBook(p))
 								press.operatePress();
 							event.setCancelled(true);
-						} else if (is.getType().equals(Material.BOOK_AND_QUILL)){
-							if(p.hasPermission("booksuite.copy.unsigned")){
-								if(functions.canObtainBook(p))
+						} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
+							if (p.hasPermission("booksuite.copy.unsigned")) {
+								if (functions.canObtainBook(p))
 									press.operatePress();
 							} else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy unsigned books!");
 							event.setCancelled(true);
 						}
 					}
-				}
-			} else if (is.getType().equals(Material.WRITTEN_BOOK)){
-				if(!(is.hasItemMeta()||is.getItemMeta()!=null))
-					return;
-				if (clicked.getType().equals(Material.CAULDRON)){
-					BookMeta bm = (BookMeta) is.getItemMeta();if(p.hasPermission("booksuite.block.erase")){
-						if (clicked.getData()<1&&!p.getGameMode().equals(GameMode.CREATIVE)&&!p.hasPermission("booksuite.block.erase.free"))
-							p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
-						else if(bm.getAuthor().equalsIgnoreCase(p.getDisplayName())){
-							functions.unsign(p);
-							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
-								clicked.setData((byte) (clicked.getData()-1));
-						}
-						else if (p.hasPermission("booksuite.block.erase.other")){
-							functions.unsign(p);
-							if(!p.hasPermission("booksuite.block.erase.free")&&!p.getGameMode().equals(GameMode.CREATIVE))
-								clicked.setData((byte) (clicked.getData()-1));
-						}
-						else p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
+				} else if (event.getBlockFace().equals(BlockFace.UP) && blockUp.isEmpty() && functions.isCorrectStairType(is)) {
+					if (p.hasPermission("booksuite.copy.createpress")) {
+						blockUp.setTypeIdAndData(is.getTypeId(), functions.getCorrectStairOrientation(p), true);
+						if (is.getAmount() == 1)
+							p.setItemInHand(null);
+						else is.setAmount(is.getAmount()-1);
 						event.setCancelled(true);
-					} else if (!p.hasPermission("booksuite.denynowarn.erase")){
+						p.updateInventory();
+					}
+				}
+			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
+				if (!(is.hasItemMeta() || is.getItemMeta()!=null))
+					return;
+				if (clicked.getType().equals(Material.CAULDRON)) {
+					BookMeta bm = (BookMeta) is.getItemMeta();
+					if (p.hasPermission("booksuite.block.erase")) {
+						if (clicked.getData() < 1 && !p.getGameMode().equals(GameMode.CREATIVE) && !p.hasPermission("booksuite.block.erase.free"))
+							p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
+						else if (bm.getAuthor().equalsIgnoreCase(p.getDisplayName())) {
+							functions.unsign(p);
+							if (!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
+								clicked.setData((byte) (clicked.getData()-1));
+						} else if (p.hasPermission("booksuite.block.erase.other")) {
+							functions.unsign(p);
+							if(!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
+								clicked.setData((byte) (clicked.getData()-1));
+						} else p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
+						event.setCancelled(true);
+					} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
 						p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use erasers.");
 						event.setCancelled(true);
 					}
