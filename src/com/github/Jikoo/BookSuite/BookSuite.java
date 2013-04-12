@@ -24,7 +24,7 @@ import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
-	String version = "3.0.0";
+	String version = "3.1.0";
 	PermissionsListener perms;
 	Functions functions = new Functions();
 	FileManager filemanager = new FileManager();
