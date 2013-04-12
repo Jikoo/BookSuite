@@ -3,6 +3,7 @@ package com.github.Jikoo.BookSuite;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
+import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 
 public class CommandHandler implements CommandExecutor {
@@ -35,8 +37,8 @@ public class CommandHandler implements CommandExecutor {
 			plugin.saveDefaultConfig();
 			plugin.reloadConfig();
 			
-			try {
-				if(plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
+			if(plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
+				if(plugin.perms != null) {
 					if(!plugin.perms.isEnabled()){
 						plugin.perms.enable();
 					} else {
@@ -44,15 +46,46 @@ public class CommandHandler implements CommandExecutor {
 						plugin.perms.enable();
 					}
 				} else {
-					plugin.perms.disable();
-					plugin.perms = null;
-				}
-			} catch (Exception e) {
-				if(plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
 					plugin.perms = new PermissionsListener(plugin);
 					plugin.perms.enable();
 				}
+			} else {
+				if (plugin.perms != null) {
+					plugin.perms.disable();
+					plugin.perms = null;
+				}
 			}
+			
+			try {
+				if (plugin.getConfig().getBoolean("enable-metrics")) {
+					if (plugin.metrics == null) {
+						try {
+							plugin.metrics = new Metrics(plugin);
+							plugin.metrics.start();
+						} catch (IOException e) {
+							plugin.getLogger().warning("[BookSuite] Error enabling metrics: " + e);
+							e.printStackTrace();
+							plugin.getLogger().warning("[BookSuite] End error report.");
+							if (plugin.metrics != null) {
+								plugin.metrics.disable();
+								plugin.metrics = null;
+							}
+						}
+					} else {
+						plugin.metrics.start();
+					}
+				} else {
+					if (plugin.metrics != null) {
+						plugin.metrics.disable();
+						plugin.metrics = null;
+					}
+				}
+			} catch (Exception e) {
+				plugin.getLogger().warning("[BookSuite] Error reloading metrics: " + e);
+				e.printStackTrace();
+				plugin.getLogger().warning("[BookSuite] End error report.");
+			}
+			
 			if (new File(plugin.getDataFolder(), "temp").exists())
 				plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
 			sender.sendMessage(ChatColor.DARK_GREEN+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" reloaded!");

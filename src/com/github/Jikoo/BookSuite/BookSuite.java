@@ -1,6 +1,7 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 
 
@@ -27,22 +29,48 @@ public class BookSuite extends JavaPlugin implements Listener {
 	Functions functions = new Functions();
 	FileManager filemanager = new FileManager();
 	MailExecutor mail = new MailExecutor();
+	Metrics metrics;
 	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
+		
 		try {
-			boolean inbuiltPermissions = getConfig().getBoolean("use-inbuilt-permissions");
-			if (inbuiltPermissions) {
+			
+			getConfig().addDefault("use-inbuilt-permissions", false);
+			
+			if (getConfig().getBoolean("use-inbuilt-permissions")) {
 				perms = new PermissionsListener(this);
-				getServer().getPluginManager().registerEvents(perms, this);
+				perms.enable();
 				
 			}
-		} catch (Exception e) {
 			
+			getConfig().addDefault("enable-metrics", true);
+			
+			//Let's allow players to more easily disable our metrics
+			if (getConfig().getBoolean("enable-metrics")) {
+				try {
+					metrics = new Metrics(this);
+					metrics.start();
+				} catch (IOException e) {
+					getLogger().warning("[BookSuite] Error enabling metrics: " + e);
+					e.printStackTrace();
+					getLogger().warning("[BookSuite] End error report.");
+					if (metrics != null) {
+						metrics.disable();
+						metrics = null;
+					}
+				}
+			}
+		} catch (Exception e) {
+			getLogger().warning("[BookSuite] Error loading configuration: " + e);
+			e.printStackTrace();
+			getLogger().warning("[BookSuite] End error report.");
 		}
+		
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
+		
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("book").setExecutor(new CommandHandler(this));
 		getLogger().info("BookSuite v"+version+" enabled!");

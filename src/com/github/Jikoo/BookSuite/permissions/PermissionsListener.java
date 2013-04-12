@@ -14,7 +14,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class PermissionsListener implements Listener {
-	Permissions permissions = new Permissions();
+	Permissions permissions;
 	boolean enabled = false;
 	BookSuite plugin;
 
@@ -72,15 +72,21 @@ public class PermissionsListener implements Listener {
 	}
 
 	public void enable() {
-		enabled = true;
-		registerListeners();
-		registerOnlinePlayers();
+		if (!enabled) {
+			enabled = true;
+			permissions = new Permissions();
+			registerListeners();
+			registerOnlinePlayers();
+		}
 	}
 
 	public void disable() {
-		enabled = false;
-		permissions.removeAllPermissions();
-		HandlerList.unregisterAll(this);
+		if (enabled) {
+			enabled = false;
+			permissions.removeAllPermissions();
+			HandlerList.unregisterAll(this);
+			permissions = null;
+		}
 	}
 
 	public void registerListeners() {

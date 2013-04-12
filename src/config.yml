@@ -1,8 +1,8 @@
 ###PERMISSIONS###
-# If changing external permissions from false to true,
-# a full server restart is recommended to slightly
-# improve memory usage.
 use-external-permissions: true
+
+###METRICS###
+enable-metrics: true
 
 ###ALIASES###
 # Aliases are names people are allowed to sign books with

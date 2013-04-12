@@ -1,3 +1,8 @@
+;3.1.0
+:added metrics
+:improved initial plugin enable
+:improved reload
+:improved check to see if player is online after press is destroyed mid-press
 ;3.0.0
 :sneaking and placing stairs on a crafting bench automatically inverts them, creating a press
 :added commands for book and quill editing:
