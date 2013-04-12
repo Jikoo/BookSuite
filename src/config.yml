@@ -4,6 +4,11 @@ use-external-permissions: true
 ###METRICS###
 enable-metrics: true
 
+###UPDATE CHECK###
+# if true, players with the ability to use the update check
+# command will automatically trigger a check on login
+login-update-check: true
+
 ###ALIASES###
 # Aliases are names people are allowed to sign books with
 # and authors whose books they can unsign.

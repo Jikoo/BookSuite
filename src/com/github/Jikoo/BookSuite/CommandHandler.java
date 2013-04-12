@@ -37,6 +37,8 @@ public class CommandHandler implements CommandExecutor {
 			plugin.saveDefaultConfig();
 			plugin.reloadConfig();
 			
+			
+			
 			if(plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
 				if(plugin.perms != null) {
 					if(!plugin.perms.isEnabled()){
@@ -55,6 +57,8 @@ public class CommandHandler implements CommandExecutor {
 					plugin.perms = null;
 				}
 			}
+			
+			
 			
 			try {
 				if (plugin.getConfig().getBoolean("enable-metrics")) {
@@ -86,12 +90,24 @@ public class CommandHandler implements CommandExecutor {
 				plugin.getLogger().warning("[BookSuite] End error report.");
 			}
 			
+			
+			
+			if (plugin.getConfig().getBoolean("login-update-check")) {
+				plugin.update.disableNotifications();
+				plugin.update.enableNotifications();
+			} else plugin.update.disableNotifications();
+			
+			
+			
 			if (new File(plugin.getDataFolder(), "temp").exists())
 				plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
 			sender.sendMessage(ChatColor.DARK_GREEN+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" reloaded!");
 			return true;
 		}
 		
+		if (args.length == 1 && args[0].equalsIgnoreCase("update") && (sender.hasPermission("booksuite.command.update") || !(sender instanceof Player))) {
+			plugin.update.asyncUpdateCheck(sender.getName(), true);
+		}
 		
 		
 		
@@ -358,7 +374,6 @@ public class CommandHandler implements CommandExecutor {
 	
 	
 	
-	
 	public class getStreamBook implements Runnable {
 		String p;
 		URL url;
@@ -401,7 +416,7 @@ public class CommandHandler implements CommandExecutor {
 		}
 	}
 	public void asyncBookImport(String p, String s, String dir) {
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir), 0L);
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir));
 	}
 	public class giveStreamBook implements Runnable {
 		Player p;
@@ -442,8 +457,11 @@ public class CommandHandler implements CommandExecutor {
 	}
 	
 	public void syncBookImport(String p, int temp) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp), 0L);
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp));
 	}
+	
+	
+	
 	public class overwriteTimer implements Runnable {
 		Player p;
 		overwriteTimer(Player p) {

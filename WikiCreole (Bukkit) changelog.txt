@@ -1,5 +1,7 @@
 ;3.1.0
+:added update checker
 :added metrics
+:improved memory usage when disabled
 :improved initial plugin enable
 :improved reload
 :improved check to see if player is online after press is destroyed mid-press

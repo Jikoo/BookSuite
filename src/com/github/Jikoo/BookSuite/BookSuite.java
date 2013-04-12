@@ -21,34 +21,45 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
+import com.github.Jikoo.BookSuite.update.UpdateCheck;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
 	String version = "3.1.0";
+	public int currentFile = 9;
+
+	MailExecutor mail;
+	Functions functions;
+	FileManager filemanager;
+	UpdateCheck update;
 	PermissionsListener perms;
-	Functions functions = new Functions();
-	FileManager filemanager = new FileManager();
-	MailExecutor mail = new MailExecutor();
 	Metrics metrics;
-	
+
 	@Override
 	public void onEnable() {
+		getLogger().info("[BookSuite] Enabling...");
 		saveDefaultConfig();
 		
+		mail = new MailExecutor();
+		functions = new Functions();
+		filemanager = new FileManager();
+		update = new UpdateCheck(this);
+		
 		try {
-			
 			getConfig().addDefault("use-inbuilt-permissions", false);
 			
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {
+				getLogger().info("[BookSuite] Enabling inbuilt permissions.");
 				perms = new PermissionsListener(this);
 				perms.enable();
-				
 			}
+			
 			
 			getConfig().addDefault("enable-metrics", true);
 			
 			//Let's allow players to more easily disable our metrics
 			if (getConfig().getBoolean("enable-metrics")) {
+				getLogger().info("[BookSuite] Enabling metrics.");
 				try {
 					metrics = new Metrics(this);
 					metrics.start();
@@ -62,6 +73,16 @@ public class BookSuite extends JavaPlugin implements Listener {
 					}
 				}
 			}
+			
+			
+			getConfig().addDefault("login-update-check", true);
+			
+			if(getConfig().getBoolean("login-update-check")) {
+				getLogger().info("[BookSuite] Enabling login update check.");
+				update.enableNotifications();
+			}
+			
+			
 		} catch (Exception e) {
 			getLogger().warning("[BookSuite] Error loading configuration: " + e);
 			e.printStackTrace();
@@ -73,7 +94,11 @@ public class BookSuite extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("book").setExecutor(new CommandHandler(this));
-		getLogger().info("BookSuite v"+version+" enabled!");
+		
+		getLogger().info("[BookSuite] v"+version+" enabled!");
+		
+		getLogger().info("[BookSuite] Starting update check...");
+		update.asyncUpdateCheck(null, true);
 	}
 	
 	
@@ -84,6 +109,19 @@ public class BookSuite extends JavaPlugin implements Listener {
 	public void onDisable() {
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
+		try {
+			if (metrics != null) {
+				metrics.disable();
+				metrics = null;
+			}
+		} catch (IOException e) {
+			getLogger().warning("[BookSuite] Error disabling metrics.");
+		}
+		mail = null;
+		functions = null;
+		filemanager = null;
+		update.disableNotifications();
+		update = null;
 		perms = null;
 		getLogger().info("BookSuite v"+version+" disabled!");
 	}
