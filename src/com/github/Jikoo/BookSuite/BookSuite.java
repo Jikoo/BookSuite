@@ -22,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
+import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
@@ -37,8 +38,10 @@ public class BookSuite extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		getLogger().info("[BookSuite] Enabling...");
+		getLogger().info("[BookSuite] Initializing.");
+		
 		saveDefaultConfig();
+		new UpdateConfig(this).update();
 		
 		mail = new MailExecutor();
 		functions = new Functions();

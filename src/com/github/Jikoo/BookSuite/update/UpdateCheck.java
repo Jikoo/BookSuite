@@ -30,19 +30,19 @@ public class UpdateCheck implements Listener {
 		try {
 			URL feed = new URL("http://dev.bukkit.org/server-mods/booksuite/files.rss");
 			Scanner stream = new Scanner(feed.openStream());
+			boolean item = false;
 			while (stream.hasNextLine()) {
 				String line = stream.nextLine();
-				boolean item = false;
 				if (line.contains("<item>")) {
 					item = true;
 				}
 				if (item) {
 					if (line.contains("<title>")) {
-						update = ChatColor.DARK_PURPLE + line.replaceAll("<title>", "").replaceAll("</title>", "");
+						update = ChatColor.DARK_PURPLE + line.replaceAll("(\\s)*<title>", "").replaceAll("</title>(\\s)*", "");
 						update += ChatColor.DARK_GREEN + " is now available at ";
 					}
 					if (line.contains("<link>")) {
-						line = line.replace("<link>", "").replace("</link", "");
+						line = line.replace("<link>", "").replace("</link>", "").replaceAll("\\s", "");
 						current = parseFileNumber(line);
 						update += ChatColor.DARK_BLUE + line;
 						break;
@@ -87,7 +87,6 @@ public class UpdateCheck implements Listener {
 	public int parseFileNumber(String s) {
 		s = s.replace("http://dev.bukkit.org/server-mods/booksuite/files/", "");
 		s = s.replaceAll("-.*", "");
-		
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException e) {

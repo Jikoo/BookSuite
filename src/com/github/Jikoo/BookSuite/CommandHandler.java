@@ -107,6 +107,7 @@ public class CommandHandler implements CommandExecutor {
 		
 		if (args.length == 1 && args[0].equalsIgnoreCase("update") && (sender.hasPermission("booksuite.command.update") || !(sender instanceof Player))) {
 			plugin.update.asyncUpdateCheck(sender.getName(), true);
+			return true;
 		}
 		
 		
@@ -114,6 +115,7 @@ public class CommandHandler implements CommandExecutor {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" is enabled!");
 			sender.sendMessage(ChatColor.AQUA+"book reload"+ChatColor.DARK_GREEN+" - reload the plugin.");
+			sender.sendMessage(ChatColor.AQUA+"book update"+ChatColor.DARK_GREEN+" - check for plugin updates.");
 			return true;
 		}
 		
@@ -368,6 +370,8 @@ public class CommandHandler implements CommandExecutor {
 			p.sendMessage(ChatColor.AQUA+"/book d(elete) <file>"+ChatColor.DARK_GREEN+" - delete specified book");
 		if (p.hasPermission("booksuite.command.reload"))
 			p.sendMessage(ChatColor.AQUA+"/book reload"+ChatColor.DARK_GREEN+" - reload the plugin");
+		if (p.hasPermission("booksuite.command.update"))
+			p.sendMessage(ChatColor.AQUA+"/book update"+ChatColor.DARK_GREEN+" - check for updates");
 		return true;
 	}
 	
