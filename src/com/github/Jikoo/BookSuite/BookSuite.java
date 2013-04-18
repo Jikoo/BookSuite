@@ -26,8 +26,10 @@ import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
-	String version = "3.1.0";
-	public int currentFile = 9;
+	String version = "3.1.1";
+	public int currentFile = 10;
+	public boolean hasUpdate;
+	public String updateString;
 
 	MailExecutor mail;
 	Functions functions;
@@ -41,7 +43,9 @@ public class BookSuite extends JavaPlugin implements Listener {
 		getLogger().info("[BookSuite] Initializing.");
 		
 		saveDefaultConfig();
-		new UpdateConfig(this).update();
+		
+		if (new UpdateConfig(this).update())
+			getLogger().warning("[BookSuite] New defaults have been added. Please be sure to check your configuration!");
 		
 		mail = new MailExecutor();
 		functions = new Functions();
@@ -49,8 +53,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 		update = new UpdateCheck(this);
 		
 		try {
-			getConfig().addDefault("use-inbuilt-permissions", false);
-			
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {
 				getLogger().info("[BookSuite] Enabling inbuilt permissions.");
 				perms = new PermissionsListener(this);
@@ -58,7 +60,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 			}
 			
 			
-			getConfig().addDefault("enable-metrics", true);
 			
 			//Let's allow players to more easily disable our metrics
 			if (getConfig().getBoolean("enable-metrics")) {
@@ -78,11 +79,15 @@ public class BookSuite extends JavaPlugin implements Listener {
 			}
 			
 			
-			getConfig().addDefault("login-update-check", true);
-			
-			if(getConfig().getBoolean("login-update-check")) {
-				getLogger().info("[BookSuite] Enabling login update check.");
-				update.enableNotifications();
+			if(getConfig().getBoolean("update-check")) {
+				if(getConfig().getBoolean("login-update-check")) {
+					getLogger().info("[BookSuite] Enabling login update check.");
+					update.enableNotifications();
+				}
+				
+				getLogger().info("[BookSuite] Starting update check...");
+				
+				update.asyncUpdateCheck(null, false);
 			}
 			
 			
@@ -100,8 +105,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 		
 		getLogger().info("[BookSuite] v"+version+" enabled!");
 		
-		getLogger().info("[BookSuite] Starting update check...");
-		update.asyncUpdateCheck(null, true);
 	}
 	
 	

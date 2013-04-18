@@ -1,10 +1,18 @@
+:3.1.1
+:add quick config options to entirely disable update check to meet Bukkit requirements
 ;3.1.0
-:added update checker
 :added metrics
+:added update checker
+:added config updater
+:new command to check for updates:
+:- /book update
 :improved memory usage when disabled
 :improved initial plugin enable
 :improved reload
 :improved check to see if player is online after press is destroyed mid-press
+:fixed stair placement for press creation
+:saving an invalid file name no longer will throw an error
+:book savename is now specified for clarity as all non-word characters are removed
 ;3.0.0
 :sneaking and placing stairs on a crafting bench automatically inverts them, creating a press
 :added commands for book and quill editing:

@@ -1,3 +1,7 @@
+# For more details about the configuration, please see
+# http://dev.bukkit.org/server-mods/booksuite/pages/default-config/
+
+
 ###PERMISSIONS###
 use-external-permissions: true
 
@@ -5,8 +9,8 @@ use-external-permissions: true
 enable-metrics: true
 
 ###UPDATE CHECK###
-# if true, players with the ability to use the update check
-# command will automatically trigger a check on login
+update-check: true
+allow-update-command: true
 login-update-check: true
 
 ###ALIASES###

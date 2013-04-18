@@ -50,8 +50,11 @@ public class UpdateCheck implements Listener {
 				}
 			}
 			stream.close();
-			if (current > plugin.currentFile)
+			if (current > plugin.currentFile) {
+				plugin.hasUpdate = true;
+				plugin.updateString = update;
 				return true;
+			}
 		} catch (MalformedURLException e) {
 			plugin.getLogger().warning("[BookSuite] Error with update URL: " + e);
 			e.printStackTrace();
@@ -98,11 +101,11 @@ public class UpdateCheck implements Listener {
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		delayUpdateCheck(event.getPlayer());
+		delayUpdateCheck(event.getPlayer(), 20L);
 	}
 
-	public void delayUpdateCheck(Player p) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new startUpdateCheck(p), 20L);
+	public void delayUpdateCheck(Player p, Long length) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new startUpdateCheck(p), length);
 	}
 
 	public class startUpdateCheck implements Runnable {
@@ -112,7 +115,9 @@ public class UpdateCheck implements Listener {
 		}
 		public void run() {
 			if (p.hasPermission("booksuite.command.update"))
-				asyncUpdateCheck(p.getName(), false);
+				if (plugin.hasUpdate) {
+					p.sendMessage(plugin.updateString);
+				} else asyncUpdateCheck(p.getName(), false);
 		}
 	}
 
