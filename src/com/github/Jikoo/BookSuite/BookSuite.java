@@ -26,17 +26,19 @@ import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
-	String version = "3.1.1";
-	public int currentFile = 10;
+	String version = "3.2.0";
+	public int currentFile = 11;
 	public boolean hasUpdate;
 	public String updateString;
+
+	UpdateCheck update;
+	PermissionsListener perms;
 
 	MailExecutor mail;
 	Functions functions;
 	FileManager filemanager;
-	UpdateCheck update;
-	PermissionsListener perms;
 	Metrics metrics;
+	Alias alias;
 
 	@Override
 	public void onEnable() {
@@ -45,12 +47,15 @@ public class BookSuite extends JavaPlugin implements Listener {
 		saveDefaultConfig();
 		
 		if (new UpdateConfig(this).update())
-			getLogger().warning("[BookSuite] New defaults have been added. Please be sure to check your configuration!");
+			getLogger().warning("[BookSuite] Your configuration has been changed, please check it!");
 		
 		mail = new MailExecutor();
 		functions = new Functions();
 		filemanager = new FileManager();
-		update = new UpdateCheck(this);
+		alias = new Alias(this);
+		
+		if (getConfig().getBoolean("update-check") || getConfig().getBoolean("allow-update-command"))
+			update = new UpdateCheck(this);
 		
 		try {
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {
@@ -60,8 +65,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 			}
 			
 			
-			
-			//Let's allow players to more easily disable our metrics
 			if (getConfig().getBoolean("enable-metrics")) {
 				getLogger().info("[BookSuite] Enabling metrics.");
 				try {
@@ -123,13 +126,26 @@ public class BookSuite extends JavaPlugin implements Listener {
 		} catch (IOException e) {
 			getLogger().warning("[BookSuite] Error disabling metrics.");
 		}
-		mail = null;
-		functions = null;
-		filemanager = null;
-		update.disableNotifications();
+		
+		if (update != null)
+			update.disableNotifications();
 		update = null;
+		
+		if (perms != null)
+			perms.disable();
 		perms = null;
-		getLogger().info("BookSuite v"+version+" disabled!");
+		
+		alias.save();
+		alias = null;
+		
+		//mail.disable()
+		mail = null;
+		
+		functions = null;
+		
+		filemanager = null;
+		
+		getLogger().info("BookSuite v" + version + " disabled!");
 	}
 
 

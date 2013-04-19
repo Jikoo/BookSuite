@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -101,23 +102,32 @@ public class UpdateCheck implements Listener {
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		delayUpdateCheck(event.getPlayer(), 20L);
+		if (event.getPlayer().hasPermission("booksuite.command.update")) {
+			delayUpdateCheck(event.getPlayer(), false, 20L);
+		}
 	}
 
-	public void delayUpdateCheck(Player p, Long length) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new startUpdateCheck(p), length);
+	public void delayUpdateCheck(CommandSender sender, boolean warn, Long length) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new startUpdateCheck(sender, warn), length);
 	}
 
 	public class startUpdateCheck implements Runnable {
-		Player p;
-		startUpdateCheck(Player p) {
-			this.p = p;
+		CommandSender sender;
+		boolean warn;
+		startUpdateCheck(CommandSender sender, boolean warn) {
+			this.sender = sender;
+			this.warn = warn;
 		}
 		public void run() {
-			if (p.hasPermission("booksuite.command.update"))
-				if (plugin.hasUpdate) {
-					p.sendMessage(plugin.updateString);
-				} else asyncUpdateCheck(p.getName(), false);
+			if (plugin.hasUpdate) {
+				sender.sendMessage(plugin.updateString);
+			} else {
+				if (sender instanceof Player) {
+					asyncUpdateCheck(sender.getName(), false);
+				} else {
+					asyncUpdateCheck(null, false);
+				}
+			}
 		}
 	}
 

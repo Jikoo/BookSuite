@@ -3,9 +3,12 @@
 
 
 ###PERMISSIONS###
-use-external-permissions: true
+# If you use a permissions plugin, set to false and assign permissions.
+use-inbuilt-permissions: true
 
 ###METRICS###
+# Please do not disable metrics, being able to see that there are
+# servers using BookSuite encourages me to develop it further.
 enable-metrics: true
 
 ###UPDATE CHECK###

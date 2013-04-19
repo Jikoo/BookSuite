@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
+import com.github.Jikoo.BookSuite.update.UpdateCheck;
 
 public class CommandHandler implements CommandExecutor {
 	
@@ -32,16 +33,16 @@ public class CommandHandler implements CommandExecutor {
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if(args.length == 1 && args[0].equalsIgnoreCase("reload") && (sender.hasPermission("booksuite.command.reload") || !(sender instanceof Player))) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {//TODO completely reorganize commands for efficiency
+		if (args.length == 1 && args[0].equalsIgnoreCase("reload") && (sender.hasPermission("booksuite.command.reload") || !(sender instanceof Player))) {
 			plugin.saveDefaultConfig();
 			plugin.reloadConfig();
 			
 			
 			
-			if(plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
-				if(plugin.perms != null) {
-					if(!plugin.perms.isEnabled()){
+			if (plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
+				if (plugin.perms != null) {
+					if (!plugin.perms.isEnabled()) {
 						plugin.perms.enable();
 					} else {
 						plugin.perms.disable();
@@ -93,76 +94,92 @@ public class CommandHandler implements CommandExecutor {
 			
 			
 			if (plugin.getConfig().getBoolean("login-update-check")) {
+				if (plugin.update == null)
+					plugin.update = new UpdateCheck(plugin);
 				plugin.update.disableNotifications();
 				plugin.update.enableNotifications();
-			} else plugin.update.disableNotifications();
+			} else {
+				if (plugin.update != null)
+					plugin.update.disableNotifications();
+			}
+			
+			
+			
+			plugin.alias.reload();
 			
 			
 			
 			if (new File(plugin.getDataFolder(), "temp").exists())
 				plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
-			sender.sendMessage(ChatColor.DARK_GREEN+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" reloaded!");
+			sender.sendMessage(ChatColor.DARK_GREEN + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " reloaded!");
 			return true;
 		}
 		
 		if (args.length == 1 && args[0].equalsIgnoreCase("update") && (sender.hasPermission("booksuite.command.update") || !(sender instanceof Player))) {
-			plugin.update.asyncUpdateCheck(sender.getName(), true);
+			plugin.update.delayUpdateCheck(sender, true, 0L);
 			return true;
 		}
 		
 		
 		
+		
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" is enabled!");
-			sender.sendMessage(ChatColor.AQUA+"book reload"+ChatColor.DARK_GREEN+" - reload the plugin.");
-			sender.sendMessage(ChatColor.AQUA+"book update"+ChatColor.DARK_GREEN+" - check for plugin updates.");
+			sender.sendMessage(ChatColor.AQUA + "BookSuite v"+ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " is enabled!");
+			sender.sendMessage(ChatColor.AQUA + "book reload"+ChatColor.DARK_GREEN + " - reload the plugin.");
+			sender.sendMessage(ChatColor.AQUA + "book update"+ChatColor.DARK_GREEN + " - check for plugin updates.");
 			return true;
 		}
 		
 		Player p = (Player) sender;
 		
 		
-		if (args.length >=2 && args[0].equalsIgnoreCase("addpage")) {
+		
+		
+		if (args.length >= 2 && args[0].equalsIgnoreCase("addpage")) {
 			if (p.hasPermission("booksuite.command.edit")) {
 				String text = "";
 				for (int i = 2; i < args.length; i++) {
-					if (i != (args.length-1))
-						text += args[i]+" ";
+					if (i != (args.length - 1))
+						text += args[i] + " ";
 					else text += args[i];
 				}
 				if (plugin.functions.insertPageAt(p, args[1], text))
-					p.sendMessage(ChatColor.DARK_GREEN+"Page added!");
+					p.sendMessage(ChatColor.DARK_GREEN + "Page added!");
 				return true;
 			}
 		}
+		
 		
 		
 		
 		if (args.length == 2 && args[0].equalsIgnoreCase("delpage")) {
 			if (p.hasPermission("booksuite.command.edit")) {
 				if (plugin.functions.deletePageAt(p, args[1]))
-					p.sendMessage(ChatColor.DARK_GREEN+"Page deleted!");
+					p.sendMessage(ChatColor.DARK_GREEN + "Page deleted!");
 				return true;
 			}
 		}
+		
 		
 		
 		
 		//command: /book u - attempt to unsign book
 		if (args.length == 1 && (args[0].equalsIgnoreCase("u") || args[0].equalsIgnoreCase("unsign"))) {
 			if (p.hasPermission("booksuite.command.unsign")) {
-				if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK) && p.getName().equals(((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())){
+				if (p.getName().equals(((BookMeta) p.getItemInHand().getItemMeta()).getAuthor())) {
 					if (plugin.functions.unsign(p))
-						p.sendMessage(ChatColor.DARK_GREEN+"Book unsigned!");
-					else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
+						p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
+					else p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book to use this command!");
 				} else if (p.hasPermission("booksuite.command.unsign.other")) {
 					if (plugin.functions.unsign(p))
-						p.sendMessage(ChatColor.DARK_GREEN+"Book unsigned!");
-					else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
-				} else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to unsign others' books!");
+						p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
+					else p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book to use this command!");
+				} else p.sendMessage(ChatColor.DARK_RED + "You do not have permission to unsign others' books!");
 				return true;
 			}
 		}
+		
+		
 		
 		
 		//command: /book a <args> - attempt to change author with additional args. Include spaces.
@@ -174,64 +191,68 @@ public class CommandHandler implements CommandExecutor {
 						newAuthor += args[i] + " ";
 					else newAuthor += args[i];
 				if (plugin.functions.setAuthor(p, newAuthor))
-					p.sendMessage(ChatColor.DARK_GREEN+"Author changed!");
-				else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
+					p.sendMessage(ChatColor.DARK_GREEN + "Author changed!");
+				else p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book to use this command!");
 				return true;
 			}
 		}
+		
+		
 		
 		
 		//command: /book t <args> - attempt to change title with additional args. Include spaces.
 		if (args.length > 1 && (args[0].equalsIgnoreCase("t") || args[0].equalsIgnoreCase("title"))) {
 			if (p.hasPermission("booksuite.command.title")) {
-				if (p.getName().equals(((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())) {
+				if (p.getName().equals(((BookMeta) p.getItemInHand().getItemMeta()).getAuthor())) {
 					String newTitle = "";
 					for (int i = 1; i < args.length; i++)
 						if (i != (args.length-1))
 							newTitle += args[i] + " ";
 						else newTitle += args[i];
 					if (plugin.functions.setTitle(p, newTitle)) {
-						p.sendMessage(ChatColor.DARK_GREEN+"Title changed!");
-					} else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
+						p.sendMessage(ChatColor.DARK_GREEN + "Title changed!");
+					} else p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book to use this command!");
 				} else if (p.hasPermission("booksuite.command.title.other")) {
 					String newTitle = "";
 					for (int i = 1; i < args.length; i++)
-						if (i != (args.length-1))
+						if (i != (args.length - 1))
 							newTitle += args[i] + " ";
 						else newTitle += args[i];
 					if (plugin.functions.setTitle(p, newTitle)) {
-						p.sendMessage(ChatColor.DARK_GREEN+"Title changed!");
-					} else p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to use this command!");
-				} else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to rename others' books!");
+						p.sendMessage(ChatColor.DARK_GREEN + "Title changed!");
+					} else p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book to use this command!");
+				} else p.sendMessage(ChatColor.DARK_RED + "You do not have permission to rename others' books!");
 				return true;
 			}
 		}
+		
+		
 		
 		
 		//command: /book l(ist) - list all files in /SavedBooks/
 		if (args.length == 1 && (args[0].equalsIgnoreCase("l") || args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("ls"))) {
 			if (p.hasPermission("booksuite.command.list")) {
 				if (args.length == 1) {
-					plugin.filemanager.listBookFilesIn(plugin.getDataFolder()+"/SavedBooks/", p);
+					plugin.filemanager.listBookFilesIn(plugin.getDataFolder() + "/SavedBooks/", p);
 					return true;
 				}
 			}
 		}
 		
 		
+		
+		
 		//command: /book <u(rl)|f(ile)|l(oad)> <args> - attempt to import a book from location args[2]
-		if (args.length == 2){
+		if (args.length == 2) {
 			if ((args[0].equalsIgnoreCase("f") || args[0].equalsIgnoreCase("file") || args[0].equalsIgnoreCase("l") || args[0].equalsIgnoreCase("load")) && p.hasPermission("booksuite.command.import")) {
 				ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, args[1], plugin.getDataFolder()+"/SavedBooks/", true));
+				newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, args[1], plugin.getDataFolder() + "/SavedBooks/", true));
 				if (!newbook.hasItemMeta()) {
-					p.sendMessage(ChatColor.DARK_RED+"Error reading book file. Does it exist?");
-				}
-				else if (!plugin.functions.canObtainBook(p)) return true;
+					p.sendMessage(ChatColor.DARK_RED + "Error reading book file. Does it exist?");
+				} else if (!plugin.functions.canObtainBook(p)) return true;
 				else p.getInventory().addItem(newbook);
 				return true;
-			}
-			else if ((args[0].equalsIgnoreCase("u") || args[0].equalsIgnoreCase("url")) && (p.hasPermission("booksuite.command.import"))) {
+			} else if ((args[0].equalsIgnoreCase("u") || args[0].equalsIgnoreCase("url")) && (p.hasPermission("booksuite.command.import"))) {
 				if (!plugin.functions.canObtainBook(p)) return true;
 				else asyncBookImport(p.getName(), args[1], plugin.getDataFolder().getPath());
 				return true;
@@ -240,20 +261,21 @@ public class CommandHandler implements CommandExecutor {
 		
 		
 		
+		
 		//command: /book <e(xport)|s(ave)> <filename> - attempt to save book in hand to file
 		if (args.length == 2 && (args[0].equalsIgnoreCase("e") || args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("s") || args[0].equalsIgnoreCase("save"))) {
 			if (p.hasPermission("booksuite.command.export")) {
 				if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-					p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book to export it!");
+					p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book to export it!");
 					return true;
 				}
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				if(plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder()+"/SavedBooks/", args[1], false)) {
-					p.sendMessage(ChatColor.DARK_GREEN+"Book saved successfully!");
+				if (plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder() + "/SavedBooks/", args[1], false)) {
+					p.sendMessage(ChatColor.DARK_GREEN + "Book saved successfully!");
 				} else {
-					p.sendMessage(ChatColor.DARK_RED+"A book by this name already exists!");
-					if(p.hasPermission("booksuite.command.delete")){
-						p.sendMessage(ChatColor.DARK_RED+"To overwrite it, do \""+ChatColor.DARK_AQUA+"/book overwrite"+ChatColor.DARK_RED+"\" within 10 seconds.");
+					p.sendMessage(ChatColor.DARK_RED + "A book by this name already exists!");
+					if (p.hasPermission("booksuite.command.delete")) {
+						p.sendMessage(ChatColor.DARK_RED + "To overwrite it, do \"" + ChatColor.DARK_AQUA + "/book overwrite" + ChatColor.DARK_RED + "\" within 10 seconds.");
 						overwritable.put(p.getName(), args[1]);
 						syncOverwriteTimer(p);
 					}
@@ -262,12 +284,15 @@ public class CommandHandler implements CommandExecutor {
 			}
 		}
 		
+		
+		
+		
 		//command: /book <d(elete)> <filename> - attempt to delete file
 		if (args.length == 2 && (args[0].equalsIgnoreCase("d") || args[0].equalsIgnoreCase("delete"))) {
 			if (p.hasPermission("booksuite.command.delete")) {
-				if (args[1].contains(".")) plugin.filemanager.delete(plugin.getDataFolder()+"/SavedBooks/", args[1]);
-				else plugin.filemanager.delete(plugin.getDataFolder()+"/SavedBooks/", args[1]+".book");
-				p.sendMessage(ChatColor.DARK_GREEN+"Deleted!");
+				if (args[1].contains(".")) plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1]);
+				else plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1] + ".book");
+				p.sendMessage(ChatColor.DARK_GREEN + "Deleted!");
 				return true;
 			}
 		}
@@ -275,27 +300,27 @@ public class CommandHandler implements CommandExecutor {
 		
 		
 		
-		if(args.length >=1 && args[0].equalsIgnoreCase("overwrite")) {
-			if(p.hasPermission("booksuite.command.delete") && p.hasPermission("booksuite.command.export")) {
+		if (args.length >= 1 && args[0].equalsIgnoreCase("overwrite")) {
+			if (p.hasPermission("booksuite.command.delete") && p.hasPermission("booksuite.command.export")) {
 				if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-					p.sendMessage(ChatColor.DARK_RED+"You must be holding a written book overwrite an existing book!");
+					p.sendMessage(ChatColor.DARK_RED + "You must be holding a written book overwrite an existing book!");
 					return true;
 				} else {
 					if (overwritable.containsKey(p.getName())) {
 						if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName()), true)) {
-							p.sendMessage(ChatColor.DARK_GREEN+"Book updated successfully!");
+							p.sendMessage(ChatColor.DARK_GREEN + "Book updated successfully!");
 						}
 						overwritable.remove(p.getName());
 						return true;
 					} else {
-						if(args.length == 2){
-							if (!plugin.filemanager.delete(plugin.getDataFolder()+"/SavedBooks/", args[1])) {
-								p.sendMessage(ChatColor.DARK_RED+"You shouldn't make a habit of using overwrite instead of save.");
+						if (args.length == 2) {
+							if (!plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1])) {
+								p.sendMessage(ChatColor.DARK_RED + "You shouldn't make a habit of using overwrite instead of save.");
 							}
-							if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder()+"/SavedBooks/", args[1], true)) {
-								p.sendMessage(ChatColor.DARK_GREEN+"Book updated successfully!");
+							if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder() + "/SavedBooks/", args[1], true)) {
+								p.sendMessage(ChatColor.DARK_GREEN + "Book updated successfully!");
 							}
-						} else p.sendMessage(ChatColor.DARK_RED+"What are you trying to overwrite? Use the save function.");
+						} else p.sendMessage(ChatColor.DARK_RED + "What are you trying to overwrite? Use the save function.");
 						return true;
 					}
 				}
@@ -305,73 +330,69 @@ public class CommandHandler implements CommandExecutor {
 		
 		
 		
-		
 		if (args.length >= 1 && args[0].equalsIgnoreCase("help")) {
-			if (args.length >= 2){
-				if ((args[1].toLowerCase().contains("press") || args[1].toLowerCase().contains("printing")) && p.hasPermission("booksuite.copy.self")){
-					p.sendMessage(ChatColor.DARK_GREEN+"A "+ChatColor.AQUA+"printing press"+ChatColor.DARK_GREEN+" is made by placing inverted stairs over a crafting table.");
+			if (args.length >= 2) {
+				if ((args[1].toLowerCase().contains("press") || args[1].toLowerCase().contains("printing")) && p.hasPermission("booksuite.copy.self")) {
+					p.sendMessage(ChatColor.DARK_GREEN + "A " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " is made by placing inverted stairs over a crafting table.");
 					if (p.hasPermission("booksuite.copy.createpress"))
-						p.sendMessage(ChatColor.DARK_GREEN+"Right click the top of a crafting table holding stairs to easily assemble one!");
-					p.sendMessage(ChatColor.DARK_GREEN+"To use a press, right click it with a copiable item.");
-					p.sendMessage(ChatColor.DARK_GREEN+"Copiables: "+ChatColor.AQUA+"Written Book"+ChatColor.DARK_GREEN+", "+ChatColor.AQUA+"Book and Quill"+ChatColor.DARK_GREEN+", "+ChatColor.AQUA+"Map");
+						p.sendMessage(ChatColor.DARK_GREEN + "Right click the top of a crafting table holding stairs to easily assemble one!");
+					p.sendMessage(ChatColor.DARK_GREEN + "To use a press, right click it with a copiable item.");
+					p.sendMessage(ChatColor.DARK_GREEN + "Copiables: " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN+", " + ChatColor.AQUA + "Book and Quill" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "Map");
 					return true;
 				} else if (args[1].toLowerCase().contains("erase") && p.hasPermission("booksuite.block.erase")) {
-					p.sendMessage(ChatColor.DARK_GREEN+"An "+ChatColor.AQUA+"eraser"+ChatColor.DARK_GREEN+" is a cauldron. Right click one with a Written Book to unsign!");
+					p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA+"eraser" + ChatColor.DARK_GREEN + " is a cauldron. Right click one with a Written Book to unsign!");
 					if (!p.hasPermission("booksuite.block.erase.free"))
-						p.sendMessage(ChatColor.DARK_GREEN+"Erasing books consumes water.");
+						p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes water.");
 					return true;
 				}
 			}
 			if (p.hasPermission("booksuite.copy.self") && p.hasPermission("booksuite.block.erase")) {
-				p.sendMessage(ChatColor.DARK_GREEN+"Possible help topics: "+ChatColor.AQUA+"printing press"+ChatColor.DARK_GREEN+", "+ChatColor.AQUA+"eraser");
+				p.sendMessage(ChatColor.DARK_GREEN + "Possible help topics: " + ChatColor.AQUA+"printing press" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "eraser");
 			return true;
-			}
-			else if (p.hasPermission("booksuite.copy.self")) {
-				p.sendMessage(ChatColor.DARK_GREEN+"Possible help topics: "+ChatColor.AQUA+"printing press");
+			} else if (p.hasPermission("booksuite.copy.self")) {
+				p.sendMessage(ChatColor.DARK_GREEN+"Possible help topics: " + ChatColor.AQUA + "printing press");
 				return true;
-			}
-			else if (p.hasPermission("booksuite.block.erase")) {
-				p.sendMessage(ChatColor.DARK_GREEN+"Possible help topics: "+ChatColor.AQUA+"eraser");
+			} else if (p.hasPermission("booksuite.block.erase")) {
+				p.sendMessage(ChatColor.DARK_GREEN + "Possible help topics: " + ChatColor.AQUA + "eraser");
 				return true;
 			}
 		}
-		
 		
 		
 		
 		
 		//if no commands match, print out help based on permissions
-		p.sendMessage(ChatColor.AQUA+"BookSuite v"+ChatColor.DARK_PURPLE+plugin.version+ChatColor.AQUA+" is enabled!");
+		p.sendMessage(ChatColor.AQUA + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " is enabled!");
 		if (p.hasPermission("booksuite.copy.self")) {
-			p.sendMessage(ChatColor.DARK_GREEN+"Right click a "+ChatColor.AQUA+"printing press"+ChatColor.DARK_GREEN+" with a copiable object to use.");
+			p.sendMessage(ChatColor.DARK_GREEN + "Right click a " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " with a copiable object to use.");
 		}
 		if (p.hasPermission("booksuite.block.erase")) {
-			p.sendMessage(ChatColor.DARK_GREEN+"Right click an "+ChatColor.AQUA+"eraser"+ChatColor.DARK_GREEN+" to unsign a book.");
+			p.sendMessage(ChatColor.DARK_GREEN + "Right click an " + ChatColor.AQUA + "eraser" + ChatColor.DARK_GREEN + " to unsign a book.");
 		}
 		if (p.hasPermission("booksuite.copy.self") || p.hasPermission("booksuite.block.erase"))
-			p.sendMessage(ChatColor.AQUA+"/book help"+ChatColor.DARK_GREEN+" for more details.");
-		if(p.hasPermission("booksuite.command.edit")) {
-			p.sendMessage(ChatColor.AQUA+"/book addpage <number> [text]"+ChatColor.DARK_GREEN+" - add a page to a book");
-			p.sendMessage(ChatColor.AQUA+"/book delpage <number>"+ChatColor.DARK_GREEN+" - delete page from book");
+			p.sendMessage(ChatColor.AQUA + "/book help" + ChatColor.DARK_GREEN + " for more details.");
+		if (p.hasPermission("booksuite.command.edit")) {
+			p.sendMessage(ChatColor.AQUA + "/book addpage <number> [text]" + ChatColor.DARK_GREEN + " - add a page to a book");
+			p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
 		}
 		if (p.hasPermission("booksuite.command.author"))
-			p.sendMessage(ChatColor.AQUA+"/book a(uthor) <new author>"+ChatColor.DARK_GREEN+" - change author of book in hand.");
+			p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
 		if (p.hasPermission("booksuite.command.title"))
-			p.sendMessage(ChatColor.AQUA+"/book t(itle) <new title>"+ChatColor.DARK_GREEN+" - change title of book in hand");
+			p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
 		if (p.hasPermission("booksuite.command.unsign"))
-			p.sendMessage(ChatColor.AQUA+"/book u(nsign)"+ChatColor.DARK_GREEN+" - unsign book in hand.");
+			p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
 		if (p.hasPermission("booksuite.command.import"))
-			p.sendMessage(ChatColor.AQUA+"/book <u(rl)|f(ile)> <url|filename>"+ChatColor.DARK_GREEN+" - import book from file or url");
+			p.sendMessage(ChatColor.AQUA + "/book <u(rl)|f(ile)> <url|filename>" + ChatColor.DARK_GREEN + " - import book from file or url");
 		if (p.hasPermission("booksuite.command.export"))
-			p.sendMessage(ChatColor.AQUA+"/book <e(xport)|s(ave)> <filename>"+ChatColor.DARK_GREEN+" - export held book to file");
+			p.sendMessage(ChatColor.AQUA + "/book <e(xport)|s(ave)> <filename>" + ChatColor.DARK_GREEN + " - export held book to file");
 		if (p.hasPermission("booksuite.command.list"))
-			p.sendMessage(ChatColor.AQUA+"/book l(ist)"+ChatColor.DARK_GREEN+" - list all books");
+			p.sendMessage(ChatColor.AQUA + "/book l(ist)" + ChatColor.DARK_GREEN + " - list all books");
 		if (p.hasPermission("booksuite.command.delete"))
-			p.sendMessage(ChatColor.AQUA+"/book d(elete) <file>"+ChatColor.DARK_GREEN+" - delete specified book");
+			p.sendMessage(ChatColor.AQUA + "/book d(elete) <file>" + ChatColor.DARK_GREEN + " - delete specified book");
 		if (p.hasPermission("booksuite.command.reload"))
-			p.sendMessage(ChatColor.AQUA+"/book reload"+ChatColor.DARK_GREEN+" - reload the plugin");
+			p.sendMessage(ChatColor.AQUA + "/book reload" + ChatColor.DARK_GREEN + " - reload the plugin");
 		if (p.hasPermission("booksuite.command.update"))
-			p.sendMessage(ChatColor.AQUA+"/book update"+ChatColor.DARK_GREEN+" - check for updates");
+			p.sendMessage(ChatColor.AQUA + "/book update" + ChatColor.DARK_GREEN + " - check for updates");
 		return true;
 	}
 	

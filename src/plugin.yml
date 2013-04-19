@@ -1,7 +1,7 @@
 name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
-version: 3.1.0
+version: 3.2.0
 author: Adam Gunn (PlanarWarp/Jikoo)  Ted Meyer (tmathmeyer)
 
 permissions:
@@ -10,221 +10,247 @@ permissions:
         default: false
         children:
             booksuite.free: true
-            booksuite.copy.other: true
+            booksuite.copy.admin: true
             booksuite.command.admin: true
             booksuite.mail.admin: true
             booksuite.block.erase.other: true
-    booksuite.standard:
+    booksuite.default:
         description: Average Joe's permissions.
         default: false
         children:
-            booksuite.copy.self: true
-            booksuite.copy.unsigned: true
-            booksuite.copy.map: true
-            booksuite.command: true
-            booksuite.command.list: true
-            booksuite.command.import: true
-            booksuite.command.export: true
-            booksuite.block.erase: true
-            booksuite.mail.send: true
-            booksuite.mail.receive: true
-            booksuite.mail.attach: true
+            booksuite.standard:
+                default: false
+                children:
+                    booksuite.copy.default: true
+                    booksuite.command.default: true
+                    booksuite.block.erase: true
+                    booksuite.mail.send: true
+                    booksuite.mail.receive: true
+                    booksuite.mail.attach: true
+
+
 
     booksuite.free:
         description: No cost associated with anything!
         default: false
         children:
-            booksuite.book.free: true
-            booksuite.block.erase.free: true
-    booksuite.book.free:
-        description: copy and create books for free
-        default: false
+            booksuite.book.free:
+                description: copy and create books for free
+                default: false
+            booksuite.block.erase.free:
+                description: don't use water from cauldron when erasing a book
+                default: false
 
-    booksuite.mail.send:
-        description: Send mail with a right click!
-        default: false
-    booksuite.mail.send.other:
-        description: Mail packages as anyone
-        default: false
-        children:
-            booksuite.mail.send: true
-    booksuite.mail.global:
-        description: TODO Mail every player with a mailbox and every online player with perms - no item attachments.
-        default: false
-    booksuite.mail.receive:
-        description: can check/receive non-global (personal) mail
-        default: false
-    booksuite.mail.attach:
-        description: send items with mail!
-        default: false
-    booksuite.mail.attach.self:
-        description: mail self items - Enable with caution, can be used as a personal enderchest with no space limit.
-        default: false
-        children:
-            booksuite.mail.attach: true
+
+
     booksuite.mail.admin:
         description: all mail
+        default: false
         children:
-            booksuite.mail.send.other: true
-            booksuite.mail.receive: true
-            booksuite.mail.global: true
-            booksuite.mail.attach.self: true
+            booksuite.mail.send.other:
+                description: Mail packages as anyone
+                default: false
+                children:
+                    booksuite.mail.send: true
+            booksuite.mail.global:
+                description: TODO Mail every player with a mailbox and every online player with perms - no item attachments.
+                default: false
+            booksuite.mail.attach.self:
+                description: mail self items - Enable with caution, can be used as a personal enderchest with no space limit.
+                default: false
+                children:
+                    booksuite.mail.attach: true
+            booksuite.mail.default:
+                description: default mail
+                children:
+                    booksuite.mail.send:
+                        description: Send mail with a right click!
+                        default: false
+                    booksuite.mail.attach:
+                        description: send items with mail!
+                        default: false
+                    booksuite.mail.receive:
+                        description: can check/receive non-global (personal) mail
+                        default: false
 
-    booksuite.copy.self:
-        description: copy own books
-        default: false
-        children:
-            booksuite.denynowarn.press: false
-    booksuite.copy.other:
-        description: copy all books
-        default: false
-        children:
-            booksuite.copy.self: true
-    booksuite.copy.unsigned:
-        description: copy unsigned books
-        default: false
-    booksuite.copy.map:
-        description: copy maps
-        default: false
+
+
     booksuite.copy.admin:
         description: copy everything copiable
         default: false
         children:
-            booksuite.copy.other: true
-            booksuite.copy.unsigned: true
-            booksuite.copy.map: true
+            booksuite.copy.other:
+                description: copy all books
+                default: false
+                children:
+                    booksuite.copy.self: true
+            booksuite.copy.default:
+                description: default copy functions
+                default: false
+                children:
+                    booksuite.copy.self:
+                        description: copy own books
+                        default: false
+                        children:
+                            booksuite.denynowarn.press: false
+                    booksuite.copy.unsigned:
+                        description: copy unsigned books
+                        default: false
+                        children:
+                            booksuite.denynowarn.press: false
+                    booksuite.copy.map:
+                        description: copy maps
+                        default: false
+                        children:
+                            booksuite.denynowarn.press: false
 
-    booksuite.denynowarn.press:
-        description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
-        default: false
-    booksuite.denynowarn.erase:
-        description: right click sponge with book does not notify if lacking unsign perms
-        default: false
 
-    booksuite.block.erase:
-        description: erase own books
-        default: false
-    booksuite.block.erase.other:
-        description: erase others' books
-        default: false
-        children:
-            booksuite.block.erase: true
-    booksuite.block.erase.free:
-        description: don't use water from cauldron when erasing a book
-        default: false
 
-    booksuite.command.export:
-        description: make a file from book
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.import:
-        description: make a book from file
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.import.other:
-        description: import a book with an author other than themself
-        default: false
-        children:
-            booksuite.command.import: true
-    booksuite.command.author:
-        description: change author
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.title:
-        description: change title
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.list:
-        description: list all .book files in /SavedBooks/
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.delete:
-        description: Delete a book from /SavedBooks/
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.reload:
-        description: reload the plugin
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.update:
-        description: check for updates
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.add:
-        description: add alias to self
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.set:
-        description: set active alias
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.delete:
-        description: delete alias from self
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.list:
-        description: list all registered aliases
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.add.other:
-        description: add alias to specified player
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.set.other:
-        description: set active alias of specified player
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.delete.other:
-        description: remove alias from specified player
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias.list:
-        description: list all registered aliases of specified player
-        default: false
-        children:
-            booksuite.command: true
-    booksuite.command.alias:
-        description: permission for all alias-related commands
-        default: false
-        children:
-            booksuite.command.alias.add: true
-            booksuite.command.alias.set: true
-            booksuite.command.alias.delete: true
-            booksuite.command.alias.list: true
-            booksuite.command.alias.add.other: true
-            booksuite.command.alias.set.other: true
-            booksuite.command.alias.delete.other: true
-            booksuite.command.alias.list.other: true
+
     booksuite.command.admin:
         description: all commands
         default: false
         children:
-            booksuite.command: true
-            booksuite.command.export: true
-            booksuite.command.import.other: true
-            booksuite.command.unsign: true
-            booksuite.command.author: true
-            booksuite.command.title: true
-            booksuite.command.list: true
-            booksuite.command.delete: true
-            booksuite.command.reload: true
-            booksuite.command.update: true
-            booksuite.command.alias: true
+            booksuite.command.default:
+                description: standard commands
+                default: false
+                children:
+                    booksuite.command.list:
+                        description: list all .book files in /SavedBooks/
+                        default: false
+                        children:
+                            booksuite.command: true
+                    booksuite.command.import:
+                        description: make a book from file
+                        default: false
+                        children:
+                            booksuite.command: true
+                    booksuite.command.export:
+                        description: make a file from book
+                        default: false
+                        children:
+                            booksuite.command: true
+                    booksuite.command.edit:
+                        description: allow usage of addpage and delpage for book and quill editing
+                        default: false
+                        children:
+                            booksuite.command: true
+                    booksuite.command.alias.default: true
+            booksuite.command.import.other:
+                description: import a book with an author other than themself
+                default: false
+                children:
+                    booksuite.command.import: true
+            booksuite.command.unsign.other:
+                description: unsign books by anyone
+                default: false
+                children:
+                    booksuite.command.unsign:
+                        description: unsign books by self
+                        default: false
+                        children:
+                            booksuite.command: true
+            booksuite.command.author:
+                description: change author
+                default: false
+                children:
+                    booksuite.command: true
+            booksuite.command.title.other:
+                description: re-title books by anyone
+                default: false
+                children:
+                    booksuite.command.title:
+                        description: re-title books by self
+                        default: false
+                        children:
+                            booksuite.command: true
+            booksuite.command.delete:
+                description: Delete a book from /SavedBooks/
+                default: false
+                children:
+                    booksuite.command: true
+            booksuite.command.reload:
+                description: reload the plugin
+                default: false
+                children:
+                    booksuite.command: true
+            booksuite.command.update:
+                description: check for updates
+                default: false
+                children:
+                    booksuite.command: true
+            booksuite.command.alias.admin:
+                description: permission for all alias-related commands
+                default: false
+                children:
+                    booksuite.command.alias.add.other:
+                        description: add alias to specified player
+                        default: false
+                        children:
+                            booksuite.command.alias.add:
+                                description: add alias to self
+                                default: false
+                                children:
+                                    booksuite.command: true
+                    booksuite.command.alias.delete.other:
+                        description: remove alias from specified player
+                        default: false
+                        children:
+                            booksuite.command.alias.delete: true
+                    booksuite.command.alias.set.other:
+                        description: set active alias of specified player
+                        default: false
+                        children:
+                            booksuite.command: true
+                    booksuite.command.alias.list.other:
+                        description: list all registered aliases of specified player
+                        default: false
+                        children:
+                            booksuite.command.alias.list: true
+                    booksuite.command.alias.default:
+                        description: permission for standard alais-related commands
+                        default: false
+                        children:
+                            booksuite.command.alias.delete:
+                                description: delete alias from self
+                                default: false
+                                children:
+                                    booksuite.command: true
+                            booksuite.command.alias.set:
+                                description: set active alias
+                                default: false
+                                children:
+                                    booksuite.command: true
+                            booksuite.command.alias.list:
+                                description: list all registered aliases
+                                default: false
+                                children:
+                                    booksuite.command: true
+
+
+
+    booksuite.block.erase.other:
+        description: erase others' books
+        default: false
+        children:
+            booksuite.block.erase:
+                description: erase own books
+                default: false
+
+
+
+    booksuite.denynowarn:
+        description: vanilla behavior on attempted usage of "eraser" and "press"
+        default: false
+        children:
+            booksuite.denynowarn.press:
+                description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
+                default: false
+            booksuite.denynowarn.erase:
+                description: right click cauldron with book does not notify if lacking unsign perms
+                default: false
+
+
 
 commands:
     book:
