@@ -1,12 +1,15 @@
 config file:
-    - more permissions! usePerms
     - configurable cost per book?
     - support other costs (leather, 3 pages, ink)
 
 standalone editor for the books (with automatic uploading!)
 
+reorganize commands for efficiency
 
-store config as object, pass config to all objects/methods that will need it
+separate event handler
+
+Take a leaf out of Ben's book for isolating modules
+allow disabling of individual modules in config
 
 method for ops to check others' mail - useful if players can mail to a collective complaints box, etc.
 The rebellion must be crushed at all costs.

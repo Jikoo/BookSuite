@@ -52,7 +52,9 @@ public class BookSuite extends JavaPlugin implements Listener {
 		mail = new MailExecutor();
 		functions = new Functions();
 		filemanager = new FileManager();
+		
 		alias = new Alias(this);
+		alias.load();
 		
 		if (getConfig().getBoolean("update-check") || getConfig().getBoolean("allow-update-command"))
 			update = new UpdateCheck(this);
@@ -105,6 +107,9 @@ public class BookSuite extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		getCommand("book").setExecutor(new CommandHandler(this));
+		
+		//if (getConfig().getBoolean("book-rules"))
+			//getServer().getPluginCommand("rules").setExecutor(new Rules(this));
 		
 		getLogger().info("[BookSuite] v"+version+" enabled!");
 		

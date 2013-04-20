@@ -105,7 +105,7 @@ public class CommandHandler implements CommandExecutor {
 			
 			
 			
-			plugin.alias.reload();
+			plugin.alias.load();
 			
 			
 			

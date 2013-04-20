@@ -12,18 +12,17 @@ import org.bukkit.entity.Player;
 
 public class Alias {
 	
-	FileConfiguration aliasYML = new YamlConfiguration();
+	FileConfiguration aliasYML;
 	String aliasType;
 	BookSuite plugin;
 	File aliasFile;
 	
 	public Alias(BookSuite plugin) {
 		this.plugin = plugin;
-		reload();
 	}
 	
 	
-	public void reload() {
+	public void load() {
 		aliasType = plugin.getConfig().getString("alias-mode");
 		if (aliasType.equals("multi")) {
 			aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
@@ -61,6 +60,7 @@ public class Alias {
 		ArrayList<String> aliasList = (ArrayList<String>) aliasYML.getStringList(pName);
 		aliasList.add(newAlias);
 		aliasYML.set(pName, aliasList);
+		save();
 		return true;
 	}
 	
@@ -87,6 +87,7 @@ public class Alias {
 		ArrayList<String> aliasList = (ArrayList<String>) aliasYML.getStringList(pName);
 		aliasList.remove(oldAlias);
 		aliasYML.set(pName, aliasList);
+		save();
 		return true;
 	}
 	
@@ -107,16 +108,33 @@ public class Alias {
 	}
 	
 	
-	//TODO setActiveAlias "active."+p.getName()
+	public boolean setActiveAlias(Player p, String active) {
+		if (getAliases(p).contains(active)) {
+			aliasYML.set("current."+p.getName(), active);
+			save();
+			return true;
+		}
+		return false;
+	}
 	
 	
-	//TODO getActiveAlias
+	public void setTargetActiveAlias(CommandSender s, Player target, String active, boolean warn) {
+		if (setActiveAlias(target, active)) {
+			s.sendMessage(ChatColor.DARK_GREEN + target.getName() + "'s active alias set to " + active + "!");
+			if (warn)
+				target.sendMessage(ChatColor.DARK_GREEN + s.getName() + " set your active alias to " + active + "!");
+		} else s.sendMessage(ChatColor.DARK_RED + target.getName() + "does not have the alias " + active + "!");
+	}
 	
 	
-	//TODO setTargetActiveAlias
-	
-	
-	//TODO getTargetActiveAlias
+	public String getActiveAlias(Player p) {
+		String current = aliasYML.getString("current." + p.getName());
+		if (getAliases(p).contains(current))
+			return current;
+		aliasYML.set("current." + p.getName(), p.getDisplayName());
+		save();
+		return p.getDisplayName();
+	}
 	
 	
 	public ArrayList<String> getAliases(Player p) {
