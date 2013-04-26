@@ -1,9 +1,19 @@
-;3.2.0 (3.1.2 if event is not added by completion)
-:Added Aliases (still incomplete :V)
+;3.2.0
+:added Aliases (incomplete) (if event is released on completion)
+:added book-based rules (incomplete)
+:added book encryption (not started)
+:added private book saves (not started)
+:added commands:
+: - /book copy (quantity)
+: - /book usage <command> (not started)
+: - /book encrypt|decrypt <code> (not started)
 :improved memory usage when disabled
+:presses should no longer function when plugin is disabled (not started)
 :reformatted more code to be more readable
 :no longer check Bukkit if an update has already been detected
+:no longer notify on startup if an update is not available
 :reformatted plugin.yml to reduce duplicate text
+:individual modules can now be disabled in the config
 ;3.1.1
 :add quick config options to entirely disable update check to meet Bukkit requirements
 ;3.1.0

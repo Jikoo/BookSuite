@@ -21,6 +21,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
+import com.github.Jikoo.BookSuite.press.PrintingPress;
+import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
@@ -33,9 +35,11 @@ public class BookSuite extends JavaPlugin implements Listener {
 
 	UpdateCheck update;
 	PermissionsListener perms;
+	Rules rules;
+	CommandHandler command;
 
 	MailExecutor mail;
-	Functions functions;
+	public Functions functions;
 	FileManager filemanager;
 	Metrics metrics;
 	Alias alias;
@@ -52,6 +56,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 		mail = new MailExecutor();
 		functions = new Functions();
 		filemanager = new FileManager();
+		command = new CommandHandler(this);
 		
 		alias = new Alias(this);
 		alias.load();
@@ -106,12 +111,14 @@ public class BookSuite extends JavaPlugin implements Listener {
 			filemanager.delete(getDataFolder().getPath(), "temp");
 		
 		getServer().getPluginManager().registerEvents(this, this);
-		getCommand("book").setExecutor(new CommandHandler(this));
+		getCommand("book").setExecutor(command);
 		
-		//if (getConfig().getBoolean("book-rules"))
-			//getServer().getPluginCommand("rules").setExecutor(new Rules(this));
+		if (getConfig().getBoolean("book-rules")) {
+			getServer().getPluginCommand("rules").setExecutor(new Rules(this));
+			getServer().getPluginCommand("?").setExecutor(new Rules(this));
+		}
 		
-		getLogger().info("[BookSuite] v"+version+" enabled!");
+		getLogger().info("[BookSuite] v" + version + " enabled!");
 		
 	}
 	
@@ -143,8 +150,12 @@ public class BookSuite extends JavaPlugin implements Listener {
 		alias.save();
 		alias = null;
 		
+		command = null;
+		
 		//mail.disable()
 		mail = null;
+		
+		rules = null;//TODO
 		
 		functions = null;
 		
@@ -171,26 +182,35 @@ public class BookSuite extends JavaPlugin implements Listener {
 			
 			
 			//if clicking a workbench, check to see if it is a press and act accordingly
-			if (clicked.getType().equals(Material.WORKBENCH)) {
+			if (clicked.getType().equals(Material.WORKBENCH) && getConfig().getBoolean("enable-printing-presses")) {
 				if (functions.isInvertedStairs(blockUp)) {
-					PrintingPress press = new PrintingPress(this, p, is, blockUp);
-					if (!press.denyUseage()) {
+					PrintingPress press = new PrintingPress(this, p.getName(), blockUp);
+					if (!p.hasPermission("booksuite.denynowarn.press")) {
 						if (is.getType().equals(Material.MAP)) {
-							if (functions.canObtainMap(p))
+							if (functions.canObtainMap(p)) {
 								press.operatePress();
+								functions.copy(p);
+								p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
+							}
 							event.setCancelled(true);
-						} else if (!(is.hasItemMeta() || is.getItemMeta()!=null)) {
+						} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
 							return;
 						} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
 							BookMeta bm = (BookMeta) is.getItemMeta();
-							if (press.checkCopyPermission(bm.getAuthor()) && functions.canObtainBook(p))
+							if (functions.checkCopyPermission(p, bm.getAuthor()) && functions.canObtainBook(p)) {
 								press.operatePress();
+								functions.copy(p);
+								p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
+							}
 							event.setCancelled(true);
 						} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
 							if (p.hasPermission("booksuite.copy.unsigned")) {
-								if (functions.canObtainBook(p))
+								if (functions.canObtainBook(p)) {
 									press.operatePress();
-							} else p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy unsigned books!");
+									functions.copy(p);
+									p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
+								}
+							} else p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy unsigned books!");
 							event.setCancelled(true);
 						}
 					}
@@ -199,31 +219,31 @@ public class BookSuite extends JavaPlugin implements Listener {
 						blockUp.setTypeIdAndData(is.getTypeId(), functions.getCorrectStairOrientation(p), true);
 						if (is.getAmount() == 1)
 							p.setItemInHand(null);
-						else is.setAmount(is.getAmount()-1);
+						else is.setAmount(is.getAmount() - 1);
 						event.setCancelled(true);
 						p.updateInventory();
 					}
 				}
 			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
-				if (!(is.hasItemMeta() || is.getItemMeta()!=null))
+				if (!(is.hasItemMeta() || is.getItemMeta() != null))
 					return;
-				if (clicked.getType().equals(Material.CAULDRON)) {
+				if (clicked.getType().equals(Material.CAULDRON) && getConfig().getBoolean("enable-erasers")) {
 					BookMeta bm = (BookMeta) is.getItemMeta();
 					if (p.hasPermission("booksuite.block.erase")) {
 						if (clicked.getData() < 1 && !p.getGameMode().equals(GameMode.CREATIVE) && !p.hasPermission("booksuite.block.erase.free"))
-							p.sendMessage(ChatColor.DARK_RED+"You'll need some water to unsign this book.");
+							p.sendMessage(ChatColor.DARK_RED + "You'll need some water to unsign this book.");
 						else if (bm.getAuthor().equalsIgnoreCase(p.getDisplayName())) {
 							functions.unsign(p);
 							if (!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
-								clicked.setData((byte) (clicked.getData()-1));
+								clicked.setData((byte) (clicked.getData() - 1));
 						} else if (p.hasPermission("booksuite.block.erase.other")) {
 							functions.unsign(p);
 							if(!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
-								clicked.setData((byte) (clicked.getData()-1));
-						} else p.sendMessage(ChatColor.DARK_RED+"You can only unsign your own books.");
+								clicked.setData((byte) (clicked.getData() - 1));
+						} else p.sendMessage(ChatColor.DARK_RED + "You can only unsign your own books.");
 						event.setCancelled(true);
 					} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
-						p.sendMessage(ChatColor.DARK_RED+"You do not have permission to use erasers.");
+						p.sendMessage(ChatColor.DARK_RED + "You do not have permission to use erasers.");
 						event.setCancelled(true);
 					}
 				}
@@ -245,17 +265,17 @@ public class BookSuite extends JavaPlugin implements Listener {
 		
 		
 		// this is for taking a "package/envelope" that contains a "gift" and opening it into your inventory.
-		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)){
+		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
 			Player p = event.getPlayer();
-			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)){
-				if(!(p.getItemInHand().hasItemMeta()||p.getItemInHand().getItemMeta()!=null))
+			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+				if (!(p.getItemInHand().hasItemMeta()||p.getItemInHand().getItemMeta() != null))
 					return;
 				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				if (bm.getTitle().contains("Package: ")){
-					if(mail.loadMail(p, bm, this.getDataFolder().getPath()))
+				if (bm.getTitle().contains("Package: ")) {
+					if (mail.loadMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 				}
-				else if (p.hasPermission("booksuite.mail.send")&&bm.getTitle().equalsIgnoreCase("package"))
+				else if (p.hasPermission("booksuite.mail.send") && bm.getTitle().equalsIgnoreCase("package"))
 					if (mail.sendMail(p, bm, this.getDataFolder().getPath()))
 						event.setCancelled(true);
 			}
@@ -263,8 +283,8 @@ public class BookSuite extends JavaPlugin implements Listener {
 	}
 	
 	@EventHandler
-	public void onInventoryClose (InventoryCloseEvent event){
-		if (event.getInventory().getTitle().contains("'s MailBox")){
+	public void onInventoryClose (InventoryCloseEvent event) {
+		if (event.getInventory().getTitle().contains("'s MailBox")) {
 			mail.WriteMailContents(event.getInventory());
 		}
 	}

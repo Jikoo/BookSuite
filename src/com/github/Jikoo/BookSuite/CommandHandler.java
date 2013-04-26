@@ -39,7 +39,6 @@ public class CommandHandler implements CommandExecutor {
 			plugin.reloadConfig();
 			
 			
-			
 			if (plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
 				if (plugin.perms != null) {
 					if (!plugin.perms.isEnabled()) {
@@ -156,6 +155,54 @@ public class CommandHandler implements CommandExecutor {
 			if (p.hasPermission("booksuite.command.edit")) {
 				if (plugin.functions.deletePageAt(p, args[1]))
 					p.sendMessage(ChatColor.DARK_GREEN + "Page deleted!");
+				return true;
+			}
+		}
+		
+		
+		
+		
+		if (args.length >= 1 && args[0].equalsIgnoreCase("copy")) {//TODO more efficient booksuite.copy.free
+			if (p.hasPermission("booksuite.command.copy")) {
+				int copies;
+				if (args.length >= 2) {
+					try {
+						copies = Integer.parseInt(args[1]);
+					} catch (NumberFormatException e) {
+						p.sendMessage(ChatColor.DARK_RED + args[1] + " is not a valid integer. Assuming 1..");
+						copies = 1;
+					}
+				} else copies = 1;
+				ItemStack is = p.getItemInHand();
+				if (is.getType().equals(Material.MAP)) {
+					for (int i = 0; i < copies; i++) {
+						if (plugin.functions.canObtainMap(p))
+							plugin.functions.copy(p);
+						else break;
+					}
+					return true;
+				} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
+					p.sendMessage(ChatColor.DARK_RED + "There doesn't seem to be any writing to copy.");
+				} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
+					BookMeta bm = (BookMeta) is.getItemMeta();
+					if (plugin.functions.checkCommandCopyPermission(p, bm.getAuthor())) {
+						for (int i = 0; i < copies; i++) {
+							if (plugin.functions.canObtainBook(p))
+								plugin.functions.copy(p);
+							else break;
+						}
+					}
+					return true;
+				} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
+					if (p.hasPermission("booksuite.copy.unsigned")) {
+						for (int i = 0; i < copies; i++) {
+							if (plugin.functions.canObtainBook(p))
+								plugin.functions.copy(p);
+							else break;
+						}
+					} else p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy unsigned books!");
+					return true;
+				} else p.sendMessage(ChatColor.DARK_RED + "You must be holding a copiable item to use this command!");
 				return true;
 			}
 		}
@@ -362,6 +409,11 @@ public class CommandHandler implements CommandExecutor {
 		
 		
 		//if no commands match, print out help based on permissions
+		//TODO generic help sections:
+		//admin(istration)
+		//general
+		//commands
+		//new command: usage
 		p.sendMessage(ChatColor.AQUA + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " is enabled!");
 		if (p.hasPermission("booksuite.copy.self")) {
 			p.sendMessage(ChatColor.DARK_GREEN + "Right click a " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " with a copiable object to use.");
@@ -379,6 +431,8 @@ public class CommandHandler implements CommandExecutor {
 			p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
 		if (p.hasPermission("booksuite.command.title"))
 			p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
+		if (p.hasPermission("booksuite.command.copy"))
+			p.sendMessage(ChatColor.AQUA + "/book copy (quantity)" + ChatColor.DARK_GREEN + " - Create copies!");
 		if (p.hasPermission("booksuite.command.unsign"))
 			p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
 		if (p.hasPermission("booksuite.command.import"))
@@ -398,6 +452,10 @@ public class CommandHandler implements CommandExecutor {
 	
 	
 	
+	
+	public void asyncBookImport(String p, String s, String dir) {
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir));
+	}
 	
 	public class getStreamBook implements Runnable {
 		String p;
@@ -440,9 +498,11 @@ public class CommandHandler implements CommandExecutor {
 			}
 		}
 	}
-	public void asyncBookImport(String p, String s, String dir) {
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir));
+	
+	public void syncBookImport(String p, int temp) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp));
 	}
+	
 	public class giveStreamBook implements Runnable {
 		Player p;
 		int temp;
@@ -481,11 +541,10 @@ public class CommandHandler implements CommandExecutor {
 		}
 	}
 	
-	public void syncBookImport(String p, int temp) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp));
+	
+	public void syncOverwriteTimer(Player p) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new overwriteTimer(p), 200L);
 	}
-	
-	
 	
 	public class overwriteTimer implements Runnable {
 		Player p;
@@ -498,9 +557,5 @@ public class CommandHandler implements CommandExecutor {
 				p.sendMessage(ChatColor.DARK_RED+"Overwrite time expired!");
 			}
 		}
-	}
-	
-	public void syncOverwriteTimer(Player p) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new overwriteTimer(p), 200L);
 	}
 }

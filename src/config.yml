@@ -24,8 +24,8 @@ alias-mode: default
 use-inbuilt-permissions: true
 
 ###  PRINTING PRESS  ###
-# Set to false if you do not want to allow anyone to use
-# printing presses. Will slightly improve memory usage.
+# Set to false if you do not want to
+# allow anyone to use printing presses.
 enable-printing-presses: true
 
 ###  ERASER  ###

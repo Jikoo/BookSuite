@@ -12,7 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class Functions {
+public class Functions {//TODO encryption function
 	int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
 	
 	
@@ -26,8 +26,8 @@ public class Functions {
 		Inventory inv = p.getInventory();
 		
 		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
-			if (inv.firstEmpty() == -1){
-				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+			if (inv.firstEmpty() == -1 && !canStack(p)) {
+				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				return false;
 			}
 			return true;
@@ -37,7 +37,7 @@ public class Functions {
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.BOOK, 1));
 			if (inv.firstEmpty() == -1) {
-				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.addItem(new ItemStack(Material.BOOK, 1));
 				return false;
@@ -49,7 +49,7 @@ public class Functions {
 			inv.removeItem(new ItemStack(Material.PAPER, 3));
 			inv.removeItem(new ItemStack(Material.LEATHER, 1));
 			if (inv.firstEmpty() == -1) {
-				p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.removeItem(new ItemStack(Material.PAPER, 3));
 				inv.removeItem(new ItemStack(Material.LEATHER, 1));
@@ -57,10 +57,16 @@ public class Functions {
 			}
 			return true;
 		}
-		p.sendMessage(ChatColor.DARK_RED+"To create a book, you need "+supplies+".");
+		p.sendMessage(ChatColor.DARK_RED + "To create a book, you need " + supplies + ".");
 		return false;
 	}
 	
+	
+	
+	public boolean canStack(Player p) {
+		//TODO
+		return false;
+	}
 	
 	
 	
@@ -86,8 +92,58 @@ public class Functions {
 		}
 		return "a book and an ink sack";
 	}
+
+
+
+
+	/**
+	 * @param a the author of the book to be copied
+	 * @return true if the player has permission to copy 
+	 */
+	public boolean checkCopyPermission(Player p, String a) {
+		if (p.hasPermission("booksuite.copy.other"))
+			return true;
+		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
+			return true;
+		else if (p.hasPermission("booksuite.copy.self"))
+			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
+		else
+			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
+		return false;
+	}
+
+
+
+
+	/**
+	 * @param a the author of the book to be copied
+	 * @return true if the player has permission to copy 
+	 */
+	public boolean checkCommandCopyPermission(Player p, String a) {
+		if (p.hasPermission("booksuite.command.copy.other"))
+			return true;
+		if (p.hasPermission("booksuite.command.copy") && (a.equals(null) || a.equals(p.getName())))
+			return true;
+		else if (p.hasPermission("booksuite.command.copy")) {
+			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy others' books.");
+			return false;
+		}
+		else return false;
+	}
 	
 	
+	
+	public void copy(Player p) {
+		if(canStack(p)) {
+			//TODO
+			
+		} else {
+			ItemStack duplicate = p.getItemInHand().clone();
+			duplicate.setAmount(1);
+			p.getInventory().addItem(duplicate);
+		}
+		p.updateInventory();
+	}
 	
 	
 	
@@ -138,7 +194,7 @@ public class Functions {
 		try {
 			int page = Integer.parseInt(pageNumber);
 			for (int i = 1; i <= bm.getPageCount(); i++) {
-				if(i == page)
+				if (i == page)
 					pages.add(text);
 				pages.add(bm.getPage(i));
 			}
@@ -169,7 +225,7 @@ public class Functions {
 		try {
 			int page = Integer.parseInt(pageNumber);
 			for (int i = 1; i <= bm.getPageCount(); i++) {
-				if(i!=page)
+				if(i != page)
 					pages.add(bm.getPage(i));
 			}
 			bm.setPages(pages);
@@ -194,23 +250,23 @@ public class Functions {
 		if (p.hasPermission("booksuite.copy.map")) {
 			Inventory inv = p.getInventory();
 			if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
-				if (inv.firstEmpty() == -1) {
-					p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+				if (inv.firstEmpty() == -1 && p.getItemInHand().getAmount() == 64) {
+					p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 					return false;
 				} else return true;
 			} else if (inv.contains(new ItemStack(Material.PAPER, 9))) {
 				inv.remove(new ItemStack(Material.PAPER, 9));
-				if (inv.firstEmpty() == -1){
+				if (inv.firstEmpty() == -1) {
 					inv.addItem(new ItemStack(Material.PAPER, 9));
 					p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
 					return false;
 				} else return true;
 			} else {
-				p.sendMessage(ChatColor.DARK_RED+"You need 9 paper to copy a map.");
+				p.sendMessage(ChatColor.DARK_RED + "You need 9 paper to copy a map.");
 				return false;
 			}
 		} else {
-			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy maps.");
+			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy maps.");
 			return false;
 		}
 	}
@@ -224,9 +280,9 @@ public class Functions {
 	 * @param b the block to be tested
 	 * @return whether the block is an inverted stair
 	 */
-	public boolean isInvertedStairs(Block b){
-		for(int i: acceptable)
-			if (i==b.getTypeId())return b.getData()>3;
+	public boolean isInvertedStairs(Block b) {
+		for (int i : acceptable)
+			if (i == b.getTypeId()) return b.getData()>3;
 		return false;
 	}
 
@@ -235,21 +291,21 @@ public class Functions {
 
 	public boolean isCorrectStairType(ItemStack is) {
 		for (int i : acceptable)
-			if(i==is.getTypeId()) return true;
+			if (i == is.getTypeId()) return true;
 		return false;
 	}
 
 
 
 
-	public byte getCorrectStairOrientation(Player p){
-		byte playerFace = (byte) Math.abs(Math.round(p.getLocation().getYaw()/90f));
-		if(playerFace == 0 || playerFace == 4)
-			return 6;
-		else if (playerFace == 1)
-			return 5;
-		else if(playerFace == 2)
-			return 7;
-		else return 4;
+	public byte getCorrectStairOrientation(Player p) {
+		byte playerFace = (byte) Math.round(p.getLocation().getYaw()/90);
+		if(playerFace == 0 || playerFace == -4 || playerFace == 4)
+			return 6;//open north
+		else if (playerFace == 1 || playerFace == -3)
+			return 5;//open east
+		else if(playerFace == 2 || playerFace == -2)
+			return 7;//open south
+		else return 4;//open west
 	}
 }

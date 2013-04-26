@@ -150,6 +150,15 @@ permissions:
                         default: false
                         children:
                             booksuite.command: true
+            booksuite.command.copy.other:
+                description: copy books by anyone
+                default: false
+                children:
+                    booksuite.command.copy:
+                        description: copy books by self
+                        default: false
+                        children:
+                            booksuite.command: true
             booksuite.command.author:
                 description: change author
                 default: false

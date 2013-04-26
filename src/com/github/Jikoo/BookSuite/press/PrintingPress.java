@@ -1,57 +1,27 @@
-package com.github.Jikoo.BookSuite;
+package com.github.Jikoo.BookSuite.press;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import com.github.Jikoo.BookSuite.BookSuite;
 
 
 public class PrintingPress {
 	
 	BookSuite plugin;
-	Player p;
-	ItemStack is;
 	Block blockUp;
 	BlockState originalBlock;
 	BlockState changedBlock;
+	String pName;
 	
 	
-	public PrintingPress (BookSuite plugin, Player p, ItemStack is, Block blockUp) {
+	public PrintingPress (BookSuite plugin, String pName, Block blockUp) {
 		this.plugin = plugin;
-		this.p = p;
-		this.is = is;
 		this.blockUp = blockUp;
 		originalBlock = blockUp.getState();
-	}
-
-
-
-
-	/**
-	 * @param a
-	 * @return
-	 */
-	public boolean checkCopyPermission(String a) {
-		if (p.hasPermission("booksuite.copy.other"))
-			return true;
-		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
-			return true;
-		else if (p.hasPermission("booksuite.copy.self"))
-			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
-		else
-			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
-		return false;
-	}
-
-
-
-
-	public boolean denyUseage() {
-		if (p.hasPermission("booksuite.denynowarn.press"))
-			return true;
-		return false;
+		this.pName = pName;
 	}
 
 
@@ -60,11 +30,6 @@ public class PrintingPress {
 	public void operatePress() {
 		changeStairBlock(blockUp);
 		revertBlockPause(blockUp);
-		ItemStack duplicate = is.clone();
-		duplicate.setAmount(1);
-		p.getInventory().addItem(duplicate);
-		p.updateInventory();
-		p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
 	}
 
 
@@ -119,7 +84,7 @@ public class PrintingPress {
 			if(b.getType().equals(changedBlock.getType())) {
 				b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock.getData().getData(), false);
 			} else {
-				Player owner = Bukkit.getPlayerExact(p.getName());
+				Player owner = Bukkit.getPlayerExact(pName);
 				if (owner != null)
 					owner.sendMessage(ChatColor.DARK_RED+"The press you used appears to have broken.");
 			}
