@@ -1,7 +1,9 @@
 package com.github.Jikoo.BookSuite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -12,7 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class Functions {//TODO encryption function
+public class Functions {//TODO "encryption" function
 	int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
 	
 	
@@ -26,7 +28,7 @@ public class Functions {//TODO encryption function
 		Inventory inv = p.getInventory();
 		
 		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
-			if (inv.firstEmpty() == -1 && !canStack(p)) {
+			if (!hasRoom(p)) {
 				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				return false;
 			}
@@ -36,7 +38,7 @@ public class Functions {//TODO encryption function
 		if (supplies.equals("crafted")) {
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.BOOK, 1));
-			if (inv.firstEmpty() == -1) {
+			if (!hasRoom(p)) {
 				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.addItem(new ItemStack(Material.BOOK, 1));
@@ -48,7 +50,7 @@ public class Functions {//TODO encryption function
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.PAPER, 3));
 			inv.removeItem(new ItemStack(Material.LEATHER, 1));
-			if (inv.firstEmpty() == -1) {
+			if (!hasRoom(p)) {
 				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.removeItem(new ItemStack(Material.PAPER, 3));
@@ -63,9 +65,9 @@ public class Functions {//TODO encryption function
 	
 	
 	
-	public boolean canStack(Player p) {
-		//TODO
-		return false;
+	
+	public boolean hasRoom(Player p) {
+		return (p.getInventory().firstEmpty() != -1 || (p.getItemInHand().getAmount() < 64 && p.hasPermission("booksuite.copy.stack")));
 	}
 	
 	
@@ -80,14 +82,12 @@ public class Functions {//TODO encryption function
 	public String checkBookSupplies(Inventory inv) {
 		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)) {
 			return "crafted";
-		}
-		else if (inv.contains(Material.INK_SACK)) {
+		} else if (inv.contains(Material.INK_SACK)) {
 			if (inv.contains(new ItemStack(Material.PAPER, 3))&&inv.contains(Material.LEATHER)) {
 				return "uncrafted";
 			}
 			return "a book";
-		}
-		else if (inv.contains(Material.BOOK)) {
+		} else if (inv.contains(Material.BOOK)) {
 			return "an ink sack";
 		}
 		return "a book and an ink sack";
@@ -134,15 +134,37 @@ public class Functions {//TODO encryption function
 	
 	
 	public void copy(Player p) {
-		if(canStack(p)) {
-			//TODO
-			
+		if (!p.getItemInHand().getType().equals(Material.MAP) && p.hasPermission("booksuite.copy.stack")) {
+			if (p.getItemInHand().getAmount() == 64) {
+				HashMap<Integer, ? extends ItemStack> all = p.getInventory().all(p.getItemInHand().getType());
+				if (all.size() == 1) { 
+					newDuplicate(p); 
+				} else {
+					for (Entry<Integer, ? extends ItemStack> e : all.entrySet()) {
+						if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
+							if (e.getValue().getAmount() < 64) {
+								ItemStack book = e.getValue();
+								book.setAmount(e.getValue().getAmount() + 1);
+								p.getInventory().setItem(e.getKey(), book);
+							}
+						}
+					}
+				}
+			} else {
+				p.getItemInHand().setAmount(p.getItemInHand().getAmount() + 1);
+			}
 		} else {
-			ItemStack duplicate = p.getItemInHand().clone();
-			duplicate.setAmount(1);
-			p.getInventory().addItem(duplicate);
+			newDuplicate(p);
 		}
 		p.updateInventory();
+	}
+	
+	
+	
+	public void newDuplicate (Player p) {
+		ItemStack duplicate = p.getItemInHand().clone();
+		duplicate.setAmount(1);
+		p.getInventory().addItem(duplicate);
 	}
 	
 	
@@ -185,7 +207,7 @@ public class Functions {//TODO encryption function
 	
 	public boolean insertPageAt(Player p, String pageNumber, String text) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
-			p.sendMessage(ChatColor.DARK_RED+"You must be holding a book and quill to use this command!");
+			p.sendMessage(ChatColor.DARK_RED + "You must be holding a book and quill to use this command!");
 			return false;
 		}
 		ItemStack book = p.getItemInHand();
@@ -200,13 +222,13 @@ public class Functions {//TODO encryption function
 			}
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
-			p.sendMessage(ChatColor.DARK_RED+"Correct usage is \"/book addpage <page number> [optional page text]\"");
+			p.sendMessage(ChatColor.DARK_RED + "Correct usage is \"/book addpage <page number> [optional page text]\"");
 			return false;
 		} catch (IndexOutOfBoundsException e1) {
-			p.sendMessage(ChatColor.DARK_RED+"Please enter a number between 1 and "+(bm.getPageCount()-1)+".");
+			p.sendMessage(ChatColor.DARK_RED + "Please enter a number between 1 and " + (bm.getPageCount() - 1) + ".");
 			return false;
 		} catch (Exception e2) {
-			System.err.println("[BookSuite] Functions.insertPageAt: "+e2);
+			System.err.println("[BookSuite] Functions.insertPageAt: " + e2);
 			e2.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 		}
@@ -216,7 +238,7 @@ public class Functions {//TODO encryption function
 	
 	public boolean deletePageAt(Player p, String pageNumber) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
-			p.sendMessage(ChatColor.DARK_RED+"You must be holding a book and quill to use this command!");
+			p.sendMessage(ChatColor.DARK_RED + "You must be holding a book and quill to use this command!");
 			return false;
 		}
 		ItemStack book = p.getItemInHand();
@@ -225,18 +247,18 @@ public class Functions {//TODO encryption function
 		try {
 			int page = Integer.parseInt(pageNumber);
 			for (int i = 1; i <= bm.getPageCount(); i++) {
-				if(i != page)
+				if (i != page)
 					pages.add(bm.getPage(i));
 			}
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
-			p.sendMessage(ChatColor.DARK_RED+"Correct usage is \"/book delpage <page number>\"");
+			p.sendMessage(ChatColor.DARK_RED + "Correct usage is \"/book delpage <page number>\"");
 			return false;
 		} catch (IndexOutOfBoundsException e1) {
-			p.sendMessage(ChatColor.DARK_RED+"Please enter a number between 1 and "+(bm.getPageCount()-1)+".");
+			p.sendMessage(ChatColor.DARK_RED + "Please enter a number between 1 and " + (bm.getPageCount() - 1) + ".");
 			return false;
 		} catch (Exception e2) {
-			System.err.println("[BookSuite] Functions.insertPageAt: "+e2);
+			System.err.println("[BookSuite] Functions.insertPageAt: " + e2);
 			e2.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 		}
@@ -258,7 +280,7 @@ public class Functions {//TODO encryption function
 				inv.remove(new ItemStack(Material.PAPER, 9));
 				if (inv.firstEmpty() == -1) {
 					inv.addItem(new ItemStack(Material.PAPER, 9));
-					p.sendMessage(ChatColor.DARK_RED+"Inventory full!");
+					p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 					return false;
 				} else return true;
 			} else {

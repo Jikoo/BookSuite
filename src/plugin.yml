@@ -84,6 +84,9 @@ permissions:
                 default: false
                 children:
                     booksuite.copy.self: true
+            booksuite.copy.stack:
+                description: stack books up to 64 when copying
+                default: false
             booksuite.copy.default:
                 description: default copy functions
                 default: false
