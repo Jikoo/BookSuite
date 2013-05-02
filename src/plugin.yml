@@ -2,7 +2,10 @@ name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
 version: 3.2.0
-author: Adam Gunn (PlanarWarp/Jikoo)  Ted Meyer (tmathmeyer)
+author: Adam Gunn (PlanarWarp/Jikoo)
+authors: [Ted Meyer (tmathmeyer)]
+description: A large collection of book-related functions.
+website: http://dev.bukkit.org/server-mods/booksuite/
 
 permissions:
     booksuite.admin:
@@ -23,10 +26,8 @@ permissions:
                 children:
                     booksuite.copy.default: true
                     booksuite.command.default: true
+                    booksuite.mail.default: true
                     booksuite.block.erase: true
-                    booksuite.mail.send: true
-                    booksuite.mail.receive: true
-                    booksuite.mail.attach: true
 
 
 
@@ -106,7 +107,6 @@ permissions:
                         default: false
                         children:
                             booksuite.denynowarn.press: false
-
 
 
 
@@ -269,3 +269,4 @@ commands:
         default: false
         description: booksuite universal command
         permission: booksuite.command
+        aliases: [booksuite, bsuite]

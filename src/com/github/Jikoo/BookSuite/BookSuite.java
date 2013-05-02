@@ -3,6 +3,7 @@ package com.github.Jikoo.BookSuite;
 import java.io.File;
 import java.io.IOException;
 
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,16 +20,19 @@ public class BookSuite extends JavaPlugin implements Listener {
 	public boolean hasUpdate;
 	public String updateString;
 
+	CommandExecutor originalRules;
+	CommandExecutor originalQuestion;
+
 	UpdateCheck update;
 	PermissionsListener perms;
 	Rules rules;
-	CommandHandler command;
-
-	MainListener listener;
-	MailExecutor mail;
-	public Functions functions;
-	FileManager filemanager;
 	Metrics metrics;
+
+	public Functions functions;
+	public FileManager filemanager;
+	MainListener listener;
+	CommandHandler command;
+	MailExecutor mail;
 	Alias alias;
 
 	@Override
@@ -45,6 +49,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 		filemanager = new FileManager();
 		command = new CommandHandler(this);
 		listener = new MainListener(this);
+		rules = new Rules(this);
 		
 		alias = new Alias(this);
 		alias.load();
@@ -102,8 +107,10 @@ public class BookSuite extends JavaPlugin implements Listener {
 		getCommand("book").setExecutor(command);
 		
 		if (getConfig().getBoolean("book-rules")) {
-			getServer().getPluginCommand("rules").setExecutor(new Rules(this));
-			getServer().getPluginCommand("?").setExecutor(new Rules(this));
+			originalRules = getServer().getPluginCommand("rules").getExecutor();
+			originalQuestion = getServer().getPluginCommand("?").getExecutor();
+			getServer().getPluginCommand("rules").setExecutor(rules);
+			getServer().getPluginCommand("?").setExecutor(rules);
 		}
 		
 		getLogger().info("[BookSuite] v" + version + " enabled!");
@@ -143,6 +150,10 @@ public class BookSuite extends JavaPlugin implements Listener {
 		//mail.disable()
 		mail = null;
 		
+		if (getConfig().getBoolean("book-rules")) {
+			getServer().getPluginCommand("rules").setExecutor(originalRules);
+			getServer().getPluginCommand("?").setExecutor(originalQuestion);
+		}
 		rules = null;//TODO
 		
 		functions = null;

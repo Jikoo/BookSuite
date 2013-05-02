@@ -106,9 +106,9 @@ public class Functions {//TODO "encryption" function
 		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
 			return true;
 		else if (p.hasPermission("booksuite.copy.self"))
-			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy others' books.");
+			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy others' books.");
 		else
-			p.sendMessage(ChatColor.DARK_RED+"You do not have permission to copy books.");
+			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy books.");
 		return false;
 	}
 
@@ -134,7 +134,7 @@ public class Functions {//TODO "encryption" function
 	
 	
 	public void copy(Player p) {
-		if (!p.getItemInHand().getType().equals(Material.MAP) && p.hasPermission("booksuite.copy.stack")) {
+		if (p.hasPermission("booksuite.copy.stack") && !p.getItemInHand().getType().equals(Material.MAP)) {
 			if (p.getItemInHand().getAmount() == 64) {
 				HashMap<Integer, ? extends ItemStack> all = p.getInventory().all(p.getItemInHand().getType());
 				if (all.size() == 1) { 
