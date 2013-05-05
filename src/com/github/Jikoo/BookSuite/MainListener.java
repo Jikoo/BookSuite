@@ -36,6 +36,7 @@ public class MainListener implements Listener {
 	 * 
 	 * @param event world triggered event
 	 */
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {

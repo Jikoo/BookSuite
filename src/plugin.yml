@@ -110,6 +110,39 @@ permissions:
 
 
 
+    booksuite.rules.admin:
+        description: all rule-related commands and permissions
+        default: false
+        children:
+            booksuite.rules.edit:
+                description: permission for all rule-changing commands
+                default: false
+                children:
+                    booksuite.rules.add:
+                        description: permission to add new rulebooks
+                        default: false
+                    booksuite.rules.delete:
+                        description: permission to delete saved rulebooks
+                        default: false
+                    booksuite.rules.swap:
+                        description: permission to change the order of 2 rulebooks
+                        default: false
+            booksuite.rules.default:
+                description: default rule-related permissions
+                default: false
+                children:
+                    booksuite.rules.get:
+                        description: permission to obtain a rulebook with /rules or /?
+                        default: false
+                    booksuite.rules.list:
+                        description: permission to use /rules list to list all saved rulebooks
+                        default: false
+                    booksuite.rules.login:
+                        description: ability to obtain a rulebook with /rules or /?
+                        default: false
+
+
+
     booksuite.command.admin:
         description: all commands
         default: false

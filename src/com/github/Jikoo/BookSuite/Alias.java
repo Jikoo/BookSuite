@@ -40,19 +40,13 @@ public class Alias {
 	
 	public void save() {
 		aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
-		if (aliasFile.exists()) {
-			try {
-				aliasYML.save(aliasFile);
-			} catch (IOException e) {
-				plugin.getLogger().warning(ChatColor.DARK_RED + "Could not save aliases.yml!");
-			}
-		} else {
-			try {
+		try {
+			if (!aliasFile.exists()) {
 				aliasFile.createNewFile();
-				aliasYML.save(aliasFile);
-			} catch (IOException e1) {
-				plugin.getLogger().warning(ChatColor.DARK_RED + "Could not save aliases.yml!");
 			}
+			aliasYML.save(aliasFile);
+		} catch (IOException e) {
+			plugin.getLogger().warning(ChatColor.DARK_RED + "Could not save aliases.yml!");
 		}
 	}
 	
