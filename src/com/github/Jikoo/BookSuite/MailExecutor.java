@@ -12,8 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 public class MailExecutor {
-	Functions functions = new Functions();
-	FileManager filemanager = new FileManager();
+	private Functions functions = Functions.getInstance();
+	private FileManager filemanager = FileManager.getInstance();
+	private static MailExecutor instance;
 	
 	public boolean sendMail(Player p, BookMeta bm, String pluginDataFolder){
 		bm = (BookMeta) p.getItemInHand().getItemMeta();
@@ -151,5 +152,11 @@ public class MailExecutor {
 	public void WriteMailContents(Inventory inventory) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private MailExecutor(){}
+	public static MailExecutor getInstance(){
+		if (instance == null) instance = new MailExecutor();
+		return instance;
 	}
 }

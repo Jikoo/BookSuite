@@ -28,8 +28,11 @@ public class CommandHandler implements CommandExecutor {
 	BookSuite plugin;
 	HashMap<String, String> overwritable = new HashMap<String, String>();
 	
-	public CommandHandler(BookSuite plugin) {
-		this.plugin = plugin;
+	private static CommandHandler instance;
+	private CommandHandler(BookSuite bs){this.plugin = bs;}
+	public static CommandHandler getInstance(BookSuite bs){
+		if (instance == null) instance = new CommandHandler(bs);
+		return instance;
 	}
 	
 	@Override
@@ -453,6 +456,7 @@ public class CommandHandler implements CommandExecutor {
 	
 	
 	
+	@SuppressWarnings("deprecation")
 	public void asyncBookImport(String p, String s, String dir) {
 		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir));
 	}
@@ -506,7 +510,7 @@ public class CommandHandler implements CommandExecutor {
 	public class giveStreamBook implements Runnable {
 		Player p;
 		int temp;
-		FileManager fm = new FileManager();
+		FileManager fm = FileManager.getInstance();
 		giveStreamBook(String p, int temp) {
 			this.p = plugin.getServer().getPlayer(p);
 			this.temp = temp;

@@ -44,14 +44,14 @@ public class BookSuite extends JavaPlugin implements Listener {
 		if (new UpdateConfig(this).update())
 			getLogger().warning("[BookSuite] Your configuration has been changed, please check it!");
 		
-		mail = new MailExecutor();
-		functions = new Functions();
-		filemanager = new FileManager();
-		command = new CommandHandler(this);
-		listener = new MainListener(this);
-		rules = new Rules(this);
+		mail = MailExecutor.getInstance();
+		functions = Functions.getInstance();
+		filemanager = FileManager.getInstance();
+		command = CommandHandler.getInstance(this);
+		listener = MainListener.getInstance(this);
+		rules = Rules.getInstance(this);
 		
-		alias = new Alias(this);
+		alias = Alias.getInstance(this);
 		alias.load();
 		
 		if (getConfig().getBoolean("update-check") || getConfig().getBoolean("allow-update-command"))

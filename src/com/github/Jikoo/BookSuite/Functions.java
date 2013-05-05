@@ -14,8 +14,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class Functions {//TODO "encryption" function
-	int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
+public class Functions {
+	private static Functions instance = null;
+		//TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
+	private int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
 	
 	
 	/**
@@ -329,5 +331,12 @@ public class Functions {//TODO "encryption" function
 		else if(playerFace == 2 || playerFace == -2)
 			return 7;//open south
 		else return 4;//open west
+	}
+	
+	
+	private Functions(){}
+	public static Functions getInstance(){
+		if (instance == null) instance = new Functions();
+		return instance;
 	}
 }

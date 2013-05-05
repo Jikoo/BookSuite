@@ -19,8 +19,11 @@ public class Rules implements CommandExecutor {
 	File ruleFile;
 	FileConfiguration ruleYML;
 
-	public Rules(BookSuite plugin) {
-		this.plugin = plugin;
+	private static Rules instance;
+	private Rules(BookSuite bs){this.plugin = bs;}
+	public static Rules getInstance(BookSuite bs){
+		if (instance == null) instance = new Rules(bs);
+		return instance;
 	}
 
 	@Override
@@ -85,4 +88,8 @@ public class Rules implements CommandExecutor {
 			}
 		}
 	}
+	
+	
+	
+	
 }

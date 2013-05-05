@@ -131,6 +131,7 @@ public class UpdateCheck implements Listener {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void asyncUpdateCheck(String pName, boolean inform) {
 		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new doUpdateCheck(pName, inform));
 	}

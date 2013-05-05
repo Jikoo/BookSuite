@@ -17,8 +17,11 @@ public class Alias {
 	BookSuite plugin;
 	File aliasFile;
 	
-	public Alias(BookSuite plugin) {
-		this.plugin = plugin;
+	private static Alias instance;
+	private Alias(BookSuite bs){this.plugin = bs;}
+	public static Alias getInstance(BookSuite bs){
+		if (instance == null) instance = new Alias(bs);
+		return instance;
 	}
 	
 	
