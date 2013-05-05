@@ -453,6 +453,7 @@ public class CommandHandler implements CommandExecutor {
 	
 	
 	
+	@SuppressWarnings("deprecation")
 	public void asyncBookImport(String p, String s, String dir) {
 		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir));
 	}

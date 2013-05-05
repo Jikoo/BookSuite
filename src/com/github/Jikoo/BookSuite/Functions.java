@@ -133,6 +133,7 @@ public class Functions {//TODO "encryption" function
 	
 	
 	
+	@SuppressWarnings("deprecation")
 	public void copy(Player p) {
 		if (p.hasPermission("booksuite.copy.stack") && !p.getItemInHand().getType().equals(Material.MAP)) {
 			if (p.getItemInHand().getAmount() == 64) {
