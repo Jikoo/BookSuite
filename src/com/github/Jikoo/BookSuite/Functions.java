@@ -17,6 +17,13 @@ import org.bukkit.inventory.meta.BookMeta;
 public class Functions {
 	private static Functions instance = null;
 		//TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
+	/* 
+	 * Honestly what I planned to do for encryption was make the book one page - 
+	 * a hash of a random UUID or something (§k<hash>), save the book as that if untaken, then
+	 * allow people to re-import it with the correct hash (savename). As long as
+	 * the ingame book editor doesn't improve, I foresee no issues.
+	 * 
+	 */
 	private int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
 	
 	

@@ -23,8 +23,10 @@ public class MainListener implements Listener {
 	BookSuite plugin;
 	
 	private static MainListener instance;
-	private MainListener(BookSuite bs){this.plugin = bs;}
-	public static MainListener getInstance(BookSuite bs){
+	private MainListener(BookSuite bs) {
+		this.plugin = bs;
+	}
+	public static MainListener getInstance(BookSuite bs) {
 		if (instance == null) instance = new MainListener(bs);
 		return instance;
 	}

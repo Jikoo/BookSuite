@@ -39,7 +39,7 @@ public class FileManager {
 					line=line.replaceAll("(<div class=\").*(\">)", "").replace("</div>", "");
 					line=line.replace("&lt;", "<").replace("&gt;", ">");
 					line=line.replace("&nbsp", "<n>");
-					line=line.replace("Â§", "ï¿½");
+					line=line.replace("Â§", "§");
 				}
 				
 				
@@ -216,35 +216,35 @@ public class FileManager {
 	
 	
 	public String parseBookText(String text) {
-		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "ï¿½o");
-		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "ï¿½l");
-		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "ï¿½n");
-		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "ï¿½m");
-		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])", "ï¿½k");
+		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", "§o");
+		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", "§l");
+		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", "§n");
+		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", "§m");
+		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])", "§k");
 		
 		text = text.replaceAll("(<|\\[)color=", "<");
- 		text = text.replaceAll("(<|\\[)black(>|\\])", "ï¿½0");
-		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", "ï¿½1");
-		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", "ï¿½2");
-		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", "ï¿½3");
-		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", "ï¿½4");
-		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", "ï¿½5");
-		text = text.replaceAll("(<|\\[)gold(>|\\])", "ï¿½6");
-		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", "ï¿½7");
-		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", "ï¿½8");
-		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", "ï¿½9");
-		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", "ï¿½a");
-		text = text.replaceAll("(<|\\[)aqua(>|\\])", "ï¿½b");
-		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", "ï¿½c");
-		text = text.replaceAll("(<|\\[)pink(>|\\])", "ï¿½d");
-		text = text.replaceAll("(<|\\[)yellow(>|\\])", "ï¿½e");
-		text = text.replaceAll("(<|\\[)white(>|\\])", "ï¿½f");
+ 		text = text.replaceAll("(<|\\[)black(>|\\])", "§0");
+		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", "§1");
+		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", "§2");
+		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", "§3");
+		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", "§4");
+		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", "§5");
+		text = text.replaceAll("(<|\\[)gold(>|\\])", "§6");
+		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", "§7");
+		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", "§8");
+		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", "§9");
+		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", "§a");
+		text = text.replaceAll("(<|\\[)aqua(>|\\])", "§b");
+		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", "§c");
+		text = text.replaceAll("(<|\\[)pink(>|\\])", "§d");
+		text = text.replaceAll("(<|\\[)yellow(>|\\])", "§e");
+		text = text.replaceAll("(<|\\[)white(>|\\])", "§f");
 		
-		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])", "ï¿½r");
-		text = text.replaceAll("(<|\\[)/color(>|\\])", "ï¿½0");
+		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])", "§r");
+		text = text.replaceAll("(<|\\[)/color(>|\\])", "§0");
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
-		text = text.replaceAll("(ï¿½r)+", "ï¿½r");
+		text = text.replaceAll("(§r)+", "§r");
 		return text;
 	}
 	
@@ -269,7 +269,7 @@ public class FileManager {
 			index.close();
 			return true;
 		} catch (IOException e) {
-			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "+e);
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return false;
@@ -285,7 +285,7 @@ public class FileManager {
 			if (!indexFile.exists())
 				return false;
 			Scanner s = new Scanner(indexFile);
-			String indexContents="";
+			String indexContents = "";
 			
 			while (s.hasNextLine()) {
 				String line = s.nextLine();
@@ -300,11 +300,11 @@ public class FileManager {
 			writer.close();
 			delete(directory, mail+".book");
 		} catch (FileNotFoundException e) {
-			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.removeMailAndIndex: "+e);
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.removeMailAndIndex: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 		} catch (IOException e) {
-			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "+e);
+			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return false;
@@ -343,9 +343,9 @@ public class FileManager {
 			}
 		}
 		if (bookList.length==1&&bookList[0].equals("")) {
-			p.sendMessage(ChatColor.DARK_RED+"No books found.");
+			p.sendMessage(ChatColor.DARK_RED + "No books found.");
 		} else {
-			for (String book : bookList){
+			for (String book : bookList) {
 				p.sendMessage(ChatColor.DARK_GREEN+book);
 			}
 		}
@@ -362,7 +362,7 @@ public class FileManager {
 	
 	private static FileManager instance;
 	private FileManager(){}
-	public static FileManager getInstance(){
+	public static FileManager getInstance() {
 		if (instance == null) instance = new FileManager();
 		return instance;
 	}
