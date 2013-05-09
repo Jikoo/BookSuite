@@ -11,28 +11,26 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class Rules implements CommandExecutor {
 
-	BookSuite plugin;
+	BookSuite plugin = BookSuite.getInstance();
 
 	File ruleFile;
 	FileConfiguration ruleYML;
 
-	private static Rules instance;
-	private Rules(BookSuite bs){this.plugin = bs;}
-	public static Rules getInstance(BookSuite bs){
-		if (instance == null) instance = new Rules(bs);
-		return instance;
-	}
 
-	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String Label, String[] args) {
 		if (args.length == 0) {
 			
 			//do rulebook getting
+			// things of note:
+			// - villagers
+			// - rule updates
 		}
 		
 		if (args.length >= 1) {
@@ -94,6 +92,13 @@ public class Rules implements CommandExecutor {
 	
 	
 	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		//TODO
+	}
+	
+	
+	
 	public void load() {
 		ruleFile = new File(plugin.getDataFolder() + "/Rules/", "rules.yml");
 		if (ruleFile.exists()) {
@@ -119,5 +124,7 @@ public class Rules implements CommandExecutor {
 	
 	
 	
+	//TODO enable
 	
+	//TODO disable
 }

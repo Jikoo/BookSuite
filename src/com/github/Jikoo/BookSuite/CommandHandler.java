@@ -34,8 +34,7 @@ public class CommandHandler implements CommandExecutor {
 		if (instance == null) instance = new CommandHandler(bs);
 		return instance;
 	}
-	
-	@Override
+
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {//TODO completely reorganize commands for efficiency
 		if (args.length == 1 && args[0].equalsIgnoreCase("reload") && (sender.hasPermission("booksuite.command.reload") || !(sender instanceof Player))) {
 			plugin.saveDefaultConfig();

@@ -35,9 +35,13 @@ public class BookSuite extends JavaPlugin implements Listener {
 	MailExecutor mail;
 	Alias alias;
 
+	private static BookSuite instance;
+
 	@Override
 	public void onEnable() {
 		getLogger().info("[BookSuite] Initializing.");
+		
+		instance = this;
 		
 		saveDefaultConfig();
 		
@@ -49,7 +53,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 		filemanager = FileManager.getInstance();
 		command = CommandHandler.getInstance(this);
 		listener = MainListener.getInstance(this);
-		rules = Rules.getInstance(this);
 		
 		alias = Alias.getInstance(this);
 		alias.load();
@@ -107,6 +110,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 		getCommand("book").setExecutor(command);
 		
 		if (getConfig().getBoolean("book-rules")) {
+			rules = new Rules();
 			originalRules = getServer().getPluginCommand("rules").getExecutor();
 			originalQuestion = getServer().getPluginCommand("?").getExecutor();
 			getServer().getPluginCommand("rules").setExecutor(rules);
@@ -154,6 +158,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 			getServer().getPluginCommand("rules").setExecutor(originalRules);
 			getServer().getPluginCommand("?").setExecutor(originalQuestion);
 		}
+		//rules.disable();
 		rules = null;//TODO
 		
 		functions = null;
@@ -163,6 +168,16 @@ public class BookSuite extends JavaPlugin implements Listener {
 		listener.disable();
 		listener = null;
 		
+		instance = null;
+		
 		getLogger().info("BookSuite v" + version + " disabled!");
+	}
+
+
+
+
+
+	public static BookSuite getInstance() {
+		return instance;
 	}
 }

@@ -141,7 +141,7 @@ public class Alias {
 	public ArrayList<String> getAliases(Player p) {
 		ArrayList<String> aliases = new ArrayList<String>();
 		aliases.add(p.getName());
-		switch (aliasType) {
+		/*switch (aliasType) {//TODO 1.6 compatability - ENUM
 			case "multi":
 				aliases.add(p.getDisplayName());
 				for (String s : aliasYML.getStringList(p.getName())) {
@@ -152,7 +152,7 @@ public class Alias {
 				aliases.add(p.getDisplayName());
 				break;
 			default: break;
-		}
+		}*/
 		return aliases;
 	}
 }
