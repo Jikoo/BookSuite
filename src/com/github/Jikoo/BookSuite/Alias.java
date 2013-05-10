@@ -12,26 +12,24 @@ import org.bukkit.entity.Player;
 
 public class Alias {
 	
-	FileConfiguration aliasYML;
-	String aliasType;
-	BookSuite plugin;
+	BookSuite plugin = BookSuite.getInstance();
+	
 	File aliasFile;
+	FileConfiguration aliasYML;
+	
+	enum aliasType {MULTI, DEFAULT};
+	aliasType type;
 	
 	private static Alias instance;
-	
-	private Alias(BookSuite bs) {
-		this.plugin = bs;
-	}
-	
-	public static Alias getInstance(BookSuite bs) {
-		if (instance == null) instance = new Alias(bs);
+	public static Alias getInstance() {
+		if (instance == null) instance = new Alias();
 		return instance;
 	}
 	
 	
 	public void load() {
-		aliasType = plugin.getConfig().getString("alias-mode");
-		if (aliasType.equals("multi")) {
+		type = aliasType.valueOf(plugin.getConfig().getString("alias-mode").toUpperCase());
+		if (type.equals(aliasType.MULTI)) {
 			aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 			if (aliasFile.exists()) {
 				aliasYML = YamlConfiguration.loadConfiguration(aliasFile);
@@ -67,7 +65,7 @@ public class Alias {
 	
 	
 	public void addAliasToTarget(CommandSender s, Player target, String newAlias, boolean warn) {
-		if (!aliasType.equals("multi")) {
+		if (!type.equals(aliasType.MULTI)) {
 			s.sendMessage(ChatColor.DARK_RED + "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
 			return;
 		}
@@ -94,7 +92,7 @@ public class Alias {
 	
 	
 	public void removeAliasFromTarget(CommandSender s, Player target, String oldAlias, boolean warn) {
-		if (!aliasType.equals("multi")) {
+		if (!type.equals(aliasType.MULTI)) {
 			s.sendMessage(ChatColor.DARK_RED + "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
 			return;
 		}
@@ -141,18 +139,18 @@ public class Alias {
 	public ArrayList<String> getAliases(Player p) {
 		ArrayList<String> aliases = new ArrayList<String>();
 		aliases.add(p.getName());
-		/*switch (aliasType) {//TODO 1.6 compatability - ENUM
-			case "multi":
+		switch (aliasType.valueOf(plugin.getConfig().getString("alias-mode"))) {//TODO 1.6 compatability - ENUM
+			case MULTI:
 				aliases.add(p.getDisplayName());
 				for (String s : aliasYML.getStringList(p.getName())) {
 					aliases.add(s);
 				}
 				break;
-			case "default":
+			case DEFAULT:
 				aliases.add(p.getDisplayName());
 				break;
 			default: break;
-		}*/
+		}
 		return aliases;
 	}
 }

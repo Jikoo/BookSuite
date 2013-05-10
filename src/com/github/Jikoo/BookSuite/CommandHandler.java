@@ -113,14 +113,9 @@ public class CommandHandler implements CommandExecutor {
 			if (plugin.getConfig().getBoolean("book-rules")) {
 				if (plugin.rules == null) {
 					plugin.rules = new Rules();
-					plugin.originalRules = plugin.getServer().getPluginCommand("rules").getExecutor();
-					plugin.originalQuestion = plugin.getServer().getPluginCommand("?").getExecutor();
-					plugin.getServer().getPluginCommand("rules").setExecutor(plugin.rules);
-					plugin.getServer().getPluginCommand("?").setExecutor(plugin.rules);
+					plugin.rules.enable();
 				} else plugin.rules.load();
 			} else if (plugin.rules != null) {
-				plugin.getServer().getPluginCommand("rules").setExecutor(plugin.originalRules);
-				plugin.getServer().getPluginCommand("?").setExecutor(plugin.originalQuestion);
 				plugin.rules.disable();
 				plugin.rules = null;
 			}

@@ -20,9 +20,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 	public boolean hasUpdate;
 	public String updateString;
 
-	CommandExecutor originalRules;
-	CommandExecutor originalQuestion;
-
 	UpdateCheck update;
 	PermissionsListener perms;
 	Rules rules;
@@ -51,10 +48,8 @@ public class BookSuite extends JavaPlugin implements Listener {
 		mail = MailExecutor.getInstance();
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();
-		command = CommandHandler.getInstance();
-		listener = MainListener.getInstance();
 		
-		alias = Alias.getInstance(this);
+		alias = Alias.getInstance();
 		alias.load();
 		
 		if (getConfig().getBoolean("update-check") || getConfig().getBoolean("allow-update-command"))
@@ -97,6 +92,12 @@ public class BookSuite extends JavaPlugin implements Listener {
 			}
 			
 			
+			if (getConfig().getBoolean("book-rules")) {
+				rules = new Rules();
+				rules.enable();
+			}
+			
+			
 		} catch (Exception e) {
 			getLogger().warning("[BookSuite] Error loading configuration: " + e);
 			e.printStackTrace();
@@ -106,25 +107,18 @@ public class BookSuite extends JavaPlugin implements Listener {
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
 		
+		listener = MainListener.getInstance();
 		getServer().getPluginManager().registerEvents(listener, this);
+		command = CommandHandler.getInstance();
 		getCommand("book").setExecutor(command);
 		
-		if (getConfig().getBoolean("book-rules")) {
-			rules = new Rules();
-			originalRules = getServer().getPluginCommand("rules").getExecutor();
-			originalQuestion = getServer().getPluginCommand("?").getExecutor();
-			getServer().getPluginCommand("rules").setExecutor(rules);
-			getServer().getPluginCommand("?").setExecutor(rules);
-		}
-		
 		getLogger().info("[BookSuite] v" + version + " enabled!");
-		
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	@Override
 	public void onDisable() {
 		if (new File(getDataFolder(), "temp").exists())
@@ -158,8 +152,6 @@ public class BookSuite extends JavaPlugin implements Listener {
 		}
 		
 		if (rules != null) {
-			getServer().getPluginCommand("rules").setExecutor(originalRules);
-			getServer().getPluginCommand("?").setExecutor(originalQuestion);
 			rules.disable();
 			rules = null;
 		}

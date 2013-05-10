@@ -22,9 +22,12 @@ public class Rules implements CommandExecutor, Listener {
 
 	BookSuite plugin = BookSuite.getInstance();
 
-	File ruleFile;
+	File ruleContainer = new File(plugin.getDataFolder() + "/Rules/Books/");;
+	File ruleFile = new File(plugin.getDataFolder() + "/Rules/", "rules.yml");;
 	FileConfiguration ruleYML;
 
+	CommandExecutor originalRules;
+	CommandExecutor originalQuestion;
 
 	public boolean onCommand(CommandSender sender, Command cmd, String Label, String[] args) {
 		if (args.length == 0) {
@@ -56,12 +59,13 @@ public class Rules implements CommandExecutor, Listener {
 			} else if (args[0].equals("del") || args[0].equals("delete") || args[0].equals("d")) {
 				//remove entry
 				//remove file
+				//if in default, remove
 				
 			} else if (args[0].equals("list")) {
 				//list entries in rules.yml in order
 				
 				
-			} else if (args[0].equals("set")) {
+			} else if (args[0].equals("set") || args[0].equals("update")) {
 				//set entry specified to 
 				
 				
@@ -78,7 +82,11 @@ public class Rules implements CommandExecutor, Listener {
 				
 				
 			} else if (args[0].equals("swap")) {
-				//list entries in rules.yml in order
+				//swap
+				
+				
+			} else if (args[0].equals("insert")) {
+				//... these are relatively self-explanatory, really.
 				
 				
 			} else {
@@ -102,19 +110,34 @@ public class Rules implements CommandExecutor, Listener {
 	
 	
 	
+	public void renameBookFile(String currentName, String newName) {
+		if (ruleContainer.exists()) {
+			File f = new File(ruleContainer, currentName);
+			if (f.exists()) {
+				File target = new File(ruleContainer, newName);
+				if (target.exists())//TODO refine for swaps - temp files?
+					target.delete();
+				f.renameTo(target);
+			}
+		}
+	}
+	
+	
+	
+	
+	
 	public void load() {
-		ruleFile = new File(plugin.getDataFolder() + "/Rules/", "rules.yml");
 		if (ruleFile.exists()) {
 			ruleYML = YamlConfiguration.loadConfiguration(ruleFile);
 		} else {
 			ruleYML = new YamlConfiguration();
 		}
+		
 	}
 
 
 
 	public void save() {
-		ruleFile = new File(plugin.getDataFolder() + "/Rules/", "rules.yml");
 		try {
 			if (!ruleFile.exists()) {
 				ruleFile.createNewFile();
@@ -129,11 +152,18 @@ public class Rules implements CommandExecutor, Listener {
 
 	public void disable() {
 		HandlerList.unregisterAll(this);
+		plugin.getServer().getPluginCommand("rules").setExecutor(originalRules);
+		plugin.getServer().getPluginCommand("?").setExecutor(originalQuestion);
 	}
 
 
 
 	public void enable() {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		originalRules = plugin.getServer().getPluginCommand("rules").getExecutor();
+		originalQuestion = plugin.getServer().getPluginCommand("?").getExecutor();
+		plugin.getServer().getPluginCommand("rules").setExecutor(this);
+		plugin.getServer().getPluginCommand("?").setExecutor(this);
+		load();
 	}
 }
