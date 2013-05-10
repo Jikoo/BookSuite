@@ -21,17 +21,17 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
+import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 
 public class CommandHandler implements CommandExecutor {
 	
-	BookSuite plugin;
+	BookSuite plugin = BookSuite.getInstance();
 	HashMap<String, String> overwritable = new HashMap<String, String>();
 	
 	private static CommandHandler instance;
-	private CommandHandler(BookSuite bs){this.plugin = bs;}
-	public static CommandHandler getInstance(BookSuite bs){
-		if (instance == null) instance = new CommandHandler(bs);
+	public static CommandHandler getInstance() {
+		if (instance == null) instance = new CommandHandler();
 		return instance;
 	}
 
@@ -108,6 +108,22 @@ public class CommandHandler implements CommandExecutor {
 			
 			plugin.alias.load();
 			
+			
+			
+			if (plugin.getConfig().getBoolean("book-rules")) {
+				if (plugin.rules == null) {
+					plugin.rules = new Rules();
+					plugin.originalRules = plugin.getServer().getPluginCommand("rules").getExecutor();
+					plugin.originalQuestion = plugin.getServer().getPluginCommand("?").getExecutor();
+					plugin.getServer().getPluginCommand("rules").setExecutor(plugin.rules);
+					plugin.getServer().getPluginCommand("?").setExecutor(plugin.rules);
+				} else plugin.rules.load();
+			} else if (plugin.rules != null) {
+				plugin.getServer().getPluginCommand("rules").setExecutor(plugin.originalRules);
+				plugin.getServer().getPluginCommand("?").setExecutor(plugin.originalQuestion);
+				plugin.rules.disable();
+				plugin.rules = null;
+			}
 			
 			
 			if (new File(plugin.getDataFolder(), "temp").exists())

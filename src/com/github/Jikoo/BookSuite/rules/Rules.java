@@ -12,11 +12,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.github.Jikoo.BookSuite.BookSuite;
 
-public class Rules implements CommandExecutor {
+public class Rules implements CommandExecutor, Listener {
 
 	BookSuite plugin = BookSuite.getInstance();
 
@@ -31,6 +33,7 @@ public class Rules implements CommandExecutor {
 			// things of note:
 			// - villagers
 			// - rule updates
+			
 		}
 		
 		if (args.length >= 1) {
@@ -107,9 +110,9 @@ public class Rules implements CommandExecutor {
 			ruleYML = new YamlConfiguration();
 		}
 	}
-	
-	
-	
+
+
+
 	public void save() {
 		ruleFile = new File(plugin.getDataFolder() + "/Rules/", "rules.yml");
 		try {
@@ -121,10 +124,16 @@ public class Rules implements CommandExecutor {
 			plugin.getLogger().warning(ChatColor.DARK_RED + "Could not save rules.yml!");
 		}
 	}
-	
-	
-	
-	//TODO enable
-	
-	//TODO disable
+
+
+
+	public void disable() {
+		HandlerList.unregisterAll(this);
+	}
+
+
+
+	public void enable() {
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
 }

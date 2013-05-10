@@ -51,8 +51,8 @@ public class BookSuite extends JavaPlugin implements Listener {
 		mail = MailExecutor.getInstance();
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();
-		command = CommandHandler.getInstance(this);
-		listener = MainListener.getInstance(this);
+		command = CommandHandler.getInstance();
+		listener = MainListener.getInstance();
 		
 		alias = Alias.getInstance(this);
 		alias.load();
@@ -138,9 +138,10 @@ public class BookSuite extends JavaPlugin implements Listener {
 			getLogger().warning("[BookSuite] Error disabling metrics.");
 		}
 		
-		if (update != null)
+		if (update != null) {
 			update.disableNotifications();
-		update = null;
+			update = null;
+		}
 		
 		if (perms != null)
 			perms.disable();
@@ -151,15 +152,17 @@ public class BookSuite extends JavaPlugin implements Listener {
 		
 		command = null;
 		
-		//mail.disable()
-		mail = null;
+		if (mail != null) {
+			//TODO mail.disable()
+			mail = null;
+		}
 		
-		if (getConfig().getBoolean("book-rules")) {
+		if (rules != null) {
 			getServer().getPluginCommand("rules").setExecutor(originalRules);
 			getServer().getPluginCommand("?").setExecutor(originalQuestion);
+			rules.disable();
+			rules = null;
 		}
-		//rules.disable();
-		rules = null;//TODO
 		
 		functions = null;
 		

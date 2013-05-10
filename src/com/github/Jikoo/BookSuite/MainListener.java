@@ -20,14 +20,11 @@ import com.github.Jikoo.BookSuite.press.PrintingPress;
 
 public class MainListener implements Listener {
 	
-	BookSuite plugin;
+	BookSuite plugin = BookSuite.getInstance();
 	
 	private static MainListener instance;
-	private MainListener(BookSuite bs) {
-		this.plugin = bs;
-	}
-	public static MainListener getInstance(BookSuite bs) {
-		if (instance == null) instance = new MainListener(bs);
+	public static MainListener getInstance() {
+		if (instance == null) instance = new MainListener();
 		return instance;
 	}
 	
