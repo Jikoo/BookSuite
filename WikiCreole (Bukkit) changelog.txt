@@ -2,12 +2,10 @@
 :books will now stack when copied, up to 64. Requires permission booksuite.copy.stack, default op.
 :added Aliases (incomplete) (if event is released on completion)
 :added book-based rules (incomplete)
-:added book encryption (not started)
-:added private book saves (not started)
 :added commands:
 : - /book copy (quantity)
 : - /book usage <command> (not started)
-: - /book encrypt|decrypt <code> (not started)
+: - /rules|/? (args)
 :improved memory usage when disabled
 :presses should no longer function when plugin is disabled (not started)
 :reformatted more code to be more readable
@@ -15,6 +13,7 @@
 :no longer notify on startup if an update is not available
 :reformatted plugin.yml to reduce duplicate text
 :individual modules can now be disabled in the config
+:1.5 compatible
 ;3.1.1
 :add quick config options to entirely disable update check to meet Bukkit requirements
 ;3.1.0
