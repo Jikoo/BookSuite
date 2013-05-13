@@ -390,79 +390,113 @@ public class CommandHandler implements CommandExecutor {
 		
 		
 		
-		if (args.length >= 1 && args[0].equalsIgnoreCase("help")) {
-			if (args.length >= 2) {
-				if ((args[1].toLowerCase().contains("press") || args[1].toLowerCase().contains("printing")) && p.hasPermission("booksuite.copy.self")) {
-					p.sendMessage(ChatColor.DARK_GREEN + "A " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " is made by placing inverted stairs over a crafting table.");
-					if (p.hasPermission("booksuite.copy.createpress"))
-						p.sendMessage(ChatColor.DARK_GREEN + "Right click the top of a crafting table holding stairs to easily assemble one!");
-					p.sendMessage(ChatColor.DARK_GREEN + "To use a press, right click it with a copiable item.");
-					p.sendMessage(ChatColor.DARK_GREEN + "Copiables: " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN+", " + ChatColor.AQUA + "Book and Quill" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "Map");
-					return true;
-				} else if (args[1].toLowerCase().contains("erase") && p.hasPermission("booksuite.block.erase")) {
-					p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA+"eraser" + ChatColor.DARK_GREEN + " is a cauldron. Right click one with a Written Book to unsign!");
-					if (!p.hasPermission("booksuite.block.erase.free"))
-						p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes water.");
-					return true;
+		if (args.length >= 1 && (args[0].equalsIgnoreCase("usage") || args[0].equalsIgnoreCase("help"))) {
+			String permittedCommands = listPermittedCommands(p);
+			if (permittedCommands.length() > 0) {
+				if (args.length == 1) {
+					p.sendMessage(ChatColor.DARK_RED + "Please specify a help topic!");
+					p.sendMessage(ChatColor.DARK_RED + "Possible topics are as follows:");
+					p.sendMessage(ChatColor.DARK_RED + permittedCommands);
+				} else {//TODO redo this, short aliases for commands will ruin it
+					if (permittedCommands.contains("import"))
+						permittedCommands = permittedCommands + "loadfileurl";
+					if (permittedCommands.contains("export"))
+						permittedCommands = permittedCommands + "save";
+					for (String s : args) {
+						if (permittedCommands.contains(s.toLowerCase())) {
+							if ("printingpress".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.DARK_GREEN + "A " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " is made by placing inverted stairs over a crafting table.");
+								if (p.hasPermission("booksuite.copy.createpress"))
+									p.sendMessage(ChatColor.DARK_GREEN + "Right click the top of a crafting table holding stairs to easily assemble one!");
+								p.sendMessage(ChatColor.DARK_GREEN + "To use a press, right click it with a copiable item.");
+								p.sendMessage(ChatColor.DARK_GREEN + "Copiables: " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN+", " + ChatColor.AQUA + "Book and Quill" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "Map");
+							} else if ("eraser".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA+"eraser" + ChatColor.DARK_GREEN + " is a cauldron. Right click one with a Written Book to unsign!");
+								if (!p.hasPermission("booksuite.block.erase.free"))
+									p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes water.");
+							} else if ("edit".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book addpage <number> (text)" + ChatColor.DARK_GREEN + " - add a page to a book");
+								p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
+							} else if ("addpage".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book addpage <number> (text)" + ChatColor.DARK_GREEN + " - add a page to a book");
+							} else if ("delpage".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
+							} else if ("author".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
+							} else if ("title".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
+							} else if ("copy".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book copy <quantity>" + ChatColor.DARK_GREEN + " - Create copies!");
+							} else if ("unsign".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
+							} else if ("importloadfileurl".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book <u(rl)|f(ile)> <url|filename>" + ChatColor.DARK_GREEN + " - import book from file or url");
+							} else if ("saveexport".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book <e(xport)|s(ave)> <filename>" + ChatColor.DARK_GREEN + " - export held book to file");
+							} else if ("list".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book l(ist)" + ChatColor.DARK_GREEN + " - list all books");
+							} else if ("delete".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book d(elete) <file>" + ChatColor.DARK_GREEN + " - delete specified book");
+							} else if ("reload".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book reload" + ChatColor.DARK_GREEN + " - reload the plugin");
+							} else if ("update".contains(s.toLowerCase())) {
+								p.sendMessage(ChatColor.AQUA + "/book update" + ChatColor.DARK_GREEN + " - check for updates");
+							}
+						} else {
+							p.sendMessage(ChatColor.DARK_RED + "Unknown usage topic: " + s + ".");
+						}
+					}
 				}
-			}
-			if (p.hasPermission("booksuite.copy.self") && p.hasPermission("booksuite.block.erase")) {
-				p.sendMessage(ChatColor.DARK_GREEN + "Possible help topics: " + ChatColor.AQUA+"printing press" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "eraser");
-			return true;
-			} else if (p.hasPermission("booksuite.copy.self")) {
-				p.sendMessage(ChatColor.DARK_GREEN+"Possible help topics: " + ChatColor.AQUA + "printing press");
-				return true;
-			} else if (p.hasPermission("booksuite.block.erase")) {
-				p.sendMessage(ChatColor.DARK_GREEN + "Possible help topics: " + ChatColor.AQUA + "eraser");
 				return true;
 			}
 		}
 		
 		
-		
-		
-		//if no commands match, print out help based on permissions
-		//TODO generic help sections:
-		//admin(istration)
-		//general
-		//commands
-		//new command: usage
 		p.sendMessage(ChatColor.AQUA + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " is enabled!");
-		if (p.hasPermission("booksuite.copy.self")) {
-			p.sendMessage(ChatColor.DARK_GREEN + "Right click a " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " with a copiable object to use.");
-		}
-		if (p.hasPermission("booksuite.block.erase")) {
-			p.sendMessage(ChatColor.DARK_GREEN + "Right click an " + ChatColor.AQUA + "eraser" + ChatColor.DARK_GREEN + " to unsign a book.");
-		}
-		if (p.hasPermission("booksuite.copy.self") || p.hasPermission("booksuite.block.erase"))
-			p.sendMessage(ChatColor.AQUA + "/book help" + ChatColor.DARK_GREEN + " for more details.");
-		if (p.hasPermission("booksuite.command.edit")) {
-			p.sendMessage(ChatColor.AQUA + "/book addpage <number> [text]" + ChatColor.DARK_GREEN + " - add a page to a book");
-			p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
-		}
-		if (p.hasPermission("booksuite.command.author"))
-			p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
-		if (p.hasPermission("booksuite.command.title"))
-			p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
-		if (p.hasPermission("booksuite.command.copy"))
-			p.sendMessage(ChatColor.AQUA + "/book copy (quantity)" + ChatColor.DARK_GREEN + " - Create copies!");
-		if (p.hasPermission("booksuite.command.unsign"))
-			p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
-		if (p.hasPermission("booksuite.command.import"))
-			p.sendMessage(ChatColor.AQUA + "/book <u(rl)|f(ile)> <url|filename>" + ChatColor.DARK_GREEN + " - import book from file or url");
-		if (p.hasPermission("booksuite.command.export"))
-			p.sendMessage(ChatColor.AQUA + "/book <e(xport)|s(ave)> <filename>" + ChatColor.DARK_GREEN + " - export held book to file");
-		if (p.hasPermission("booksuite.command.list"))
-			p.sendMessage(ChatColor.AQUA + "/book l(ist)" + ChatColor.DARK_GREEN + " - list all books");
-		if (p.hasPermission("booksuite.command.delete"))
-			p.sendMessage(ChatColor.AQUA + "/book d(elete) <file>" + ChatColor.DARK_GREEN + " - delete specified book");
-		if (p.hasPermission("booksuite.command.reload"))
-			p.sendMessage(ChatColor.AQUA + "/book reload" + ChatColor.DARK_GREEN + " - reload the plugin");
-		if (p.hasPermission("booksuite.command.update"))
-			p.sendMessage(ChatColor.AQUA + "/book update" + ChatColor.DARK_GREEN + " - check for updates");
+		if (listPermittedCommands(p).length() > 0)
+			p.sendMessage(ChatColor.DARK_GREEN + "For a list of commands, use " + ChatColor.AQUA + "/book help");
+		
 		return true;
 	}
 	
+	
+	
+
+	
+	
+	
+	public String listPermittedCommands(Player p) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (p.hasPermission("booksuite.copy.self"))
+			sb.append("printingpress, ");
+		if (p.hasPermission("booksuite.block.erase"))
+			sb.append("eraser, ");
+		if (p.hasPermission("booksuite.command.edit"))
+			sb.append("addpage, delpage, ");
+		if (p.hasPermission("booksuite.command.author"))
+			sb.append("author, ");
+		if (p.hasPermission("booksuite.command.title"))
+			sb.append("title, ");
+		if (p.hasPermission("booksuite.command.copy"))
+			sb.append("copy, ");
+		if (p.hasPermission("booksuite.command.unsign"))
+			sb.append("unsign, ");
+		if (p.hasPermission("booksuite.command.import"))
+			sb.append("import, ");
+		if (p.hasPermission("booksuite.command.export"))
+			sb.append("export, ");
+		if (p.hasPermission("booksuite.command.list"))
+			sb.append("list, ");
+		if (p.hasPermission("booksuite.command.delete"))
+			sb.append("delete, ");
+		if (p.hasPermission("booksuite.command.reload"))
+			sb.append("reload, ");
+		if (p.hasPermission("booksuite.command.update"))
+			sb.append("update, ");
+		
+		return sb.substring(0, sb.length() - 2);
+	}
 	
 	
 	
@@ -489,7 +523,7 @@ public class CommandHandler implements CommandExecutor {
 				dir.mkdirs();
 			File tempFile;
 			for (int i = 1; i <= 5; i++) {
-				tempFile = new File(dir, "temp"+i+".book");
+				tempFile = new File(dir, "temp" + i + ".book");
 				if (!tempFile.exists()){
 					try {
 						tempFile.createNewFile();
@@ -507,7 +541,7 @@ public class CommandHandler implements CommandExecutor {
 					}
 					syncBookImport(p, i);
 					return;
-				} else if (i==5)
+				} else if (i == 5)
 					syncBookImport(p, -1);
 			}
 		}
@@ -526,34 +560,35 @@ public class CommandHandler implements CommandExecutor {
 			this.temp = temp;
 		}
 		public void run() {
-			if (temp == -1){
+			if (temp == -1) {
 				p.sendMessage(ChatColor.DARK_RED+"Too many books are being imported at this time, please try again later.");
 				return;
 			}
-			BookMeta bm = fm.makeBookMetaFromText(p, "temp"+temp, plugin.getDataFolder()+"/temp/", true);
-			fm.delete(plugin.getDataFolder()+"/temp/", "temp"+temp+".book");
-			if (bm!=null) {
+			BookMeta bm = fm.makeBookMetaFromText(p, "temp" + temp, plugin.getDataFolder() + "/temp/", true);
+			fm.delete(plugin.getDataFolder() + "/temp/", "temp" + temp + ".book");
+			if (bm != null) {
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				is.setItemMeta(bm);
-				if(p.getInventory().firstEmpty() != -1) {
+				if (p.getInventory().firstEmpty() != -1) {
 					p.getInventory().addItem(is);
 				} else {
 					p.getWorld().dropItem(p.getLocation(), is);
 				}
 			}
 			else {
-				p.sendMessage(ChatColor.DARK_RED+"Error reading from URL.");
-				if(p.getInventory().firstEmpty()>0){
+				p.sendMessage(ChatColor.DARK_RED + "Error reading from URL.");
+				if(p.getInventory().firstEmpty() > 0) {
 					p.getInventory().addItem(new ItemStack(Material.INK_SACK, 1));
 					p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
 				} else {
-					p.sendMessage(ChatColor.DARK_RED+"Dropped book supplies at your feet.");
+					p.sendMessage(ChatColor.DARK_RED + "Dropped book supplies at your feet.");
 					p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.INK_SACK, 1));
 					p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.BOOK, 1));
 				}
 			}
 		}
 	}
+	
 	
 	
 	public void syncOverwriteTimer(Player p) {

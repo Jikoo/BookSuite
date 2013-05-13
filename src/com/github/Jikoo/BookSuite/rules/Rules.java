@@ -106,6 +106,9 @@ public class Rules implements CommandExecutor, Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		//TODO
+		//check if user has received up-to-date rules
+		//if no, give book synchronously
+		//TODO rewrite importing ;-;
 	}
 	
 	

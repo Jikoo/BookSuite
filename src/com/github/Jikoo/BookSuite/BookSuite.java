@@ -14,7 +14,7 @@ import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
-	String version = "3.2.0";
+	String version = "3.1.2";
 	public int currentFile = 11;
 	public boolean hasUpdate;
 	public String updateString;
@@ -35,14 +35,14 @@ public class BookSuite extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		getLogger().info("[BookSuite] Initializing.");
+		getLogger().info("Initializing.");
 		
 		instance = this;
 		
 		saveDefaultConfig();
 		
 		if (new UpdateConfig(this).update())
-			getLogger().warning("[BookSuite] Your configuration has been changed, please check it!");
+			getLogger().warning("Your configuration has been changed, please check it!");
 		
 		mail = MailExecutor.getInstance();
 		functions = Functions.getInstance();
@@ -56,21 +56,21 @@ public class BookSuite extends JavaPlugin implements Listener {
 		
 		try {
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {
-				getLogger().info("[BookSuite] Enabling inbuilt permissions.");
+				getLogger().info("Enabling inbuilt permissions.");
 				perms = new PermissionsListener(this);
 				perms.enable();
 			}
 			
 			
 			if (getConfig().getBoolean("enable-metrics")) {
-				getLogger().info("[BookSuite] Enabling metrics.");
+				getLogger().info("Enabling metrics.");
 				try {
 					metrics = new Metrics(this);
 					metrics.start();
 				} catch (IOException e) {
-					getLogger().warning("[BookSuite] Error enabling metrics: " + e);
+					getLogger().warning("Error enabling metrics: " + e);
 					e.printStackTrace();
-					getLogger().warning("[BookSuite] End error report.");
+					getLogger().warning("End error report.");
 					if (metrics != null) {
 						metrics.disable();
 						metrics = null;
@@ -81,11 +81,11 @@ public class BookSuite extends JavaPlugin implements Listener {
 			
 			if(getConfig().getBoolean("update-check")) {
 				if(getConfig().getBoolean("login-update-check")) {
-					getLogger().info("[BookSuite] Enabling login update check.");
+					getLogger().info("Enabling login update check.");
 					update.enableNotifications();
 				}
 				
-				getLogger().info("[BookSuite] Starting update check...");
+				getLogger().info("Starting update check...");
 				
 				update.asyncUpdateCheck(null, false);
 			}
@@ -98,9 +98,9 @@ public class BookSuite extends JavaPlugin implements Listener {
 			
 			
 		} catch (Exception e) {
-			getLogger().warning("[BookSuite] Error loading configuration: " + e);
+			getLogger().warning("Error loading configuration: " + e);
 			e.printStackTrace();
-			getLogger().warning("[BookSuite] End error report.");
+			getLogger().warning("End error report.");
 		}
 		
 		if (new File(getDataFolder(), "temp").exists())
@@ -111,7 +111,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 		command = CommandHandler.getInstance();
 		getCommand("book").setExecutor(command);
 		
-		getLogger().info("[BookSuite] v" + version + " enabled!");
+		getLogger().info("v" + version + " enabled!");
 	}
 
 
@@ -128,7 +128,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 				metrics = null;
 			}
 		} catch (IOException e) {
-			getLogger().warning("[BookSuite] Error disabling metrics.");
+			getLogger().warning("Error disabling metrics.");
 		}
 		
 		if (update != null) {

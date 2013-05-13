@@ -1,13 +1,9 @@
 ;3.2.0
 :books will now stack when copied, up to 64. Requires permission booksuite.copy.stack, default op.
-:added Aliases (incomplete) (if event is released on completion)
-:added book-based rules (incomplete)
 :added commands:
-: - /book copy (quantity)
-: - /book usage <command> (not started)
-: - /rules|/? (args)
+: - /book copy <quantity>
+: - /book usage <command>
 :improved memory usage when disabled
-:presses should no longer function when plugin is disabled (not started)
 :reformatted more code to be more readable
 :no longer check Bukkit if an update has already been detected
 :no longer notify on startup if an update is not available
