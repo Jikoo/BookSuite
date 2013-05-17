@@ -150,7 +150,7 @@ public class Alias {
 	public ArrayList<String> getAliases(Player p) {
 		ArrayList<String> aliases = new ArrayList<String>();
 		aliases.add(p.getName());
-		switch (aliasType.valueOf(plugin.getConfig().getString("alias-mode"))) {//TODO 1.6 compatability - ENUM
+		switch (aliasType.valueOf(plugin.getConfig().getString("alias-mode"))) {
 			case MULTI:
 				aliases.add(p.getDisplayName());
 				for (String s : aliasYML.getStringList(p.getName())) {

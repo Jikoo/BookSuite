@@ -6,10 +6,9 @@ standalone editor for the books (with automatic uploading!)
 
 reorganize commands for efficiency
 
-separate event handler
+message logger and configurable strings.yml
 
-Take a leaf out of Ben's book for isolating modules
-allow disabling of individual modules in config
+customize metrics so it disables based on MY config, not the main one
 
 method for ops to check others' mail - useful if players can mail to a collective complaints box, etc.
 The rebellion must be crushed at all costs.
