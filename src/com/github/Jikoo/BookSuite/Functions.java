@@ -161,14 +161,20 @@ public class Functions {
 				if (all.size() == 1) { 
 					newDuplicate(p); 
 				} else {
+					boolean copiedSuccessfully = false;
 					for (Entry<Integer, ? extends ItemStack> e : all.entrySet()) {
 						if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
 							if (e.getValue().getAmount() < 64) {
 								ItemStack book = e.getValue();
 								book.setAmount(e.getValue().getAmount() + 1);
 								p.getInventory().setItem(e.getKey(), book);
+								copiedSuccessfully = true;
+								break;
 							}
 						}
+					}
+					if (!copiedSuccessfully) {
+						newDuplicate(p);
 					}
 				}
 			} else {

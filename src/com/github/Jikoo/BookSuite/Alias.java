@@ -28,8 +28,8 @@ public class Alias {
 	File aliasFile;
 	FileConfiguration aliasYML;
 	
-	enum aliasType {MULTI, DEFAULT};
-	aliasType type;
+	enum AliasType {MULTI, DEFAULT, NONE};
+	AliasType type = AliasType.DEFAULT;
 	
 	private static Alias instance;
 	public static Alias getInstance() {
@@ -39,14 +39,19 @@ public class Alias {
 	
 	
 	public void load() {
-		type = aliasType.valueOf(plugin.getConfig().getString("alias-mode").toUpperCase());
-		if (type.equals(aliasType.MULTI)) {
-			aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
-			if (aliasFile.exists()) {
-				aliasYML = YamlConfiguration.loadConfiguration(aliasFile);
-			} else {
-				aliasYML = new YamlConfiguration();
+		try {
+			type = AliasType.valueOf(plugin.getConfig().getString("alias-mode").toUpperCase());
+			if (type.equals(AliasType.MULTI)) {
+				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
+				if (aliasFile.exists()) {
+					aliasYML = YamlConfiguration.loadConfiguration(aliasFile);
+				} else {
+					aliasYML = new YamlConfiguration();
+				}
 			}
+		} catch (IllegalArgumentException e) {
+			type = AliasType.DEFAULT;
+			plugin.getLogger().warning(ChatColor.DARK_RED + "Invalid alias type in config, using default setting.");
 		}
 	}
 	
@@ -76,7 +81,7 @@ public class Alias {
 	
 	
 	public void addAliasToTarget(CommandSender s, Player target, String newAlias, boolean warn) {
-		if (!type.equals(aliasType.MULTI)) {
+		if (!type.equals(AliasType.MULTI)) {
 			s.sendMessage(ChatColor.DARK_RED + "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
 			return;
 		}
@@ -103,7 +108,7 @@ public class Alias {
 	
 	
 	public void removeAliasFromTarget(CommandSender s, Player target, String oldAlias, boolean warn) {
-		if (!type.equals(aliasType.MULTI)) {
+		if (!type.equals(AliasType.MULTI)) {
 			s.sendMessage(ChatColor.DARK_RED + "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
 			return;
 		}
@@ -150,7 +155,7 @@ public class Alias {
 	public ArrayList<String> getAliases(Player p) {
 		ArrayList<String> aliases = new ArrayList<String>();
 		aliases.add(p.getName());
-		switch (aliasType.valueOf(plugin.getConfig().getString("alias-mode"))) {
+		switch (type) {
 			case MULTI:
 				aliases.add(p.getDisplayName());
 				for (String s : aliasYML.getStringList(p.getName())) {

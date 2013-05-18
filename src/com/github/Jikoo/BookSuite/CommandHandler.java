@@ -431,60 +431,68 @@ public class CommandHandler implements CommandExecutor {
 					boolean failure = false;
 					StringBuilder sb = new StringBuilder();
 					for (String s : args) {
-						CommandPermissions cdp = CommandPermissions.uValueOf(s);
-						if (cdp.checkPermission(p)) {
-							switch (cdp) {
-							case EDIT:
-								p.sendMessage(ChatColor.AQUA + "/book addpage <number> (text)" + ChatColor.DARK_GREEN + " - add a page to a book");
-								p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
-								break;
-							case AUTHOR:
-								p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
-							case TITLE:
-								p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
-								break;
-							case COPY:
-								p.sendMessage(ChatColor.AQUA + "/book copy <quantity>" + ChatColor.DARK_GREEN + " - Create copies!");
-								break;
-							case UNSIGN:
-								p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
-								break;
-							case IMPORT:
-								p.sendMessage(ChatColor.AQUA + "/book <u(rl)|<f(ile)|l(oad)>> <url|filename>" + ChatColor.DARK_GREEN + " - import book from file or url");
-								break;
-							case EXPORT:
-								p.sendMessage(ChatColor.AQUA + "/book <e(xport)|s(ave)> <filename>" + ChatColor.DARK_GREEN + " - export held book to file");
-								break;
-							case LIST:
-								p.sendMessage(ChatColor.AQUA + "/book l(ist)" + ChatColor.DARK_GREEN + " - list all books");
-								break;
-							case DELETE:
-								p.sendMessage(ChatColor.AQUA + "/book d(elete) <file>" + ChatColor.DARK_GREEN + " - delete specified book");
-								break;
-							case RELOAD:
-								p.sendMessage(ChatColor.AQUA + "/book reload" + ChatColor.DARK_GREEN + " - reload the plugin");
-								break;
-							case UPDATE:
-								p.sendMessage(ChatColor.AQUA + "/book update" + ChatColor.DARK_GREEN + " - check for updates");
-								break;
-							default:
-								failure = true;
-								sb.append(s + ", ");
-								break;
-							}
-						} else if (s.equalsIgnoreCase("press") || s.equalsIgnoreCase("printingpress") && p.hasPermission("booksuite.copy.self")) {
-							p.sendMessage(ChatColor.DARK_GREEN + "A " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " is made by placing inverted stairs over a crafting table.");
-							if (p.hasPermission("booksuite.copy.createpress"))
-								p.sendMessage(ChatColor.DARK_GREEN + "Right click the top of a crafting table holding stairs to easily assemble one!");
-							p.sendMessage(ChatColor.DARK_GREEN + "To use a press, right click it with a copiable item.");
-							p.sendMessage(ChatColor.DARK_GREEN + "Copiables: " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN+", " + ChatColor.AQUA + "Book and Quill" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "Map");
-						} else if (s.equalsIgnoreCase("erase") || s.equalsIgnoreCase("eraser") || p.hasPermission("booksuite.block.erase")) {
-							p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA+"eraser" + ChatColor.DARK_GREEN + " is a cauldron. Right click one with a Written Book to unsign!");
-							if (!p.hasPermission("booksuite.block.erase.free"))
-								p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes water.");
+						s = s.replaceAll("\\W\\z", "");
+						if (s.equals(args[0])) {
 						} else {
-							failure = true;
-							sb.append(s + ", ");
+							try {
+								CommandPermissions cdp = CommandPermissions.uValueOf(s);
+								if (cdp.checkPermission(p)) {
+									switch (cdp) {
+									case EDIT:
+										p.sendMessage(ChatColor.AQUA + "/book addpage <number> (text)" + ChatColor.DARK_GREEN + " - add a page to a book");
+										p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
+										break;
+									case AUTHOR:
+										p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
+									case TITLE:
+										p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
+										break;
+									case COPY:
+										p.sendMessage(ChatColor.AQUA + "/book copy <quantity>" + ChatColor.DARK_GREEN + " - Create copies!");
+										break;
+									case UNSIGN:
+										p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
+										break;
+									case IMPORT:
+										p.sendMessage(ChatColor.AQUA + "/book <u(rl)|<f(ile)|l(oad)>> <url|filename>" + ChatColor.DARK_GREEN + " - import book from file or url");
+										break;
+									case EXPORT:
+										p.sendMessage(ChatColor.AQUA + "/book <e(xport)|s(ave)> <filename>" + ChatColor.DARK_GREEN + " - export held book to file");
+										break;
+									case LIST:
+										p.sendMessage(ChatColor.AQUA + "/book l(ist)" + ChatColor.DARK_GREEN + " - list all books");
+										break;
+									case DELETE:
+										p.sendMessage(ChatColor.AQUA + "/book d(elete) <file>" + ChatColor.DARK_GREEN + " - delete specified book");
+										break;
+									case RELOAD:
+										p.sendMessage(ChatColor.AQUA + "/book reload" + ChatColor.DARK_GREEN + " - reload the plugin");
+										break;
+									case UPDATE:
+										p.sendMessage(ChatColor.AQUA + "/book update" + ChatColor.DARK_GREEN + " - check for updates");
+										break;
+									default:
+										failure = true;
+										sb.append(s + ", ");
+										break;
+									}
+								}
+							} catch (IllegalArgumentException e) {
+								if (s.equalsIgnoreCase("press") || s.equalsIgnoreCase("printingpress") && p.hasPermission("booksuite.copy.self")) {
+									p.sendMessage(ChatColor.DARK_GREEN + "A " + ChatColor.AQUA + "printing press" + ChatColor.DARK_GREEN + " is made by placing inverted stairs over a crafting table.");
+									if (p.hasPermission("booksuite.copy.createpress"))
+										p.sendMessage(ChatColor.DARK_GREEN + "Right click the top of a crafting table holding stairs to easily assemble one!");
+									p.sendMessage(ChatColor.DARK_GREEN + "To use a press, right click it with a copiable item.");
+									p.sendMessage(ChatColor.DARK_GREEN + "Copiables: " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN+", " + ChatColor.AQUA + "Book and Quill" + ChatColor.DARK_GREEN + ", " + ChatColor.AQUA + "Map");
+								} else if (s.equalsIgnoreCase("erase") || s.equalsIgnoreCase("eraser") && p.hasPermission("booksuite.block.erase")) {
+									p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA+"eraser" + ChatColor.DARK_GREEN + " is a cauldron. Right click one with a Written Book to unsign!");
+									if (!p.hasPermission("booksuite.block.erase.free"))
+										p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes water.");
+								} else {
+									failure = true;
+									sb.append(s + ", ");
+								}
+							}
 						}
 					}
 					
