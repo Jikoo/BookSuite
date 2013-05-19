@@ -87,7 +87,29 @@ public class Functions {
 	
 	
 	public boolean hasRoom(Player p) {
-		return (p.getInventory().firstEmpty() != -1 || (p.getItemInHand().getAmount() < 64 && p.hasPermission("booksuite.copy.stack")));
+		return p.getInventory().firstEmpty() != -1 || hasStackingRoom(p);
+	}
+	
+	
+	
+	
+	public boolean hasStackingRoom(Player p) {
+		if (!p.hasPermission("booksuite.copy.stack"))
+			return false;
+		
+		HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(p.getItemInHand().getType());
+		if (allBooks.size() == 1) {
+			return p.getItemInHand().getAmount() < 64;
+		} else {
+			for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
+				if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
+					if (e.getValue().getAmount() < 64) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	
@@ -157,12 +179,12 @@ public class Functions {
 	public void copy(Player p) {
 		if (p.hasPermission("booksuite.copy.stack") && !p.getItemInHand().getType().equals(Material.MAP)) {
 			if (p.getItemInHand().getAmount() == 64) {
-				HashMap<Integer, ? extends ItemStack> all = p.getInventory().all(p.getItemInHand().getType());
-				if (all.size() == 1) { 
+				HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(p.getItemInHand().getType());
+				if (allBooks.size() == 1) { 
 					newDuplicate(p); 
 				} else {
 					boolean copiedSuccessfully = false;
-					for (Entry<Integer, ? extends ItemStack> e : all.entrySet()) {
+					for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
 						if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
 							if (e.getValue().getAmount() < 64) {
 								ItemStack book = e.getValue();
@@ -348,19 +370,18 @@ public class Functions {
 
 
 	public byte getCorrectStairOrientation(Player p) {
-		byte playerFace = (byte) Math.round(p.getLocation().getYaw()/90);
+		byte playerFace = (byte) Math.round(p.getLocation().getYaw() / 90);
 		if(playerFace == 0 || playerFace == -4 || playerFace == 4)
 			return 6;//open north
 		else if (playerFace == 1 || playerFace == -3)
 			return 5;//open east
-		else if(playerFace == 2 || playerFace == -2)
+		else if (playerFace == 2 || playerFace == -2)
 			return 7;//open south
 		else return 4;//open west
 	}
 	
 	
-	private Functions(){}
-	public static Functions getInstance(){
+	public static Functions getInstance() {
 		if (instance == null) instance = new Functions();
 		return instance;
 	}

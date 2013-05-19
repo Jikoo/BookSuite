@@ -77,7 +77,7 @@ public class MainListener implements Listener {
 							if (plugin.functions.checkCopyPermission(p, bm.getAuthor()) && plugin.functions.canObtainBook(p)) {
 								press.operatePress();
 								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
+								p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
 							}
 							event.setCancelled(true);
 						} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
@@ -85,7 +85,7 @@ public class MainListener implements Listener {
 								if (plugin.functions.canObtainBook(p)) {
 									press.operatePress();
 									plugin.functions.copy(p);
-									p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
+									p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
 								}
 							} else p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy unsigned books!");
 							event.setCancelled(true);

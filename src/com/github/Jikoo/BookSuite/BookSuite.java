@@ -53,7 +53,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 		saveDefaultConfig();
 		
 		if (new UpdateConfig(this).update())
-			getLogger().warning("Your configuration has been changed, please check it!");
+			getLogger().warning("Your configuration has been updated, please check it!");
 		
 		mail = MailExecutor.getInstance();
 		functions = Functions.getInstance();

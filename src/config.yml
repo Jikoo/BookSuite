@@ -19,6 +19,12 @@
 #     - Aliases are stored in aliases.yml
 alias-mode: default
 
+###  COPIES  ###
+# Because of the way multiple copies are handled, copying is capped
+# to 64 by default. It is certainly safe to raise the cap, but beware
+# of very high numbers.
+maximum-copies-per-operation: 64
+
 ###  PERMISSIONS  ###
 # If you use a permissions plugin, set to false and assign permissions.
 use-inbuilt-permissions: true

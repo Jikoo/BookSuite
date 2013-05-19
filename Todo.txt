@@ -6,6 +6,10 @@ standalone editor for the books (with automatic uploading!)
 
 reorganize commands for efficiency
 
+figure out a way to asynchronously create book files
+	(SHOULD be thread safe as long as we add it to the inventory with a synchronous task,
+	but early asynchronous URL import attempts did fail with that implementation..)
+
 message logger and configurable strings.yml
 
 customize metrics so it disables based on MY config, not the main one
