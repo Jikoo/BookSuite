@@ -20,10 +20,10 @@
 alias-mode: default
 
 ###  COPIES  ###
-# Because of the way multiple copies are handled, copying is capped
-# to 64 by default. It is certainly safe to raise the cap, but beware
-# of very high numbers.
-maximum-copies-per-operation: 64
+# Because of the way multiple copies are handled, copying is capped to
+# 10 by default. High numbers WILL lead to server lag on usage.
+# Also, how many of the same book do you really need?
+maximum-copies-per-operation: 10
 
 ###  PERMISSIONS  ###
 # If you use a permissions plugin, set to false and assign permissions.

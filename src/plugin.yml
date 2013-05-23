@@ -302,4 +302,4 @@ commands:
         default: false
         description: booksuite universal command
         permission: booksuite.command
-        aliases: [booksuite, bsuite]
+        aliases: [booksuite, bsuite, bs]

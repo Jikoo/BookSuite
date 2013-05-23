@@ -136,20 +136,18 @@ public class CommandHandler implements CommandExecutor {
 						
 						
 						//command: /book <u(rl)|<f(ile)|l(oad)>> <url|filename> - attempt to import a book from location
-						if (args[0].equals("f") || args[0].equals("file") || args[0].equals("l") || args[0].equals("load")) {
-							if(CommandPermissions.IMPORT.checkPermission(p)) {
-								ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-								newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, args[1], plugin.getDataFolder() + "/SavedBooks/", true));
-								if (!newbook.hasItemMeta()) {
-									p.sendMessage(ChatColor.DARK_RED + "Error reading book file. Does it exist?");
-								} else if (!functions.canObtainBook(p)) return true;
-								else p.getInventory().addItem(newbook);
-								return true;
-							} else if ((args[0].equals("u") || args[0].equals("url")) && CommandPermissions.IMPORT.checkPermission(p)) {
-								if (!functions.canObtainBook(p)) return true;
-								else asyncBookImport(p.getName(), args[1], plugin.getDataFolder().getPath());
-								return true;
-							}
+						if ((args[0].equals("f") || args[0].equals("file") || args[0].equals("l") || args[0].equals("load")) && CommandPermissions.IMPORT.checkPermission(p)) {
+							ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
+							newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, args[1], plugin.getDataFolder() + "/SavedBooks/", true));
+							if (!newbook.hasItemMeta()) {
+								p.sendMessage(ChatColor.DARK_RED + "Error reading book file. Does it exist?");
+							} else if (!functions.canObtainBook(p)) return true;
+							else p.getInventory().addItem(newbook);
+							return true;
+						} else if ((args[0].equals("u") || args[0].equals("url")) && CommandPermissions.IMPORT.checkPermission(p)) {
+							if (!functions.canObtainBook(p)) return true;
+							else asyncBookImport(p.getName(), args[1], plugin.getDataFolder().getPath());
+							return true;
 						}
 						
 						
@@ -227,7 +225,7 @@ public class CommandHandler implements CommandExecutor {
 		
 		sender.sendMessage(ChatColor.AQUA + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " is enabled!");
 		if (listPermittedCommands(sender).length() > 0) {
-			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use " + ChatColor.AQUA + "/book help" + ChatColor.DARK_GREEN + ".");
+			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use " + ChatColor.AQUA + "/book help <topic(s)>" + ChatColor.DARK_GREEN + ".");
 			sender.sendMessage(ChatColor.DARK_GREEN + "Possible topics: " + listPermittedCommands(sender));
 		}
 		
@@ -360,7 +358,7 @@ public class CommandHandler implements CommandExecutor {
 		
 		if (new File(plugin.getDataFolder(), "temp").exists())
 			plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
-		sender.sendMessage(ChatColor.DARK_GREEN + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " reloaded!");
+		sender.sendMessage(ChatColor.AQUA + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " reloaded!");
 	}
 	
 	
@@ -374,7 +372,7 @@ public class CommandHandler implements CommandExecutor {
 					copies = Integer.parseInt(args[1]);
 					if (copies > plugin.getConfig().getInt("maximum-copies-per-operation")) {
 						copies = plugin.getConfig().getInt("maximum-copies-per-operation");
-						p.sendMessage(ChatColor.DARK_RED + "");
+						p.sendMessage(ChatColor.DARK_RED + "The maximum number of books copiable at once is " + copies + ".");
 					}
 				} catch (NumberFormatException e) {
 					p.sendMessage(ChatColor.DARK_RED + args[1] + " is not a valid integer. Assuming 1..");
@@ -505,47 +503,48 @@ public class CommandHandler implements CommandExecutor {
 								case EDIT:
 									p.sendMessage(ChatColor.AQUA + "/book addpage <number> (text)" + ChatColor.DARK_GREEN + " - add a page to a book");
 									p.sendMessage(ChatColor.AQUA + "/book delpage <number>" + ChatColor.DARK_GREEN + " - delete page from book");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book addpage 1 It was a dark and stormy night.");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book delpage 1");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book addpage 1 It was a dark and stormy night.");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book delpage 1");
 									break;
 								case AUTHOR:
 									p.sendMessage(ChatColor.AQUA + "/book a(uthor) <new author>" + ChatColor.DARK_GREEN + " - change author of book in hand.");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book a Jikoo, aka Planar Warp");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book a Jikoo, aka Planar Warp");
+									break;
 								case TITLE:
 									p.sendMessage(ChatColor.AQUA + "/book t(itle) <new title>" + ChatColor.DARK_GREEN + " - change title of book in hand");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book t BookSuite Instruction Manual");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book t BookSuite Instruction Manual");
 									break;
 								case COPY:
 									p.sendMessage(ChatColor.AQUA + "/book copy <quantity>" + ChatColor.DARK_GREEN + " - Create copies!");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book copy 20");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book copy 20");
 									break;
 								case UNSIGN:
 									p.sendMessage(ChatColor.AQUA + "/book u(nsign)" + ChatColor.DARK_GREEN + " - unsign book in hand.");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book u");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book u");
 									break;
 								case IMPORT:
 									p.sendMessage(ChatColor.AQUA + "/book <u(rl)|<f(ile)|l(oad)>> <url|filename>" + ChatColor.DARK_GREEN + " - import book from file or url");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book u http://dev.bukkit.org/paste/gy7ekjupawivnbxq.txt");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book u http://dev.bukkit.org/paste/gy7ekjupawivnbxq.txt");
 									break;
 								case EXPORT:
 									p.sendMessage(ChatColor.AQUA + "/book <e(xport)|s(ave)> <filename>" + ChatColor.DARK_GREEN + " - export held book to file");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book s ExampletasticBook");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book s ExampletasticBook");
 									break;
 								case LIST:
 									p.sendMessage(ChatColor.AQUA + "/book l(ist)" + ChatColor.DARK_GREEN + " - list all books");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book l");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book l");
 									break;
 								case DELETE:
 									p.sendMessage(ChatColor.AQUA + "/book d(elete) <file>" + ChatColor.DARK_GREEN + " - delete specified book");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book d ExampletasticBook");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book d ExampletasticBook");
 									break;
 								case RELOAD:
 									p.sendMessage(ChatColor.AQUA + "/book reload" + ChatColor.DARK_GREEN + " - reload the plugin");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book reload");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book reload");
 									break;
 								case UPDATE:
 									p.sendMessage(ChatColor.AQUA + "/book update" + ChatColor.DARK_GREEN + " - check for updates");
-									p.sendMessage(ChatColor.DARK_GREEN + "Usage example:" + ChatColor.AQUA + "/book update");
+									p.sendMessage(ChatColor.DARK_GREEN + "Usage example: " + ChatColor.AQUA + "/book update");
 									break;
 								default:
 									failure = true;

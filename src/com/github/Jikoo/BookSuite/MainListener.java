@@ -67,7 +67,7 @@ public class MainListener implements Listener {
 							if (plugin.functions.canObtainMap(p)) {
 								press.operatePress();
 								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN+"Copied successfully!");
+								p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
 							}
 							event.setCancelled(true);
 						} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
@@ -115,7 +115,7 @@ public class MainListener implements Listener {
 								clicked.setData((byte) (clicked.getData() - 1));
 						} else if (p.hasPermission("booksuite.block.erase.other")) {
 							plugin.functions.unsign(p);
-							if(!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
+							if (!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
 								clicked.setData((byte) (clicked.getData() - 1));
 						} else p.sendMessage(ChatColor.DARK_RED + "You can only unsign your own books.");
 						event.setCancelled(true);
