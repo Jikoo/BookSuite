@@ -27,7 +27,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.Jikoo.BookSuite.press.PrintingPress;
+import com.github.Jikoo.BookSuite.copy.PrintingPress;
 
 public class MainListener implements Listener {
 	

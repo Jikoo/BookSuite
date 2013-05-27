@@ -77,7 +77,7 @@ public class MailExecutor {//TODO keep meaning to completely redo this all in fa
 					}
 					
 					
-					if (filemanager.makeFileFromBookMeta(newBook, pluginDataFolder + "/Mail/" + sendingData[1] + "/Books/", sendingData[0], false)){
+					if (filemanager.makeFileFromBookMeta(newBook, pluginDataFolder + "/Mail/" + sendingData[1] + "/Books/", sendingData[0])) {
 						inv.remove(p.getItemInHand());
 						p.sendMessage(ChatColor.DARK_GREEN + "Mail sent successfully!");
 						return true;

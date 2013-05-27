@@ -63,7 +63,7 @@ public class BookSuite extends JavaPlugin implements Listener {
 		alias.load();
 		
 		if (getConfig().getBoolean("update-check") || getConfig().getBoolean("allow-update-command"))
-			update = new UpdateCheck(this);
+			update = new UpdateCheck();
 		
 		try {
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {

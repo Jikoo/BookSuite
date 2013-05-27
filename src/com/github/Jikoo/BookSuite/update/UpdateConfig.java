@@ -28,7 +28,7 @@ public class UpdateConfig {
 		Set<String> current = plugin.getConfig().getKeys(false);
 		boolean changed = false;
 		
-		if(plugin.getConfig().contains("use-external-permissions")) {
+		if (plugin.getConfig().contains("use-external-permissions")) {
 			plugin.getConfig().set("use-internal-permissions", !plugin.getConfig().getBoolean("use-external-permissions"));
 			changed = true;
 		}
@@ -39,6 +39,15 @@ public class UpdateConfig {
 				changed = true;
 			}
 		}
+		
+		
+		for (String s : current) {
+			if (!options.contains(s)) {
+				plugin.getConfig().set(s, null);
+				changed = true;
+			}
+		}
+		
 		
 		if (changed) {
 			plugin.saveConfig();

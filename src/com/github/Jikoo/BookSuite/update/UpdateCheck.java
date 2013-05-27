@@ -29,14 +29,10 @@ import com.github.Jikoo.BookSuite.BookSuite;
 
 public class UpdateCheck implements Listener {
 
-	BookSuite plugin;
+	BookSuite plugin = BookSuite.getInstance();
 	String update;
 	int current;
 	boolean enabled = false;
-
-	public UpdateCheck(BookSuite plugin) {
-		this.plugin = plugin;
-	}
 
 	public boolean checkForUpdates() {
 		try {
@@ -178,11 +174,11 @@ public class UpdateCheck implements Listener {
 			if (pName != null) {
 				if (Bukkit.getPlayerExact(pName) != null) {
 					if (hasUpdate) Bukkit.getPlayerExact(pName).sendMessage(update);
-					else if (inform) Bukkit.getPlayerExact(pName).sendMessage(ChatColor.DARK_GREEN+"BookSuite is up to date!");
+					else if (inform) Bukkit.getPlayerExact(pName).sendMessage(ChatColor.DARK_GREEN + "BookSuite is up to date!");
 				}
 			} else {
 				if(hasUpdate) plugin.getLogger().info(update);
-				else if (inform) plugin.getLogger().info(ChatColor.DARK_GREEN+"BookSuite is up to date!");
+				else if (inform) plugin.getLogger().info(ChatColor.DARK_GREEN + "BookSuite is up to date!");
 			}
 		}
 	}

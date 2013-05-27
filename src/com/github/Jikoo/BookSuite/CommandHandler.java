@@ -40,6 +40,7 @@ public class CommandHandler implements CommandExecutor {
 	
 	BookSuite plugin = BookSuite.getInstance();
 	Functions functions = Functions.getInstance();
+	FileManager fManager = FileManager.getInstance();
 	HashMap<String, String> overwritable = new HashMap<String, String>();
 	
 	private static CommandHandler instance;
@@ -97,7 +98,7 @@ public class CommandHandler implements CommandExecutor {
 					if (args[0].equals("l") || args[0].equals("list") || args[0].equals("ls")) {
 						if (CommandPermissions.LIST.checkPermission(p)) {
 							if (args.length == 1) {
-								plugin.filemanager.listBookFilesIn(plugin.getDataFolder() + "/SavedBooks/", p);
+								fManager.listBookFilesIn(plugin.getDataFolder() + "/SavedBooks/", p);
 								return true;
 							}
 						}
@@ -138,7 +139,7 @@ public class CommandHandler implements CommandExecutor {
 						//command: /book <u(rl)|<f(ile)|l(oad)>> <url|filename> - attempt to import a book from location
 						if ((args[0].equals("f") || args[0].equals("file") || args[0].equals("l") || args[0].equals("load")) && CommandPermissions.IMPORT.checkPermission(p)) {
 							ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-							newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, args[1], plugin.getDataFolder() + "/SavedBooks/", true));
+							newbook.setItemMeta(fManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder() + "/SavedBooks/", true));
 							if (!newbook.hasItemMeta()) {
 								p.sendMessage(ChatColor.DARK_RED + "Error reading book file. Does it exist?");
 							} else if (!functions.canObtainBook(p)) return true;
@@ -154,8 +155,8 @@ public class CommandHandler implements CommandExecutor {
 						//command: /book d(elete) <filename> - attempt to delete file
 						if (args[0].equals("d") || args[0].equals("delete")) {
 							if (CommandPermissions.DELETE.checkPermission(p)) {
-								if (args[1].contains(".")) plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1]);
-								else plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1] + ".book");
+								if (args[1].contains(".")) fManager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1]);
+								else fManager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1] + ".book");
 								p.sendMessage(ChatColor.DARK_GREEN + "Deleted!");
 								return true;
 							}
@@ -336,7 +337,7 @@ public class CommandHandler implements CommandExecutor {
 		
 		if (plugin.getConfig().getBoolean("login-update-check")) {
 			if (plugin.update == null)
-				plugin.update = new UpdateCheck(plugin);
+				plugin.update = new UpdateCheck();
 			plugin.update.disableNotifications();
 			plugin.update.enableNotifications();
 		} else {
@@ -357,7 +358,7 @@ public class CommandHandler implements CommandExecutor {
 		}
 		
 		if (new File(plugin.getDataFolder(), "temp").exists())
-			plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
+			fManager.delete(plugin.getDataFolder().getPath(), "temp");
 		sender.sendMessage(ChatColor.AQUA + "BookSuite v" + ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA + " reloaded!");
 	}
 	
@@ -436,7 +437,7 @@ public class CommandHandler implements CommandExecutor {
 				return true;
 			}
 			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-			if (plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder() + "/SavedBooks/", args[1], false)) {
+			if (fManager.makeFileFromBookMeta(bm, plugin.getDataFolder() + "/SavedBooks/", args[1])) {
 				p.sendMessage(ChatColor.DARK_GREEN + "Book saved successfully!");
 			} else {
 				p.sendMessage(ChatColor.DARK_RED + "A book by this name already exists!");
@@ -460,17 +461,19 @@ public class CommandHandler implements CommandExecutor {
 				return true;
 			} else {
 				if (overwritable.containsKey(p.getName())) {
-					if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName()), true)) {
-						p.sendMessage(ChatColor.DARK_GREEN + "Book updated successfully!");
+					if (fManager.delete(plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName()))) {
+						if (fManager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder()+"/SavedBooks/", overwritable.get(p.getName()))) {
+							p.sendMessage(ChatColor.DARK_GREEN + "Book updated successfully!");
+						}
 					}
 					overwritable.remove(p.getName());
 					return true;
 				} else {
 					if (args.length == 2) {
-						if (!plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1])) {
+						if (!fManager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1])) {
 							p.sendMessage(ChatColor.DARK_RED + "You shouldn't make a habit of using overwrite instead of save.");
 						}
-						if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder() + "/SavedBooks/", args[1], true)) {
+						if (fManager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(), plugin.getDataFolder() + "/SavedBooks/", args[1])) {
 							p.sendMessage(ChatColor.DARK_GREEN + "Book updated successfully!");
 						}
 					} else p.sendMessage(ChatColor.DARK_RED + "What are you trying to overwrite? Use the save function.");

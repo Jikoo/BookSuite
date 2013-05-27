@@ -35,7 +35,7 @@ public class Functions {
 	 * the ingame book editor doesn't improve, I foresee no issues.
 	 * 
 	 */
-	private int[] acceptable = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
+	private final int[] ACCEPTABLE = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
 	
 	
 	/**
@@ -125,7 +125,7 @@ public class Functions {
 		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)) {
 			return "crafted";
 		} else if (inv.contains(Material.INK_SACK)) {
-			if (inv.contains(new ItemStack(Material.PAPER, 3))&&inv.contains(Material.LEATHER)) {
+			if (inv.contains(new ItemStack(Material.PAPER, 3)) && inv.contains(Material.LEATHER)) {
 				return "uncrafted";
 			}
 			return "a book";
@@ -352,7 +352,7 @@ public class Functions {
 	 * @return whether the block is an inverted stair
 	 */
 	public boolean isInvertedStairs(Block b) {
-		for (int i : acceptable)
+		for (int i : ACCEPTABLE)
 			if (i == b.getTypeId()) return b.getData()>3;
 		return false;
 	}
@@ -361,7 +361,7 @@ public class Functions {
 
 
 	public boolean isCorrectStairType(ItemStack is) {
-		for (int i : acceptable)
+		for (int i : ACCEPTABLE)
 			if (i == is.getTypeId()) return true;
 		return false;
 	}

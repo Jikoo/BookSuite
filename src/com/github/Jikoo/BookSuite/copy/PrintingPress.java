@@ -9,7 +9,7 @@
  *     Adam Gunn- initial API and implementation
  *     Ted Meyer - some help
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.press;
+package com.github.Jikoo.BookSuite.copy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -79,13 +79,16 @@ public class PrintingPress {
 		else if (b.getTypeId() == 136)//JUNGLE_WOOD_STAIRS
 			b.setTypeIdAndData(126, (byte) 3, false);//WOOD_STEP
 
-		else if (b.getTypeId() == 156)//Quartz stairs
+		else if (b.getTypeId() == 156)//QUARTZ_STAIRS
 			b.setTypeIdAndData(44, (byte) 7, false);//STEP
 		
 		changedBlock = b.getState();
 	}
 
 
+	public void revertBlockPause(Block b) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new revertBlock(b), 20L);
+	}
 	public class revertBlock implements Runnable {
 		Block b;
 		revertBlock(Block block) {
@@ -97,11 +100,8 @@ public class PrintingPress {
 			} else {
 				Player owner = Bukkit.getPlayerExact(pName);
 				if (owner != null)
-					owner.sendMessage(ChatColor.DARK_RED+"The press you used appears to have broken.");
+					owner.sendMessage(ChatColor.DARK_RED + "The press you used appears to have broken.");
 			}
 		}
-	}
-	public void revertBlockPause(Block b) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new revertBlock(b), 20L);
 	}
 }
