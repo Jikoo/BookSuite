@@ -36,7 +36,7 @@ public class UpdateCheck implements Listener {
 
 	public boolean checkForUpdates() {
 		try {
-			URL feed = new URL("http://dev.bukkit.org/server-mods/booksuite/files.rss");
+			URL feed = new URL("http://dev.bukkit.org/bukkit-mods/booksuite/files.rss");
 			Scanner stream = new Scanner(feed.openStream());
 			boolean item = false;
 			while (stream.hasNextLine()) {
@@ -64,11 +64,11 @@ public class UpdateCheck implements Listener {
 				return true;
 			}
 		} catch (MalformedURLException e) {
-			plugin.getLogger().warning("[BookSuite] Error with update URL: " + e);
+			plugin.getLogger().warning("Error with update URL: " + e);
 			e.printStackTrace();
-			plugin.getLogger().warning("[BookSuite] End error report. Please report this error!");
+			plugin.getLogger().warning("End error report. Please report this error!");
 		} catch (IOException e) {
-			plugin.getLogger().warning("[BookSuite] Error checking for updates!");
+			plugin.getLogger().warning("Error checking for updates!");
 		}
 		return false;
 	}
@@ -96,14 +96,12 @@ public class UpdateCheck implements Listener {
 	}
 	
 	public int parseFileNumber(String s) {
-		s = s.replace("http://dev.bukkit.org/server-mods/booksuite/files/", "");
-		s = s.replaceAll("-.*", "");
-		s = s.replaceAll("BookSuite","");
-		s = s.replaceAll(" ","");
+		s = s.replaceAll("http://(.)*/booksuite/files/(\\d+)-(.?)*\\z", "$2");
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			plugin.getLogger().warning("[BookSuite] File check parsing error! Please report this error!");
+			plugin.getLogger().warning("File check parsing error! Please report this error!");
+			plugin.getLogger().warning("Relevant information: \"" + s + "\"");
 			return 0;
 		}
 	}

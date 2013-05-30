@@ -6,6 +6,7 @@
 : - /book usage <command>
 :improved memory usage when disabled
 :reformatted more code to be more readable
+:changed URL in update checker to match new Bukkit site organization
 :no longer check Bukkit if an update has already been detected
 :no longer notify on startup if an update is not available
 :reformatted plugin.yml to reduce duplicate text

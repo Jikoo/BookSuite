@@ -25,8 +25,8 @@ import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
 
 public class BookSuite extends JavaPlugin implements Listener {
-	String version = "3.1.2";
-	public int currentFile = 11;
+	protected final String version = "3.1.2";
+	public final int currentFile = 11;
 	public boolean hasUpdate;
 	public String updateString;
 
