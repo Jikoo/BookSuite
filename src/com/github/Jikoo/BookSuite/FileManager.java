@@ -310,7 +310,7 @@ public class FileManager {
 		text = text.replaceAll("(<|\\[)/color(>|\\])", SECTION_SIGN + "0");
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
-		text = text.replaceAll("(§r)+", SECTION_SIGN + "r");
+		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
 		return text;
 	}
 	
@@ -422,7 +422,7 @@ public class FileManager {
 			file.mkdirs();
 			return;
 		}
-		File[] fileList = file.listFiles();
+		File[] fileList = file.listFiles();//TODO private
 		if (fileList == null) {
 			p.sendMessage(ChatColor.DARK_RED + "No books found.");
 			return;
@@ -441,10 +441,47 @@ public class FileManager {
 			for (String book : bookList) {
 				p.sendMessage(ChatColor.DARK_GREEN + book);
 			}
+			stringyMakinashun(true, true, false, new ArrayList<String>());
 		}
 	}
 	
 	
+	
+	
+	public String stringyMakinashun(boolean a, boolean b, boolean c, ArrayList<String> listy) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("I");
+		if (a)
+			sb.append(" am ");
+		else sb.append(" will ");
+		
+		if (b && a)
+			sb.append("going to eat");
+		else if (b) sb.append("be eating");
+		else sb.append("eat");
+		
+		if (c) sb.append(" cheese");
+		else sb.append(" delicious chicken");
+		
+		
+		sb.append("! Mmm, good!");
+		
+		
+		listy.add("salad");
+		listy.add("hamburgers");
+		listy.add("chips");
+		
+		sb.append("I also plan to eat ");
+		
+		for (String s : listy) {
+			if (listy.indexOf(s) == listy.size() - 1)
+				sb.append(" and ");
+			sb.append(s + ", ");
+			
+		}
+		
+		return sb.substring(0, sb.length() - 2);
+	}
 	
 	
 	/** The FileManager instance. */

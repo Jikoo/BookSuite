@@ -10,6 +10,7 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.copy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -24,32 +25,40 @@ public class Copier {
 	HashMap<Integer, ? extends ItemStack> bookMap;
 	HashMap<Integer, ? extends ItemStack> paperMap;
 	HashMap<Integer, ? extends ItemStack> leatherMap;
-	int ink;
-	int book;
-	int leather;
-	int paper;
-	//HashMap<Integer, ? extends ItemStack> blankbaqMap;TODO
+	//HashMap<Integer, ? extends ItemStack> blankbaqMap;TODO OR NOTTODO
 	HashMap<Integer, ? extends ItemStack> spaceMap;
-
-	public boolean copy(Player p, int copies) {
+	int removedPaper;
+	int removedBooks;
+	
+	ArrayList<ItemStack> consumedSupplies;
+	
+	int maxUncraftedBook;
+	
+	Player p;
+	int copies;
+	
+	public Copier(Player p, int copies) {
+		this.p = p;
+		this.copies = copies;
+	}
+	
+	
+	public CopyFailureReason copy() {
 		
 		switch (p.getItemInHand().getType()) {
 		case WRITTEN_BOOK:
 			if (!p.hasPermission("booksuite.copy.self"))
-				return false;
+				return CopyFailureReason.PERMISSION;
 			break;
 		case BOOK_AND_QUILL:
 			if (!p.hasPermission("booksuite.copy.unsigned"))
-				return false;
+				return CopyFailureReason.PERMISSION;
 			break;
 		case MAP:
 			if (!p.hasPermission("booksuite.copy.map"))
-				return false;
+				return CopyFailureReason.PERMISSION;
 			break;
-		default: return false;
-		
-		
-		
+		default: return CopyFailureReason.UNCOPIABLE;
 		}
 		
 		
@@ -60,7 +69,11 @@ public class Copier {
 				copies = maxPossible;
 			}
 			
+			
+			//remove supplies
 		}
+		
+		//check free space
 		
 		/*
 		 * Before I forget:
@@ -71,10 +84,105 @@ public class Copier {
 		 * --won't work.
 		 * 
 		 */
-		return true;
+		return null;
 	}
-
-	public int getMaximumCopiables(Player p) {//TODO
+	
+	
+	
+	
+	
+	public void removeUsedSupplies() {
+		switch (p.getItemInHand().getType()) {
+		case WRITTEN_BOOK:
+		case BOOK_AND_QUILL:
+			int suppliesUsed = 0;
+			for (ItemStack is : inkMap.values()) {
+				if (suppliesUsed >= copies) break;
+				if (copies - suppliesUsed >= is.getAmount()) {
+					suppliesUsed += is.getAmount();
+					p.getInventory().remove(is);
+				} else p.getInventory().remove(new ItemStack(Material.INK_SACK, copies - suppliesUsed, (short) 0));
+			}
+			
+			
+			int paperToConsume = maxUncraftedBook * 3;
+			for (ItemStack is : paperMap.values()) {
+				if (paperToConsume <= 0) break;
+				if (paperToConsume >= is.getAmount()) {
+					paperToConsume -= is.getAmount();
+					consumedSupplies.add(is);
+					p.getInventory().remove(is);
+				} else {
+					ItemStack is1 = is.clone();
+					is1.setAmount(paperToConsume);
+					consumedSupplies.add(is1);
+					p.getInventory().remove(is1);
+				}
+			}
+			
+			
+			suppliesUsed = 0;
+			for (ItemStack is : leatherMap.values()) {
+				if (copies - suppliesUsed >= is.getAmount()) {
+					suppliesUsed += is.getAmount();
+					consumedSupplies.add(is);
+					p.getInventory().remove(is);
+				} else {
+					ItemStack is1 = is.clone();
+					is1.setAmount(paperToConsume);
+					consumedSupplies.add(is1);
+					p.getInventory().remove(is1);
+				}
+			}
+			
+			
+			suppliesUsed = 0;
+			for (ItemStack is : bookMap.values()) {
+				if (copies - suppliesUsed >= is.getAmount()) {
+					suppliesUsed += is.getAmount();
+					consumedSupplies.add(is);
+					p.getInventory().remove(is);
+				} else {
+					ItemStack is1 = is.clone();
+					is1.setAmount(paperToConsume);
+					consumedSupplies.add(is1);
+					p.getInventory().remove(is1);
+				}
+			}
+			break;
+		case MAP:
+			int requiredPapers = copies * 9;
+			for (ItemStack is : paperMap.values()) {
+				if (requiredPapers <= 0) break;
+				if (requiredPapers >= is.getAmount()) {
+					requiredPapers -= is.getAmount();
+					consumedSupplies.add(is);
+					p.getInventory().remove(is);
+				} else {
+					ItemStack is1 = is.clone();
+					is1.setAmount(requiredPapers);
+					consumedSupplies.add(is1);
+					p.getInventory().remove(is1);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+	
+	
+	
+	
+	//public void refundSupplies
+	
+	
+	
+	
+	
+	public int getMaximumCopiables(Player p) {
 		Inventory inv = p.getInventory();
 		switch (p.getItemInHand().getType()) {
 		case WRITTEN_BOOK:
@@ -83,17 +191,19 @@ public class Copier {
 			inkMap = inv.all(Material.INK_SACK);
 			int ink = 0;
 			for (Entry<Integer, ? extends ItemStack> e : inkMap.entrySet()) {
+				//All dyes share one itemID. We're only interested in actual ink sacks.
 				if (e.getValue().getData().getData() != (byte) 0)
 					inkMap.remove(e.getKey());
 				else ink += e.getValue().getAmount();
 			}
 			
 			leatherMap = inv.all(Material.LEATHER);
-			leather = totalAmount(leatherMap);
+			int leather = totalAmount(leatherMap);
 			paperMap = inv.all(Material.PAPER);
-			paper = totalAmount(paperMap);
+			int paper = totalAmount(paperMap);
 			bookMap = inv.all(Material.BOOK);
-			int total = totalAmount(bookMap) + (leather < (paper / 3) ? leather : paper);
+			maxUncraftedBook = (leather < (paper / 3) ? leather : paper);
+			int total = totalAmount(bookMap) + maxUncraftedBook;
 			return ink < total ? ink : total;
 		case MAP:
 			return totalAmount(paperMap) / 9;
@@ -101,6 +211,9 @@ public class Copier {
 			return 0;
 		}
 	}
+	
+	
+	
 	
 	
 	public int totalAmount(HashMap<Integer, ? extends ItemStack> m) {

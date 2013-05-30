@@ -109,7 +109,7 @@ public class MainListener implements Listener {
 					if (p.hasPermission("booksuite.block.erase")) {
 						if (clicked.getData() < 1 && !p.getGameMode().equals(GameMode.CREATIVE) && !p.hasPermission("booksuite.block.erase.free"))
 							p.sendMessage(ChatColor.DARK_RED + "You'll need some water to unsign this book.");
-						else if (bm.getAuthor().equalsIgnoreCase(p.getDisplayName())) {
+						else if (bm.getAuthor().equalsIgnoreCase(p.getName())) {
 							plugin.functions.unsign(p);
 							if (!p.hasPermission("booksuite.block.erase.free") && !p.getGameMode().equals(GameMode.CREATIVE))
 								clicked.setData((byte) (clicked.getData() - 1));
