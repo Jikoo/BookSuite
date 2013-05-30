@@ -1,0 +1,9 @@
+public class Logger{
+	public static void D(String tag, String message){
+		//print to console
+	}
+	public static void E(String tag, String message){
+		//write to file
+	}
+}
+
