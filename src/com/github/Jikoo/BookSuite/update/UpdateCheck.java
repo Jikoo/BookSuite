@@ -98,6 +98,8 @@ public class UpdateCheck implements Listener {
 	public int parseFileNumber(String s) {
 		s = s.replace("http://dev.bukkit.org/server-mods/booksuite/files/", "");
 		s = s.replaceAll("-.*", "");
+		s = s.replaceAll("BookSuite","");
+		s = s.replaceAll(" ","");
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException e) {
