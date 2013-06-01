@@ -140,10 +140,14 @@ public class CommandHandler implements CommandExecutor {
 						if ((args[0].equals("f") || args[0].equals("file") || args[0].equals("l") || args[0].equals("load")) && CommandPermissions.IMPORT.checkPermission(p)) {
 							ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
 							newbook.setItemMeta(fManager.makeBookMetaFromText(p, args[1], plugin.getDataFolder() + "/SavedBooks/", true));
-							if (!newbook.hasItemMeta()) {
+							if (!newbook.hasItemMeta() || newbook.getItemMeta() == null) {
 								p.sendMessage(ChatColor.DARK_RED + "Error reading book file. Does it exist?");
-							} else if (!functions.canObtainBook(p)) return true;
-							else p.getInventory().addItem(newbook);
+							} else {
+								if (functions.canObtainBook(p)) {
+									p.getInventory().addItem(newbook);
+									p.sendMessage(ChatColor.DARK_GREEN + "Imported " + args[1] + " successfully!");
+								}
+							}
 							return true;
 						} else if ((args[0].equals("u") || args[0].equals("url")) && CommandPermissions.IMPORT.checkPermission(p)) {
 							if (!functions.canObtainBook(p)) return true;
@@ -554,6 +558,9 @@ public class CommandHandler implements CommandExecutor {
 									sb1.append(s + ", ");
 									break;
 								}
+							} else {
+								failure = true;
+								sb1.append(s + ", ");
 							}
 						} catch (IllegalArgumentException e) {
 							if ((s.equalsIgnoreCase("press") || s.equalsIgnoreCase("printingpress")) && (p.hasPermission("booksuite.copy.self") || p.hasPermission("booksuite.copy.unsigned") || p.hasPermission("booksuite.copy.map"))) {
@@ -571,9 +578,9 @@ public class CommandHandler implements CommandExecutor {
 									sb2.append(ChatColor.AQUA + "Map<3");
 								p.sendMessage(sb2.substring(0, sb2.length() - 2));
 							} else if ((s.equalsIgnoreCase("erase") || s.equalsIgnoreCase("eraser")) && p.hasPermission("booksuite.block.erase")) {
-								p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA+"eraser" + ChatColor.DARK_GREEN + " is a " + ChatColor.AQUA + "cauldron" + ChatColor.DARK_GREEN + ". Right click one with a " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN + " to unsign!");
+								p.sendMessage(ChatColor.DARK_GREEN + "An " + ChatColor.AQUA + "eraser" + ChatColor.DARK_GREEN + " is a " + ChatColor.AQUA + "cauldron" + ChatColor.DARK_GREEN + ". Right click one with a " + ChatColor.AQUA + "Written Book" + ChatColor.DARK_GREEN + " to unsign!");
 								if (!p.hasPermission("booksuite.block.erase.free"))
-									p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes water.");
+									p.sendMessage(ChatColor.DARK_GREEN + "Erasing books consumes " + ChatColor.AQUA + "water" + ChatColor.DARK_GREEN + ".");
 							} else {
 								failure = true;
 								sb1.append(s + ", ");
