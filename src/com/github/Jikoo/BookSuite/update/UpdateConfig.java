@@ -49,6 +49,9 @@ public class UpdateConfig {
 		}
 		
 		
+		plugin.getConfig().options().copyHeader(true);
+		
+		
 		if (changed) {
 			plugin.saveConfig();
 		}
