@@ -107,6 +107,8 @@ public class FileManager {
 			if (!text.hasAuthor())
 				text.setAuthor(p.getName());
 			return text;
+		} catch (FileNotFoundException e) {
+			return null;
 		} catch (Exception ex) {
 			System.err.println("[BookSuite] Error report:\nBookSuiteFileManager.makeBookMetaFromText: "+ex);
 			ex.printStackTrace();
@@ -114,6 +116,7 @@ public class FileManager {
 			return null;
 		}
 	}
+	
 	
 	
 	
@@ -215,6 +218,7 @@ public class FileManager {
 	
 	
 	
+	
 	/**
 	 * Makes a plaintext file filename in directory directory
 	 * from the contents of ItemStack is.
@@ -273,6 +277,7 @@ public class FileManager {
 	
 	
 	
+	
 	/**
 	 * Parses file text.
 	 *
@@ -317,11 +322,12 @@ public class FileManager {
 	
 	
 	
+	
 	/**
 	 * Append mail index.
 	 *
 	 * @param directory the directory
-	 * @param appendText the append text
+	 * @param appendText the text to append to the mail index
 	 * @return true, if successful
 	 */
 	public boolean appendMailIndex(String directory, String appendText) {
@@ -352,11 +358,14 @@ public class FileManager {
 	}
 	
 	
+	
+	
+	
 	/**
 	 * Removes mail.
 	 *
 	 * @param directory the directory
-	 * @param mail the mail
+	 * @param mail the name of the mail file
 	 * @return true, if successful
 	 */
 	public boolean removeMail(String directory, String mail) {
@@ -395,6 +404,7 @@ public class FileManager {
 	
 	
 	
+	
 	/**
 	 * Deletes specified file
 	 *
@@ -408,6 +418,10 @@ public class FileManager {
 			return false;
 		return file.delete();
 	}
+	
+	
+	
+	
 	
 	/**
 	 * Lists book files in directory

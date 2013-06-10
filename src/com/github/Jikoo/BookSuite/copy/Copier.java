@@ -182,6 +182,41 @@ public class Copier {
 	
 	
 	
+	//public int calcMergeFreedSpace(HashMap<Integer, ItemStack> stacks)
+	
+	
+	
+	
+	
+	public Inventory removeAddMerge(Inventory i, ItemStack is, int quantity) {
+		Material m = is.getType();
+		
+		if (m != Material.INK_SACK) {
+			i.remove(m);
+			
+			while (quantity > 0) {
+				int added;
+				if (quantity > 64) added = 64;
+				else added = quantity;
+				i.addItem(new ItemStack(m, added));
+				quantity -= added;
+			}
+		} else {
+			for (Entry<Integer, ? extends ItemStack> e : i.all(m).entrySet()) {
+				if (e.getValue().getData().getData() == (byte) 0) {
+					i.remove(e.getKey());
+				}
+			}
+		}
+		
+		
+		return i;
+	}
+	
+	
+	
+	
+	
 	public int getMaximumCopiables(Player p) {
 		Inventory inv = p.getInventory();
 		switch (p.getItemInHand().getType()) {

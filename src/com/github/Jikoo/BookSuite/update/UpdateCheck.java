@@ -177,7 +177,7 @@ public class UpdateCheck implements Listener {
 					else if (inform) Bukkit.getPlayerExact(pName).sendMessage(ChatColor.DARK_GREEN + "BookSuite is up to date!");
 				}
 			} else {
-				if(hasUpdate) plugin.getLogger().info(update);
+				if (hasUpdate) plugin.getLogger().info(update);
 				else if (inform) plugin.getLogger().info(ChatColor.DARK_GREEN + "BookSuite is up to date!");
 			}
 		}
