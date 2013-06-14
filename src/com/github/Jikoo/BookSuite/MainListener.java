@@ -23,6 +23,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -164,6 +165,13 @@ public class MainListener implements Listener {
 		if (event.getInventory().getTitle().contains("'s MailBox")) {
 			plugin.mail.WriteMailContents(event.getInventory());
 		}
+	}
+	
+	@EventHandler
+	public void onBookEdit (PlayerEditBookEvent event) {
+		BookMeta bm = event.getNewBookMeta();
+		bm.setAuthor(plugin.alias.getActiveAlias(event.getPlayer()));
+		event.setNewBookMeta(bm);
 	}
 	
 	public void disable() {
