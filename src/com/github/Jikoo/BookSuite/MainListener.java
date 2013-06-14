@@ -170,6 +170,15 @@ public class MainListener implements Listener {
 	@EventHandler
 	public void onBookEdit (PlayerEditBookEvent event) {
 		BookMeta bm = event.getNewBookMeta();
+		if ((bm.hasAuthor() && bm.getAuthor() != null)
+				&& !plugin.alias.getAliases(event.getPlayer()).contains(bm.getAuthor())) {
+			if (!event.getPlayer().hasPermission("booksuite.edit.other")) {
+				event.getPlayer().sendMessage(ChatColor.DARK_RED + "You'll need " + bm.getAuthor() + "'s permission to edit this book!");
+				event.setCancelled(true);
+			}
+		}
+		
+		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.alias.lock"))//TODO better perm name
 		bm.setAuthor(plugin.alias.getActiveAlias(event.getPlayer()));
 		event.setNewBookMeta(bm);
 	}

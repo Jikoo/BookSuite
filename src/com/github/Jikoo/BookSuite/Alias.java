@@ -22,7 +22,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class Alias {
-	
+	//TODO javadocs
+	//also TODO figure out NPE and save issue
 	BookSuite plugin = BookSuite.getInstance();
 	
 	File aliasFile;
