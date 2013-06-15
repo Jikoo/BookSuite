@@ -52,6 +52,8 @@ public class Alias {
 			}
 		} catch (IllegalArgumentException e) {
 			type = AliasType.DEFAULT;
+			plugin.getConfig().set("alias-mode", "default");
+			plugin.saveConfig();
 			plugin.getLogger().warning(ChatColor.DARK_RED + "Invalid alias type in config, using default setting.");
 		}
 	}
@@ -62,6 +64,7 @@ public class Alias {
 			try {
 				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 				if (!aliasFile.exists()) {
+					aliasFile.getParentFile().mkdirs();//TODO figure out if this fixes saving issues
 					aliasFile.createNewFile();
 				}
 				aliasYML.save(aliasFile);
