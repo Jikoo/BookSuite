@@ -2,8 +2,8 @@ package com.github.Jikoo.BookSuite.copy;
 
 public enum CopyFailureReason {
 	PERMISSION, SPACE, SUPPLIES_ALL, SUPPLIES_INK, SUPPLIES_MAP, SUPPLIES_PRINTABLE, UNCOPIABLE;
-	//TODO localization
-	
+	// TODO localization
+
 	public String getFailureReason() {
 		switch (this) {
 		case PERMISSION:
@@ -21,8 +21,8 @@ public enum CopyFailureReason {
 		case UNCOPIABLE:
 			return "That's not copiable!";
 		default:
-			return "It should not be possible to get this message." +
-					" If you see it, what are you even doing? Seriously, please tell me.";
+			return "It should not be possible to get this message."
+					+ " If you see it, what are you even doing? Seriously, please tell me.";
 		}
 	}
 }

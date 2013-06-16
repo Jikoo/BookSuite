@@ -22,40 +22,39 @@ public class UpdateConfig {
 	public UpdateConfig(BookSuite plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	public boolean update() {
 		Set<String> options = plugin.getConfig().getDefaults().getKeys(false);
 		Set<String> current = plugin.getConfig().getKeys(false);
 		boolean changed = false;
-		
+
 		if (plugin.getConfig().contains("use-external-permissions")) {
-			plugin.getConfig().set("use-internal-permissions", !plugin.getConfig().getBoolean("use-external-permissions"));
+			plugin.getConfig().set("use-internal-permissions",
+					!plugin.getConfig().getBoolean("use-external-permissions"));
 			changed = true;
 		}
-		
+
 		for (String s : options) {
 			if (!current.contains(s)) {
-				plugin.getConfig().set(s, plugin.getConfig().getDefaults().get(s));
+				plugin.getConfig().set(s,
+						plugin.getConfig().getDefaults().get(s));
 				changed = true;
 			}
 		}
-		
-		
+
 		for (String s : current) {
 			if (!options.contains(s)) {
 				plugin.getConfig().set(s, null);
 				changed = true;
 			}
 		}
-		
-		
+
 		plugin.getConfig().options().copyHeader(true);
-		
-		
+
 		if (changed) {
 			plugin.saveConfig();
 		}
-		
+
 		return changed;
 	}
 }

@@ -27,27 +27,29 @@ import org.bukkit.inventory.meta.BookMeta;
 
 public class Functions {
 	private static Functions instance = null;
-		//TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
-	/* 
-	 * Honestly what I planned to do for encryption was make the book one page - 
-	 * a hash of a random UUID or something (§k<hash>), save the book as that if untaken, then
-	 * allow people to re-import it with the correct hash (savename). As long as
-	 * the ingame book editor doesn't improve, I foresee no issues.
-	 * 
+	// TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
+	/*
+	 * Honestly what I planned to do for encryption was make the book one page -
+	 * a hash of a random UUID or something (§k<hash>), save the book as that if
+	 * untaken, then allow people to re-import it with the correct hash
+	 * (savename). As long as the ingame book editor doesn't improve, I foresee
+	 * no issues.
 	 */
-	private final int[] ACCEPTABLE = {53, 67, 108, 109, 114, 128, 134, 135, 136, 156};
-	
-	
+	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135,
+			136, 156 };
+
 	/**
 	 * master method for checking if the player can obtain the books
-	 *
-	 * @param p the player attempting to obtain the book
+	 * 
+	 * @param p
+	 *            the player attempting to obtain the book
 	 * @return whether the player can obtain the book
 	 */
 	public boolean canObtainBook(Player p) {
 		Inventory inv = p.getInventory();
-		
-		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
+
+		if (p.hasPermission("booksuite.book.free")
+				|| p.getGameMode().equals(GameMode.CREATIVE)) {
 			if (!hasRoom(p)) {
 				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 				return false;
@@ -79,30 +81,27 @@ public class Functions {
 			}
 			return true;
 		}
-		p.sendMessage(ChatColor.DARK_RED + "To create a book, you need " + supplies + ".");
+		p.sendMessage(ChatColor.DARK_RED + "To create a book, you need "
+				+ supplies + ".");
 		return false;
 	}
-	
-	
-	
-	
+
 	public boolean hasRoom(Player p) {
 		return p.getInventory().firstEmpty() != -1 || hasStackingRoom(p);
 	}
-	
-	
-	
-	
+
 	public boolean hasStackingRoom(Player p) {
 		if (!p.hasPermission("booksuite.copy.stack"))
 			return false;
-		
-		HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(p.getItemInHand().getType());
+
+		HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(
+				p.getItemInHand().getType());
 		if (allBooks.size() == 1) {
 			return p.getItemInHand().getAmount() < 64;
 		} else {
 			for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
-				if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
+				if (e.getValue().getItemMeta()
+						.equals(p.getItemInHand().getItemMeta())) {
 					if (e.getValue().getAmount() < 64) {
 						return true;
 					}
@@ -111,21 +110,20 @@ public class Functions {
 		}
 		return false;
 	}
-	
-	
-	
-	
+
 	/**
 	 * checks if the player has the supplies needed
 	 * 
-	 * @param inv the inventory of the player
+	 * @param inv
+	 *            the inventory of the player
 	 * @return whether the player has the supplies needed to copy the book
 	 */
 	public String checkBookSupplies(Inventory inv) {
 		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)) {
 			return "crafted";
 		} else if (inv.contains(Material.INK_SACK)) {
-			if (inv.contains(new ItemStack(Material.PAPER, 3)) && inv.contains(Material.LEATHER)) {
+			if (inv.contains(new ItemStack(Material.PAPER, 3))
+					&& inv.contains(Material.LEATHER)) {
 				return "uncrafted";
 			}
 			return "a book";
@@ -135,12 +133,10 @@ public class Functions {
 		return "a book and an ink sack";
 	}
 
-
-
-
 	/**
-	 * @param a the author of the book to be copied
-	 * @return true if the player has permission to copy 
+	 * @param a
+	 *            the author of the book to be copied
+	 * @return true if the player has permission to copy
 	 */
 	public boolean checkCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.copy.other"))
@@ -148,44 +144,48 @@ public class Functions {
 		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
 			return true;
 		else if (p.hasPermission("booksuite.copy.self"))
-			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy others' books.");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "You do not have permission to copy others' books.");
 		else
-			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy books.");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "You do not have permission to copy books.");
 		return false;
 	}
 
-
-
-
 	/**
-	 * @param a the author of the book to be copied
-	 * @return true if the player has permission to copy 
+	 * @param a
+	 *            the author of the book to be copied
+	 * @return true if the player has permission to copy
 	 */
 	public boolean checkCommandCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.command.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.command.copy") && (a.equals(null) || a.equals(p.getName())))
+		if (p.hasPermission("booksuite.command.copy")
+				&& (a.equals(null) || a.equals(p.getName())))
 			return true;
 		else if (p.hasPermission("booksuite.command.copy")) {
-			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy others' books.");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "You do not have permission to copy others' books.");
 			return false;
-		}
-		else return false;
+		} else
+			return false;
 	}
-	
-	
-	
+
 	@SuppressWarnings("deprecation")
 	public void copy(Player p) {
-		if (p.hasPermission("booksuite.copy.stack") && !p.getItemInHand().getType().equals(Material.MAP)) {
+		if (p.hasPermission("booksuite.copy.stack")
+				&& !p.getItemInHand().getType().equals(Material.MAP)) {
 			if (p.getItemInHand().getAmount() == 64) {
-				HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(p.getItemInHand().getType());
-				if (allBooks.size() == 1) { 
-					newDuplicate(p); 
+				HashMap<Integer, ? extends ItemStack> allBooks = p
+						.getInventory().all(p.getItemInHand().getType());
+				if (allBooks.size() == 1) {
+					newDuplicate(p);
 				} else {
 					boolean copiedSuccessfully = false;
-					for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
-						if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
+					for (Entry<Integer, ? extends ItemStack> e : allBooks
+							.entrySet()) {
+						if (e.getValue().getItemMeta()
+								.equals(p.getItemInHand().getItemMeta())) {
 							if (e.getValue().getAmount() < 64) {
 								ItemStack book = e.getValue();
 								book.setAmount(e.getValue().getAmount() + 1);
@@ -207,17 +207,13 @@ public class Functions {
 		}
 		p.updateInventory();
 	}
-	
-	
-	
-	public void newDuplicate (Player p) {
+
+	public void newDuplicate(Player p) {
 		ItemStack duplicate = p.getItemInHand().clone();
 		duplicate.setAmount(1);
 		p.getInventory().addItem(duplicate);
 	}
-	
-	
-	
+
 	public boolean unsign(Player p) {
 		ItemStack unsign = p.getItemInHand();
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
@@ -229,9 +225,7 @@ public class Functions {
 		unsign.setType(Material.BOOK_AND_QUILL);
 		return true;
 	}
-	
-	
-	
+
 	public boolean setAuthor(Player p, String newAuthor) {
 		ItemStack book = p.getItemInHand();
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
@@ -241,8 +235,7 @@ public class Functions {
 		book.setItemMeta(bookMeta);
 		return true;
 	}
-	
-	
+
 	public boolean setTitle(Player p, String newTitle) {
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
 			return false;
@@ -252,15 +245,15 @@ public class Functions {
 		book.setItemMeta(bookMeta);
 		return true;
 	}
-	
-	
+
 	public boolean insertPageAt(Player p, String pageNumber, String text) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
-			p.sendMessage(ChatColor.DARK_RED + "You must be holding a book and quill to use this command!");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "You must be holding a book and quill to use this command!");
 			return false;
 		}
 		ItemStack book = p.getItemInHand();
-		BookMeta bm = (BookMeta)book.getItemMeta();
+		BookMeta bm = (BookMeta) book.getItemMeta();
 		List<String> pages = new ArrayList<String>();
 		try {
 			int page = Integer.parseInt(pageNumber);
@@ -271,10 +264,13 @@ public class Functions {
 			}
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
-			p.sendMessage(ChatColor.DARK_RED + "Correct usage is \"/book addpage <page number> [optional page text]\"");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "Correct usage is \"/book addpage <page number> [optional page text]\"");
 			return false;
 		} catch (IndexOutOfBoundsException e1) {
-			p.sendMessage(ChatColor.DARK_RED + "Please enter a number between 1 and " + (bm.getPageCount() - 1) + ".");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "Please enter a number between 1 and "
+					+ (bm.getPageCount() - 1) + ".");
 			return false;
 		} catch (Exception e2) {
 			System.err.println("[BookSuite] Functions.insertPageAt: " + e2);
@@ -284,14 +280,15 @@ public class Functions {
 		book.setItemMeta(bm);
 		return true;
 	}
-	
+
 	public boolean deletePageAt(Player p, String pageNumber) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
-			p.sendMessage(ChatColor.DARK_RED + "You must be holding a book and quill to use this command!");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "You must be holding a book and quill to use this command!");
 			return false;
 		}
 		ItemStack book = p.getItemInHand();
-		BookMeta bm = (BookMeta)book.getItemMeta();
+		BookMeta bm = (BookMeta) book.getItemMeta();
 		List<String> pages = new ArrayList<String>();
 		try {
 			int page = Integer.parseInt(pageNumber);
@@ -301,10 +298,13 @@ public class Functions {
 			}
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
-			p.sendMessage(ChatColor.DARK_RED + "Correct usage is \"/book delpage <page number>\"");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "Correct usage is \"/book delpage <page number>\"");
 			return false;
 		} catch (IndexOutOfBoundsException e1) {
-			p.sendMessage(ChatColor.DARK_RED + "Please enter a number between 1 and " + (bm.getPageCount() - 1) + ".");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "Please enter a number between 1 and "
+					+ (bm.getPageCount() - 1) + ".");
 			return false;
 		} catch (Exception e2) {
 			System.err.println("[BookSuite] Functions.insertPageAt: " + e2);
@@ -315,74 +315,73 @@ public class Functions {
 		return true;
 	}
 
-
-
 	public boolean canObtainMap(Player p) {
 		if (p.hasPermission("booksuite.copy.map")) {
 			Inventory inv = p.getInventory();
-			if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
-				if (inv.firstEmpty() == -1 && p.getItemInHand().getAmount() == 64) {
+			if (p.hasPermission("booksuite.book.free")
+					|| p.getGameMode().equals(GameMode.CREATIVE)) {
+				if (inv.firstEmpty() == -1
+						&& p.getItemInHand().getAmount() == 64) {
 					p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 					return false;
-				} else return true;
+				} else
+					return true;
 			} else if (inv.contains(new ItemStack(Material.PAPER, 9))) {
 				inv.remove(new ItemStack(Material.PAPER, 9));
 				if (inv.firstEmpty() == -1) {
 					inv.addItem(new ItemStack(Material.PAPER, 9));
 					p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
 					return false;
-				} else return true;
+				} else
+					return true;
 			} else {
-				p.sendMessage(ChatColor.DARK_RED + "You need 9 paper to copy a map.");
+				p.sendMessage(ChatColor.DARK_RED
+						+ "You need 9 paper to copy a map.");
 				return false;
 			}
 		} else {
-			p.sendMessage(ChatColor.DARK_RED + "You do not have permission to copy maps.");
+			p.sendMessage(ChatColor.DARK_RED
+					+ "You do not have permission to copy maps.");
 			return false;
 		}
 	}
 
-
-
-
 	/**
 	 * tests if a given block is an inverted stair block
 	 * 
-	 * @param b the block to be tested
+	 * @param b
+	 *            the block to be tested
 	 * @return whether the block is an inverted stair
 	 */
 	public boolean isInvertedStairs(Block b) {
 		for (int i : ACCEPTABLE)
-			if (i == b.getTypeId()) return b.getData()>3;
+			if (i == b.getTypeId())
+				return b.getData() > 3;
 		return false;
 	}
-
-
-
 
 	public boolean isCorrectStairType(ItemStack is) {
 		for (int i : ACCEPTABLE)
-			if (i == is.getTypeId()) return true;
+			if (i == is.getTypeId())
+				return true;
 		return false;
 	}
 
-
-
-
 	public byte getCorrectStairOrientation(Player p) {
 		byte playerFace = (byte) Math.round(p.getLocation().getYaw() / 90);
-		if(playerFace == 0 || playerFace == -4 || playerFace == 4)
-			return 6;//open north
+		if (playerFace == 0 || playerFace == -4 || playerFace == 4)
+			return 6;// open north
 		else if (playerFace == 1 || playerFace == -3)
-			return 5;//open east
+			return 5;// open east
 		else if (playerFace == 2 || playerFace == -2)
-			return 7;//open south
-		else return 4;//open west
+			return 7;// open south
+		else
+			return 4;// open west
 	}
-	
-	
+
 	public static Functions getInstance() {
-		if (instance == null) instance = new Functions();
+		if (instance == null)
+			instance = new Functions();
 		return instance;
 	}
 }

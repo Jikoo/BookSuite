@@ -24,14 +24,18 @@ public class Permissions {
 
 	public void addDefaultPermissions(Player p) {
 		if (!attachments.containsKey(p.getName())) {
-			attachments.put(p.getName(), p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
+			attachments.put(
+					p.getName(),
+					p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
 		}
 		attachments.get(p.getName()).setPermission("booksuite.default", true);
 	}
 
 	public void addOpPermissions(Player p) {
 		if (!attachments.containsKey(p.getName())) {
-			attachments.put(p.getName(), p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
+			attachments.put(
+					p.getName(),
+					p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
 		}
 		attachments.get(p.getName()).setPermission("booksuite.admin", true);
 	}
@@ -40,7 +44,8 @@ public class Permissions {
 		try {
 			attachments.remove(pName).remove();
 		} catch (NullPointerException e) {
-			//Player did not have registered permissions and cannot be removed; do nothing.
+			// Player did not have registered permissions and cannot be removed;
+			// do nothing.
 		}
 	}
 
