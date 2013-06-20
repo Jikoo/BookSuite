@@ -1,5 +1,16 @@
 # For more details about the configuration, please see
 # http://dev.bukkit.org/server-mods/booksuite/pages/default-config/
+# 
+# 
+# Because of the way multiple copies are handled, copying is capped to
+# 10 by default. High numbers WILL lead to server lag on usage.
+# Also, how many of the same book do you really need?
+# 
+# This measure is temporary and will be removed in the next build.
+# The only reason a feature so badly coded is included is because
+# this release has been rushed by bugs.
+# 
+maximum-copies-per-operation: 10
 
 ###  ALIASES  ###
 # Aliases are names people are allowed to sign books with
@@ -18,12 +29,6 @@
 #     - Aliases can be set (used for signing) with /book alias <alias>
 #     - Aliases are stored in aliases.yml
 alias-mode: default
-
-###  COPIES  ###
-# Because of the way multiple copies are handled, copying is capped to
-# 10 by default. High numbers WILL lead to server lag on usage.
-# Also, how many of the same book do you really need?
-maximum-copies-per-operation: 10
 
 ###  PERMISSIONS  ###
 # If you use a permissions plugin, set to false and assign permissions.

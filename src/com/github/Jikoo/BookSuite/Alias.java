@@ -22,25 +22,31 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class Alias {
-	
+	// TODO javadocs
+	// also TODO figure out NPE and save issue
 	BookSuite plugin = BookSuite.getInstance();
-	
+
 	File aliasFile;
 	FileConfiguration aliasYML;
-	
-	enum AliasType {MULTI, DEFAULT, NONE};
+
+	enum AliasType {
+		MULTI, DEFAULT, NONE
+	};
+
 	AliasType type = AliasType.DEFAULT;
-	
+
 	private static Alias instance;
+
 	public static Alias getInstance() {
-		if (instance == null) instance = new Alias();
+		if (instance == null)
+			instance = new Alias();
 		return instance;
 	}
-	
-	
+
 	public void load() {
 		try {
-			type = AliasType.valueOf(plugin.getConfig().getString("alias-mode").toUpperCase());
+			type = AliasType.valueOf(plugin.getConfig().getString("alias-mode")
+					.toUpperCase());
 			if (type.equals(AliasType.MULTI)) {
 				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 				if (aliasFile.exists()) {
@@ -51,99 +57,116 @@ public class Alias {
 			}
 		} catch (IllegalArgumentException e) {
 			type = AliasType.DEFAULT;
-			plugin.getLogger().warning(ChatColor.DARK_RED + "Invalid alias type in config, using default setting.");
+			plugin.getConfig().set("alias-mode", "default");
+			plugin.saveConfig();
+			plugin.getLogger()
+					.warning(
+							ChatColor.DARK_RED
+									+ "Invalid alias type in config, using default setting.");
 		}
 	}
-	
-	
+
 	public void save() {
 		if (type.equals(AliasType.MULTI)) {
 			try {
 				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 				if (!aliasFile.exists()) {
+					// TODO figure out if this fixes saving issues
+					aliasFile.getParentFile().mkdirs();
 					aliasFile.createNewFile();
 				}
 				aliasYML.save(aliasFile);
 			} catch (IOException e) {
-				plugin.getLogger().warning(ChatColor.DARK_RED + "Could not save aliases.yml!");
+				plugin.getLogger().warning(
+						ChatColor.DARK_RED + "Could not save aliases.yml!");
 			}
 		}
 	}
-	
-	
+
 	public boolean addAlias(String pName, String newAlias) {
 		if (aliasYML.getStringList(pName).contains(newAlias))
 			return false;
-		ArrayList<String> aliasList = (ArrayList<String>) aliasYML.getStringList(pName);
+		ArrayList<String> aliasList = (ArrayList<String>) aliasYML
+				.getStringList(pName);
 		aliasList.add(newAlias);
 		aliasYML.set(pName, aliasList);
 		save();
 		return true;
 	}
-	
-	
-	public void addAliasToTarget(CommandSender s, Player target, String newAlias, boolean warn) {
+
+	public void addAliasToTarget(CommandSender s, Player target,
+			String newAlias, boolean warn) {
 		if (!type.equals(AliasType.MULTI)) {
-			s.sendMessage(ChatColor.DARK_RED + "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
+			s.sendMessage(ChatColor.DARK_RED
+					+ "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
 			return;
 		}
 		if (!addAlias(target.getName(), newAlias)) {
-			s.sendMessage(ChatColor.DARK_RED+target.getName() + " already has the alias " + newAlias + "!");
+			s.sendMessage(ChatColor.DARK_RED + target.getName()
+					+ " already has the alias " + newAlias + "!");
 			return;
 		} else {
-			s.sendMessage(ChatColor.DARK_GREEN + "Added alias \"" + newAlias + "\" to " + target.getName() + "!");
+			s.sendMessage(ChatColor.DARK_GREEN + "Added alias \"" + newAlias
+					+ "\" to " + target.getName() + "!");
 			if (warn)
-				target.sendMessage(ChatColor.DARK_GREEN + s.getName() + " added " + newAlias + " to your list of aliases!");
+				target.sendMessage(ChatColor.DARK_GREEN + s.getName()
+						+ " added " + newAlias + " to your list of aliases!");
 		}
 	}
-	
-	
+
 	public boolean removeAlias(String pName, String oldAlias) {
 		if (!aliasYML.getStringList(pName).contains(oldAlias))
 			return false;
-		ArrayList<String> aliasList = (ArrayList<String>) aliasYML.getStringList(pName);
+		ArrayList<String> aliasList = (ArrayList<String>) aliasYML
+				.getStringList(pName);
 		aliasList.remove(oldAlias);
 		aliasYML.set(pName, aliasList);
 		save();
 		return true;
 	}
-	
-	
-	public void removeAliasFromTarget(CommandSender s, Player target, String oldAlias, boolean warn) {
+
+	public void removeAliasFromTarget(CommandSender s, Player target,
+			String oldAlias, boolean warn) {
 		if (!type.equals(AliasType.MULTI)) {
-			s.sendMessage(ChatColor.DARK_RED + "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
+			s.sendMessage(ChatColor.DARK_RED
+					+ "Additional aliases are not allowed in the configuration. Please contact your server administrator.");
 			return;
 		}
 		if (!removeAlias(target.getName(), oldAlias)) {
-			s.sendMessage(ChatColor.DARK_RED+target.getName() + " doesn't have the alias " + oldAlias + "!");
+			s.sendMessage(ChatColor.DARK_RED + target.getName()
+					+ " doesn't have the alias " + oldAlias + "!");
 			return;
 		} else {
-			s.sendMessage(ChatColor.DARK_GREEN + "Added alias \"" + oldAlias + "\" to " + target.getName() + "!");
+			s.sendMessage(ChatColor.DARK_GREEN + "Added alias \"" + oldAlias
+					+ "\" to " + target.getName() + "!");
 			if (warn)
-				target.sendMessage(ChatColor.DARK_GREEN + s.getName() + " added " + oldAlias + " to your list of aliases!");
+				target.sendMessage(ChatColor.DARK_GREEN + s.getName()
+						+ " added " + oldAlias + " to your list of aliases!");
 		}
 	}
-	
-	
+
 	public boolean setActiveAlias(Player p, String active) {
 		if (getAliases(p).contains(active)) {
-			aliasYML.set("current."+p.getName(), active);
+			aliasYML.set("current." + p.getName(), active);
 			save();
 			return true;
 		}
 		return false;
 	}
-	
-	
-	public void setTargetActiveAlias(CommandSender s, Player target, String active, boolean warn) {
+
+	public void setTargetActiveAlias(CommandSender s, Player target,
+			String active, boolean warn) {
 		if (setActiveAlias(target, active)) {
-			s.sendMessage(ChatColor.DARK_GREEN + target.getName() + "'s active alias set to " + active + "!");
+			s.sendMessage(ChatColor.DARK_GREEN + target.getName()
+					+ "'s active alias set to " + active + "!");
 			if (warn)
-				target.sendMessage(ChatColor.DARK_GREEN + s.getName() + " set your active alias to " + active + "!");
-		} else s.sendMessage(ChatColor.DARK_RED + target.getName() + "does not have the alias " + active + "!");
+				target.sendMessage(ChatColor.DARK_GREEN + s.getName()
+						+ " set your active alias to " + active + "!");
+		} else
+			s.sendMessage(ChatColor.DARK_RED + target.getName()
+					+ "does not have the alias " + active + "!");
 	}
-	
-	
+
 	public String getActiveAlias(Player p) {
 		String current = aliasYML.getString("current." + p.getName());
 		if (getAliases(p).contains(current))
@@ -152,22 +175,22 @@ public class Alias {
 		save();
 		return p.getDisplayName();
 	}
-	
-	
+
 	public ArrayList<String> getAliases(Player p) {
 		ArrayList<String> aliases = new ArrayList<String>();
 		aliases.add(p.getName());
 		switch (type) {
-			case MULTI:
-				aliases.add(p.getDisplayName());
-				for (String s : aliasYML.getStringList(p.getName())) {
-					aliases.add(s);
-				}
-				break;
-			case DEFAULT:
-				aliases.add(p.getDisplayName());
-				break;
-			default: break;
+		case MULTI:
+			aliases.add(p.getDisplayName());
+			for (String s : aliasYML.getStringList(p.getName())) {
+				aliases.add(s);
+			}
+			break;
+		case DEFAULT:
+			aliases.add(p.getDisplayName());
+			break;
+		default:
+			break;
 		}
 		return aliases;
 	}
