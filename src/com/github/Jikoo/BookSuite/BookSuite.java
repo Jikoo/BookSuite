@@ -14,7 +14,6 @@ package com.github.Jikoo.BookSuite;
 import java.io.File;
 import java.io.IOException;
 
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.Jikoo.BookSuite.metrics.Metrics;
@@ -23,7 +22,7 @@ import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 
-public class BookSuite extends JavaPlugin implements Listener {
+public class BookSuite extends JavaPlugin {
 	protected final String version = "3.2.0";
 	public final int currentFile = 12;
 	public boolean hasUpdate;
