@@ -11,7 +11,9 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.permissions;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,41 +32,39 @@ public class PermissionsListener implements Listener {
 	Permissions permissions;
 	boolean enabled = false;
 	BookSuite plugin;
-	ArrayList<Integer> tasks;
-	ArrayList<Integer> tasksCleanup;
+	Map<String, Integer> tasks;
 
 	public PermissionsListener(BookSuite plugin) {
 		this.plugin = plugin;
-		tasks = new ArrayList<Integer>();
-		tasksCleanup = new ArrayList<Integer>();
+		tasks = new HashMap<String, Integer>();
 	}
 
 	@EventHandler
 	public void onLogin(PlayerJoinEvent event) {
 		int taskID = syncImplementPermissions(event.getPlayer());
 		if (taskID != -1) {
-			tasks.add(taskID);
-			tasksCleanup.add(taskID);
+			tasks.put(event.getPlayer().getName(), taskID);
 		}
 	}
 
 	@EventHandler
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-		if (event.isCancelled())
+		if (event.isCancelled()) {
 			return;
+		}
 		if (event.getMessage().toLowerCase().contains("op")) {
 			String[] command = event.getMessage().toLowerCase()
 					.replaceAll("/", "").split(" ");
-			if (command[0].equalsIgnoreCase("/op")
-					|| command[0].equalsIgnoreCase("/deop")) {
+			if (command[0].equals("op") || command[0].equals("deop")) {
 				// While vanilla would use getPlayerExact, we need to
 				// compensate for autofill from plugins
-				Player p = Bukkit.getPlayer(command[1]);
-				if (p != null) {
-					int taskID = syncOpPermissionsCheck(p, p.isOp());
-					if (taskID != -1) {
-						tasks.add(taskID);
-						tasksCleanup.add(taskID);
+				List<Player> pList = Bukkit.matchPlayer(command[1]);
+				for (Player p : pList) {
+					if (p != null) {
+						int taskID = syncOpPermissionsCheck(p, p.isOp());
+						if (taskID != -1) {
+							tasks.put(event.getPlayer().getName(), taskID);
+						}
 					}
 				}
 			}
@@ -77,12 +77,13 @@ public class PermissionsListener implements Listener {
 			String[] command = event.getCommand().toLowerCase().split(" ");
 			if (command.length == 2
 					&& (command[0].equals("op") || command[0].equals("deop"))) {
-				Player p = Bukkit.getPlayer(command[1]);
-				if (p != null) {
-					int taskID = syncOpPermissionsCheck(p, p.isOp());
-					if (taskID != -1) {
-						tasks.add(taskID);
-						tasksCleanup.add(taskID);
+				List<Player> pList = Bukkit.matchPlayer(command[1]);
+				for (Player p : pList) {
+					if (p != null) {
+						int taskID = syncOpPermissionsCheck(p, p.isOp());
+						if (taskID != -1) {
+							tasks.put(p.getName(), taskID);
+						}
 					}
 				}
 			}
@@ -115,9 +116,9 @@ public class PermissionsListener implements Listener {
 	public void disable() {
 		if (enabled) {
 			enabled = false;
+			this.stopAllPendingTasks();
 			permissions.removeAllPermissions();
 			HandlerList.unregisterAll(this);
-			for (int i : tasks) Bukkit.getScheduler().cancelTask(i);
 			permissions = null;
 		}
 	}
@@ -152,13 +153,12 @@ public class PermissionsListener implements Listener {
 				permissions.removePermissions(p.getName());
 				permissions.addDefaultPermissions(p);
 			}
-			cleanUpTasksList();
+			tasks.remove(p.getName());
 		}
 	}
 
 	public int syncImplementPermissions(Player p) {
-		return Bukkit.getServer()
-				.getScheduler()
+		return Bukkit.getServer().getScheduler()
 				.scheduleSyncDelayedTask(plugin, new implementPermissions(p));
 	}
 
@@ -182,23 +182,23 @@ public class PermissionsListener implements Listener {
 					permissions.addOpPermissions(p);
 				}
 			}
-			cleanUpTasksList();
+			tasks.remove(p.getName());
 		}
 	}
 
 	public int syncOpPermissionsCheck(Player p, boolean wasOp) {
-		return Bukkit.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(plugin, new opPermissionsCheck(p, wasOp));
+		return Bukkit.getServer().getScheduler()
+				.scheduleSyncDelayedTask(plugin,
+						new opPermissionsCheck(p, wasOp));
 	}
-	
-	public void cleanUpTasksList() {
-		// TODO figure out a better way of doing this - it'll remove scheduled
-		// task IDs beforehand if a second task is triggered before the first
-		// has run to completion
-		for (int i : tasksCleanup) {
-			tasks.remove(i);
-			tasksCleanup.remove(i);
+
+	public void stopAllPendingTasks() {
+		for (String s : tasks.keySet()) {
+			try {
+				Bukkit.getScheduler().cancelTask(tasks.remove(s));
+			} catch (NullPointerException e) {
+				// Mapping for s is null; do nothing.
+			}
 		}
 	}
 }

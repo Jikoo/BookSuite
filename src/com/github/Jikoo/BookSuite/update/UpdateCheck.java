@@ -37,7 +37,7 @@ public class UpdateCheck implements Listener {
 	public boolean checkForUpdates() {
 		try {
 			URL feed = new URL(
-					"http://dev.bukkit.org/bukkit-mods/booksuite/files.rss");
+					"http://dev.bukkit.org/bukkit-plugins/booksuite/files.rss");
 			Scanner stream = new Scanner(feed.openStream());
 			boolean item = false;
 			while (stream.hasNextLine()) {
@@ -204,9 +204,9 @@ public class UpdateCheck implements Listener {
 				}
 			} else {
 				if (hasUpdate)
-					plugin.getLogger().info(update);
+					plugin.getServer().getConsoleSender().sendMessage(update);
 				else if (inform)
-					plugin.getLogger().info(
+					plugin.getServer().getConsoleSender().sendMessage(
 							ChatColor.DARK_GREEN + "BookSuite is up to date!");
 			}
 		}

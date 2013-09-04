@@ -1,3 +1,10 @@
+;3.2.0
+:added aliases TODO finish/fix
+:added private saves (and relevant config + permissions) TODO perms + commands
+:fixed inbuilt permissions sometimes causing an error on reload
+:fixed mass copying TODO finish
+;3.1.3
+:Java 1.6 compatible (for real this time)
 ;3.1.2
 :fixed erasers not recognizing proper owners of books in some cases
 :books will now stack when copied, up to 64. Requires permission booksuite.copy.stack, default op.
@@ -13,7 +20,6 @@
 :individual modules can now be disabled in the config
 :importing books now supports &<color code>
 :config autoupdater now removes useless entries
-:1.5 compatible
 ;3.1.1
 :add quick config options to entirely disable update check to meet Bukkit requirements
 ;3.1.0
@@ -65,7 +71,7 @@
 :- copying a book using paper and leather instead of an unwritten book no longer breaks if inventory has empty slots
 :- copying other via press now checks usePermissions if player is op but lacks booksuite.copy.other
 ;3.0.0a5
-:fix whoopsies regarding the §'s
+:fix whoopsies regarding the section signs
 :supplies check is now with other misc. functions
 :users with permissions to use any command can use the base "/book"
 :default to not use permissions in config - preparation for rework of config/perms implementation

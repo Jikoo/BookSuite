@@ -11,6 +11,11 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
+import org.bukkit.Bukkit;
+
 public class MessageLogger {
-	//TODO strings.yml + hella configurability
+	// TODO strings.yml + hella configurability
+	public static void info(String msg) {
+		Bukkit.getConsoleSender().sendMessage("[BookSuite] " + msg);
+	}
 }

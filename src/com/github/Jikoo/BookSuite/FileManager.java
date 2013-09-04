@@ -14,8 +14,8 @@ package com.github.Jikoo.BookSuite;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -39,10 +39,10 @@ public class FileManager {
 	private final char SECTION_SIGN = '\u00A7';
 
 	/**
-	 * Makes a <code>BookMeta</code> from text. Text is read from a plaintext <code>File</code>
-	 * file stored in the directory location. If the file is read from a <code>URL</code>,
-	 * additional regex is applied to prevent special characters appearing
-	 * incorrectly.
+	 * Makes a <code>BookMeta</code> from text. Text is read from a plaintext
+	 * <code>File</code> file stored in the directory location. If the file is
+	 * read from a <code>URL</code>, additional regex is applied to prevent
+	 * special characters appearing incorrectly.
 	 * 
 	 * @param p
 	 *            the <code>Player</code> attempting to obtain a book
@@ -80,8 +80,6 @@ public class FileManager {
 							.replace("</div>", "");
 					line = line.replace("&lt;", "<").replace("&gt;", ">");
 					line = line.replace("&nbsp", "<n>");
-					line = line.replaceAll("Â" + SECTION_SIGN, SECTION_SIGN
-							+ "");
 				}
 
 				if (line.contains("<book>")) {
@@ -117,19 +115,18 @@ public class FileManager {
 			return text;
 		} catch (FileNotFoundException e) {
 			return null;
-		} catch (Exception ex) {
-			System.err
-					.println("[BookSuite] Error report:\nBookSuiteFileManager.makeBookMetaFromText: "
-							+ ex);
-			ex.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("[BookSuite] Error report:"
+					+ "\nFileManager.makeBookMetaFromText: " + e);
+			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return null;
 		}
 	}
 
 	/**
-	 * Makes an <code>ItemStack</code> from text. Text is read from a plaintext <code>File</code>
-	 * filename stored in the directory directory.
+	 * Makes an <code>ItemStack</code> from text. Text is read from a plaintext
+	 * <code>File</code> filename stored in the directory directory.
 	 * 
 	 * @param directory
 	 *            the directory of the <code>File</code>
@@ -189,8 +186,8 @@ public class FileManager {
 	}
 
 	/**
-	 * Makes a plaintext <code>File</code> filename in directory directory from the contents
-	 * of <code>BookMeta</code> bm.
+	 * Makes a plaintext <code>File</code> filename in directory directory from
+	 * the contents of <code>BookMeta</code> bm.
 	 * 
 	 * @param bm
 	 *            the <code>BookMeta</code>
@@ -211,7 +208,7 @@ public class FileManager {
 			if (!bookFile.exists()) {
 				bookFile.createNewFile();
 			} else
-				throw new FileAlreadyExistsException(bookFile.getAbsolutePath());
+				return false;
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<book>\n");
 			file.append("<author>" + bm.getAuthor() + "</author>\n");
@@ -221,11 +218,9 @@ public class FileManager {
 			file.append("</book>");
 			file.close();
 			return true;
-		} catch (FileAlreadyExistsException fe) {
-			return false;
 		} catch (Exception e) {
-			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromBookMeta: "
-							+ e);
+			System.err.println("[BookSuite] Error report:"
+					+ "\nFileManager.makeFileFromBookMeta: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return true;
@@ -233,8 +228,8 @@ public class FileManager {
 	}
 
 	/**
-	 * Makes a plaintext <code>File</code> filename in directory directory from the contents
-	 * of <code>ItemStack</code> is.
+	 * Makes a plaintext <code>File</code> filename in directory directory from
+	 * the contents of <code>ItemStack</code> is.
 	 * 
 	 * @param is
 	 *            the <code>ItemStack</code>
@@ -254,7 +249,7 @@ public class FileManager {
 			if (!itemFile.exists()) {
 				itemFile.createNewFile();
 			} else
-				throw new FileAlreadyExistsException(itemFile.getAbsolutePath());
+				return false;
 			FileWriter file = new FileWriter(itemFile);
 			file.write("<Type>" + is.getType().name() + "</Type>\n");
 			file.append("<Amount>" + is.getAmount() + "</Amount>");
@@ -281,12 +276,10 @@ public class FileManager {
 				}
 			}
 			file.close();
-			return true;
-		} catch (FileAlreadyExistsException fe) {
 			return false;
 		} catch (IOException e) {
-			System.err.println("[BookSuite] BookSuiteFileManager.makeFileFromItemStack: "
-							+ e);
+			System.err.println("[BookSuite] Error report:"
+					+ "\nFileManager.makeFileFromItemStack: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return true;
@@ -337,8 +330,9 @@ public class FileManager {
 		text = text.replaceAll("&([a-fk-orA-FK-OR0-9])", SECTION_SIGN + "$1");
 
 		text = text.replaceAll(
-						"(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])",
-						SECTION_SIGN + "r");
+				"(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?"
+						+ "|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])",
+				SECTION_SIGN + "r");
 		text = text.replaceAll("(<|\\[)/color(>|\\])", SECTION_SIGN + "0");
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
@@ -373,9 +367,8 @@ public class FileManager {
 			index.close();
 			return true;
 		} catch (IOException e) {
-			System.err
-					.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "
-							+ e);
+			System.err.println("[BookSuite] Error report:"
+					+ "\nFileManager.appendMailIndex: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return false;
@@ -413,15 +406,13 @@ public class FileManager {
 			writer.close();
 			delete(directory, mail + ".book");
 		} catch (FileNotFoundException e) {
-			System.err
-					.println("[BookSuite] Error report:\nBookSuiteFileManager.removeMailAndIndex: "
-							+ e);
+			System.err.println("[BookSuite] Error report:"
+					+ "\nFileManager.removeMailAndIndex: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 		} catch (IOException e) {
-			System.err
-					.println("[BookSuite] Error report:\nBookSuiteFileManager.appendMailIndex: "
-							+ e);
+			System.err.println("[BookSuite] Error report:"
+					+ "\nFileManager.appendMailIndex: " + e);
 			e.printStackTrace();
 			System.err.println("[BookSuite] End error report.");
 			return false;
@@ -454,30 +445,64 @@ public class FileManager {
 	 *            the <code>Player</code> to obtain file list
 	 */
 	public void listBookFilesIn(String directory, Player p) {
-		File file = new File(directory);
+		final File file = new File(directory);
 		if (!file.exists()) {
-			p.sendMessage(ChatColor.DARK_RED + "No books have been saved yet.");
+			p.sendMessage(ChatColor.DARK_RED + "No books found.");
 			file.mkdirs();
 			return;
 		}
-		File[] fileList = file.listFiles();// TODO private
-		if (fileList == null) {
+		File[] publicBooks = file.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				if (new File(dir, name).isDirectory()) {
+					return false;
+				}
+				return true;
+			}
+		});
+		File[] privateBooks = null;
+		if (BookSuite.getInstance().getConfig()
+				.getBoolean("allow-private-saving")) {
+			File privateFile = new File(file, p.getName());
+			if (privateFile.exists()) {
+				privateBooks = privateFile.listFiles();
+			}
+		}
+		if (publicBooks == null && privateBooks == null) {
 			p.sendMessage(ChatColor.DARK_RED + "No books found.");
 			return;
 		}
-		String[] bookList = new String[fileList.length];
-		int i = 0;
-		for (File bookFile : fileList) {
-			if (bookFile.getName().contains(".book")) {
-				bookList[i] = bookFile.getName().replace(".book", "");
-				i++;
+		String bookList = new String();
+		if (publicBooks != null && publicBooks.length != 0) {
+			p.sendMessage(ChatColor.DARK_GREEN + "Publicly saved books:");
+			for (File bookFile : publicBooks) {
+				bookList += bookFile.getName().replace(".book", "") + ", ";
+				// Maximum allowed characters in a server-to-client chat message
+				// is 32767.
+				// In the event that people actively try to mess things up or
+				// there are an obscene amount of books, we'll cut it off.
+				//
+				// Maximum book name from in-game save is 92 characters.
+				// Server admins will just have to not be stupid.
+				if (bookList.length() > 32500) {
+					p.sendMessage(ChatColor.DARK_GREEN
+							+ bookList.substring(0, bookList.length() - 3));
+					bookList = new String();
+				}
 			}
+			p.sendMessage(ChatColor.DARK_GREEN
+					+ bookList.substring(0, bookList.length() - 3));
 		}
-		if (bookList.length == 1 && bookList[0].equals("")) {
-			p.sendMessage(ChatColor.DARK_RED + "No books found.");
-		} else {
-			for (String book : bookList) {
-				p.sendMessage(ChatColor.DARK_GREEN + book);
+		if (privateBooks != null && privateBooks.length != 0) {
+			bookList = new String();
+			p.sendMessage(ChatColor.GOLD + "privately saved books:");
+			for (File bookFile : privateBooks) {
+				bookList += bookFile.getName().replace(".book", "") + ", ";
+
+				if (bookList.length() > 32500) {
+					p.sendMessage(ChatColor.DARK_GREEN
+							+ bookList.substring(0, bookList.length() - 2));
+					bookList = new String();
+				}
 			}
 		}
 	}

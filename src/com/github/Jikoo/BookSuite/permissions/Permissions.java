@@ -12,6 +12,8 @@
 package com.github.Jikoo.BookSuite.permissions;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,12 +22,12 @@ import org.bukkit.permissions.PermissionAttachment;
 public class Permissions {
 
 	boolean enabled = false;
-	HashMap<String, PermissionAttachment> attachments = new HashMap<String, PermissionAttachment>();
+	Map<String, PermissionAttachment> attachments =
+			new HashMap<String, PermissionAttachment>();
 
 	public void addDefaultPermissions(Player p) {
 		if (!attachments.containsKey(p.getName())) {
-			attachments.put(
-					p.getName(),
+			attachments.put(p.getName(),
 					p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
 		}
 		attachments.get(p.getName()).setPermission("booksuite.default", true);
@@ -33,8 +35,7 @@ public class Permissions {
 
 	public void addOpPermissions(Player p) {
 		if (!attachments.containsKey(p.getName())) {
-			attachments.put(
-					p.getName(),
+			attachments.put(p.getName(),
 					p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
 		}
 		attachments.get(p.getName()).setPermission("booksuite.admin", true);
@@ -50,8 +51,8 @@ public class Permissions {
 	}
 
 	public void removeAllPermissions() {
-		for (String pName : attachments.keySet()) {
-			removePermissions(pName);
+		for (Iterator<String> i = attachments.keySet().iterator(); i.hasNext();) {
+			this.removePermissions(i.next());
 		}
 	}
 }

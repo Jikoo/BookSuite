@@ -34,6 +34,10 @@ alias-mode: default
 # If you use a permissions plugin, set to false and assign permissions.
 use-inbuilt-permissions: true
 
+###  SAVING  ###
+# Should players be able to save private books to /SavedBooks/PlayerName/?
+allow-private-saving: true
+
 ###  PRINTING PRESS  ###
 # Set to false if you do not want to
 # allow anyone to use printing presses.

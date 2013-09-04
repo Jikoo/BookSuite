@@ -12,6 +12,7 @@ package com.github.Jikoo.BookSuite.copy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
@@ -21,14 +22,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class Copier {
-	HashMap<Integer, ? extends ItemStack> inkMap;
-	HashMap<Integer, ? extends ItemStack> bookMap;
-	HashMap<Integer, ? extends ItemStack> paperMap;
-	HashMap<Integer, ? extends ItemStack> leatherMap;
-	// HashMap<Integer, ? extends ItemStack> blankbaqMap;TODO OR NOTTODO
-	HashMap<Integer, ? extends ItemStack> spaceMap;
-	int removedPaper;
-	int removedBooks;
+	Map<Integer, ? extends ItemStack> inkMap;
+	Map<Integer, ? extends ItemStack> bookMap;
+	Map<Integer, ? extends ItemStack> paperMap;
+	int bookTotal;
+	int inkTotal;
 
 	ArrayList<ItemStack> consumedSupplies;
 
@@ -70,6 +68,10 @@ public class Copier {
 				copies = maxPossible;
 			}
 
+			//p.getInventory().getContents().length - p.getInventory().getSize();
+			// num starting free slots
+			// calc merge freed
+			// if merge remainder < copies add 1
 			// remove supplies
 		}
 
@@ -102,36 +104,6 @@ public class Copier {
 									- suppliesUsed, (short) 0));
 			}
 
-			int paperToConsume = maxUncraftedBook * 3;
-			for (ItemStack is : paperMap.values()) {
-				if (paperToConsume <= 0)
-					break;
-				if (paperToConsume >= is.getAmount()) {
-					paperToConsume -= is.getAmount();
-					consumedSupplies.add(is);
-					p.getInventory().remove(is);
-				} else {
-					ItemStack is1 = is.clone();
-					is1.setAmount(paperToConsume);
-					consumedSupplies.add(is1);
-					p.getInventory().remove(is1);
-				}
-			}
-
-			suppliesUsed = 0;
-			for (ItemStack is : leatherMap.values()) {
-				if (copies - suppliesUsed >= is.getAmount()) {
-					suppliesUsed += is.getAmount();
-					consumedSupplies.add(is);
-					p.getInventory().remove(is);
-				} else {
-					ItemStack is1 = is.clone();
-					is1.setAmount(paperToConsume);
-					consumedSupplies.add(is1);
-					p.getInventory().remove(is1);
-				}
-			}
-
 			suppliesUsed = 0;
 			for (ItemStack is : bookMap.values()) {
 				if (copies - suppliesUsed >= is.getAmount()) {
@@ -140,9 +112,10 @@ public class Copier {
 					p.getInventory().remove(is);
 				} else {
 					ItemStack is1 = is.clone();
-					is1.setAmount(paperToConsume);
+					is1.setAmount(suppliesUsed);
 					consumedSupplies.add(is1);
 					p.getInventory().remove(is1);
+					break;
 				}
 			}
 			break;
@@ -171,29 +144,31 @@ public class Copier {
 
 	// public void refundSupplies
 
-	// public int calcMergeFreedSpace(HashMap<Integer, ItemStack> stacks)
+	public int calcMergeFreedSpace(HashMap<Integer, ItemStack> stacks) {
+		return stacks.size() - (int) Math.ceil(totalAmount(stacks) / 64d) ;
+	}
 
 	public Inventory removeAddMerge(Inventory i, ItemStack is, int quantity) {
 		Material m = is.getType();
 
 		if (m != Material.INK_SACK) {
 			i.remove(m);
-
-			while (quantity > 0) {
-				int added;
-				if (quantity > 64)
-					added = 64;
-				else
-					added = quantity;
-				i.addItem(new ItemStack(m, added));
-				quantity -= added;
-			}
 		} else {
 			for (Entry<Integer, ? extends ItemStack> e : i.all(m).entrySet()) {
 				if (e.getValue().getData().getData() == (byte) 0) {
 					i.remove(e.getKey());
 				}
 			}
+		}
+
+		while (quantity > 0) {
+			int added;
+			if (quantity > 64)
+				added = 64;
+			else
+				added = quantity;
+			i.addItem(new ItemStack(m, added));
+			quantity -= added;
 		}
 
 		return i;
@@ -206,23 +181,9 @@ public class Copier {
 		case BOOK_AND_QUILL:
 
 			inkMap = inv.all(Material.INK_SACK);
-			int ink = 0;
-			for (Entry<Integer, ? extends ItemStack> e : inkMap.entrySet()) {
-				// All dyes share one itemID. We're only interested in actual
-				// ink sacks.
-				if (e.getValue().getData().getData() != (byte) 0)
-					inkMap.remove(e.getKey());
-				else
-					ink += e.getValue().getAmount();
-			}
-
-			leatherMap = inv.all(Material.LEATHER);
-			int leather = totalAmount(leatherMap);
-			paperMap = inv.all(Material.PAPER);
-			int paper = totalAmount(paperMap);
+			int ink = totalInk(inkMap);
 			bookMap = inv.all(Material.BOOK);
-			maxUncraftedBook = (leather < (paper / 3) ? leather : paper);
-			int total = totalAmount(bookMap) + maxUncraftedBook;
+			int total = totalAmount(bookMap);
 			return ink < total ? ink : total;
 		case MAP:
 			return totalAmount(paperMap) / 9;
@@ -231,7 +192,20 @@ public class Copier {
 		}
 	}
 
-	public int totalAmount(HashMap<Integer, ? extends ItemStack> m) {
+	private int totalInk(Map<Integer, ? extends ItemStack> m) {
+		int ink = 0;
+		for (Entry<Integer, ? extends ItemStack> e : inkMap.entrySet()) {
+			// All dyes share one itemID. We're only interested in actual
+			// ink sacks.
+			if (e.getValue().getData().getData() != (byte) 0)
+				inkMap.remove(e.getKey());
+			else
+				ink += e.getValue().getAmount();
+		}
+		return ink;
+	}
+
+	private int totalAmount(Map<Integer, ? extends ItemStack> m) {
 		int quantity = 0;
 		for (ItemStack is : m.values()) {
 			quantity += is.getAmount();

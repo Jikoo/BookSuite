@@ -12,22 +12,18 @@
 package com.github.Jikoo.BookSuite.copy;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class PrintingPress {
 
-	BookSuite plugin;
 	Block blockUp;
 	BlockState originalBlock;
 	BlockState changedBlock;
 	String pName;
 
 	public PrintingPress(BookSuite plugin, String pName, Block blockUp) {
-		this.plugin = plugin;
 		this.blockUp = blockUp;
 		originalBlock = blockUp.getState();
 		this.pName = pName;
@@ -79,8 +75,10 @@ public class PrintingPress {
 	}
 
 	public void revertBlockPause(Block b) {
-		Bukkit.getServer().getScheduler()
-				.scheduleSyncDelayedTask(plugin, new revertBlock(b), 20L);
+		Bukkit.getServer()
+				.getScheduler()
+				.scheduleSyncDelayedTask(BookSuite.getInstance(),
+						new revertBlock(b), 20L);
 	}
 
 	public class revertBlock implements Runnable {
@@ -94,11 +92,6 @@ public class PrintingPress {
 			if (b.getType().equals(changedBlock.getType())) {
 				b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock
 						.getData().getData(), false);
-			} else {
-				Player owner = Bukkit.getPlayerExact(pName);
-				if (owner != null)
-					owner.sendMessage(ChatColor.DARK_RED
-							+ "The press you used appears to have broken.");
 			}
 		}
 	}
