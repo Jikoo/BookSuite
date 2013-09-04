@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     Adam Gunn- initial API and implementation
- *     Ted Meyer - some help
+ *     Ted Meyer - mod architecture and IO specifications
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
