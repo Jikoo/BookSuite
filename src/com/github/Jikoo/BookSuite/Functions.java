@@ -20,6 +20,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +32,7 @@ public class Functions {
 	// TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
 	/*
 	 * Honestly what I planned to do for encryption was make the book one page -
-	 * a hash of a random UUID or something (§k<hash>), save the book as that if
+	 * a hash of a random UUID or something (ï¿½k<hash>), save the book as that if
 	 * untaken, then allow people to re-import it with the correct hash
 	 * (savename). As long as the ingame book editor doesn't improve, I foresee
 	 * no issues.
@@ -385,5 +387,96 @@ public class Functions {
 		if (instance == null)
 			instance = new Functions();
 		return instance;
+	}
+
+	public boolean isPrintingPress(Block blockToCheck) {
+		if (!BookSuite.getInstance().getConfig().getBoolean("enable-printing-presses")) {
+			return false;
+		}
+		if (blockToCheck.getType().equals(Material.WORKBENCH)) {
+			if (isInvertedStairs(blockToCheck.getRelative(BlockFace.UP))) {
+				return true;
+			}
+		}
+		if (isInvertedStairs(blockToCheck)) {
+			if (blockToCheck.getRelative(BlockFace.DOWN).getType().equals(Material.WORKBENCH)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean canMakePress(Block clicked, BlockFace clickedFace, ItemStack itemInHand, Player p)
+	{
+		if (! clickedFace.equals(BlockFace.UP))
+		{ // must have clicked on an upwards facing block face
+			return false;
+		}
+		if (! clicked.getType().equals(Material.WORKBENCH))
+		{ // must click on a work bench
+			return false;
+		}
+		if (! isCorrectStairType(itemInHand))
+		{ // must click with stairs
+			return false;
+		}
+		if (! p.hasPermission("booksuite.copy.createpress"))
+		{ // must have permissions
+			return false;
+		}
+		if (clicked.getRelative(BlockFace.UP).getType() != Material.AIR)
+		{ // must have room to build it
+			return false;
+		}
+		return true;
+	}
+
+	public boolean canErase(Block clicked, ItemStack itemInHand)
+	{
+		if (! itemInHand.getType().equals(Material.WRITTEN_BOOK))
+		{
+			return false;
+		}
+		if (! clicked.getType().equals(Material.CAULDRON))
+		{
+			return false;
+		}
+		if (! itemInHand.hasItemMeta())
+		{
+			return false;
+		}
+		if (itemInHand.getItemMeta() == null)
+		{
+			return false;
+		}
+		if (! BookSuite.getInstance().getConfig().getBoolean("enable-erasers"))
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean isMailBox(Block clicked)
+	{
+		Sign sign = null;
+		if (clicked.getType().equals(Material.SIGN))
+		{
+			sign = (Sign) clicked;
+		}
+		else if (clicked.getType().equals(Material.CHEST))
+		{
+			Block up = clicked.getRelative(BlockFace.UP);
+			if (up instanceof Sign)
+			{
+				sign = (Sign)up;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		//rudimentary example
+		return sign.getLine(0).equals(ChatColor.DARK_RED +
+					                  "No sign line can contain this string.");
 	}
 }

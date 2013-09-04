@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     Adam Gunn - ideas and implementation
- *     Ted Meyer - IO assistance and BML (Book Markup Language)
+ *     Ted Meyer - IO assistance and BML (Book Markup Language) plus code cleanliness =P
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -18,7 +18,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -53,127 +52,161 @@ public class MainListener implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
+
+		Player p = event.getPlayer();
+
+		// right click action
 		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 
-			Player p = event.getPlayer();
+
+			// get information about the click
 			ItemStack is = p.getItemInHand();
 			Block clicked = event.getClickedBlock();
 			Block blockUp = clicked.getRelative(BlockFace.UP);
 
+
 			// if clicking a workbench, check to see if it is a press and act accordingly
-			if (clicked.getType().equals(Material.WORKBENCH)
-					&& plugin.getConfig().getBoolean("enable-printing-presses")) {
-				if (plugin.functions.isInvertedStairs(blockUp)) {
-					PrintingPress press = new PrintingPress(plugin,
-							p.getName(), blockUp);
-					if (!p.hasPermission("booksuite.denynowarn.press")) {
-						if (is.getType().equals(Material.MAP)) {
-							if (plugin.functions.canObtainMap(p)) {
-								press.operatePress();
-								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Copied successfully!");
-							}
-							event.setCancelled(true);
-						} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
-							return;
-						} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
-							BookMeta bm = (BookMeta) is.getItemMeta();
-							if (plugin.functions.checkCopyPermission(p,
-									bm.getAuthor())
-									&& plugin.functions.canObtainBook(p)) {
-								press.operatePress();
-								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Copied successfully!");
-							}
-							event.setCancelled(true);
-						} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
-							if (p.hasPermission("booksuite.copy.unsigned")) {
-								if (plugin.functions.canObtainBook(p)) {
-									press.operatePress();
-									plugin.functions.copy(p);
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Copied successfully!");
-								}
-							} else
-								p.sendMessage(ChatColor.DARK_RED
-										+ "You do not have permission to copy unsigned books!");
-							event.setCancelled(true);
+			if (plugin.functions.isPrintingPress(clicked))
+			{
+				PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
+
+				if (!p.hasPermission("booksuite.denynowarn.press"))
+				{
+					if (is.getType().equals(Material.MAP))
+					{
+						if (plugin.functions.canObtainMap(p))
+						{
+							press.operatePress();
+							plugin.functions.copy(p);
+							p.sendMessage(ChatColor.DARK_GREEN
+									+ "Copied successfully!");
 						}
-					}
-				} else if (event.getBlockFace().equals(BlockFace.UP)
-						&& blockUp.isEmpty()
-						&& plugin.functions.isCorrectStairType(is)) {
-					if (p.hasPermission("booksuite.copy.createpress")) {
-						blockUp.setTypeIdAndData(is.getTypeId(),
-								plugin.functions.getCorrectStairOrientation(p),
-								true);
-						if (is.getAmount() == 1)
-							p.setItemInHand(null);
+						event.setCancelled(true);	
+					} 
+					else if (is.getType().equals(Material.WRITTEN_BOOK))
+					{
+						BookMeta bm = (BookMeta) is.getItemMeta();
+						
+						if (plugin.functions.checkCopyPermission(p, bm.getAuthor()) &&
+							plugin.functions.canObtainBook(p))
+						{
+							press.operatePress();
+							plugin.functions.copy(p);
+							p.sendMessage(ChatColor.DARK_GREEN
+									+ "Copied successfully!");
+						}
+						event.setCancelled(true);
+					} 
+					else if (is.getType().equals(Material.BOOK_AND_QUILL))
+					{
+						if (p.hasPermission("booksuite.copy.unsigned"))
+						{
+							if (plugin.functions.canObtainBook(p))
+							{
+								press.operatePress();
+								plugin.functions.copy(p);
+								p.sendMessage(ChatColor.DARK_GREEN
+										+ "Copied successfully!");
+							}
+						}
 						else
-							is.setAmount(is.getAmount() - 1);
+						{
+							p.sendMessage(ChatColor.DARK_RED
+									+ "You do not have permission to copy unsigned books!");
+						}
 						event.setCancelled(true);
-						p.updateInventory();
 					}
-				}
-			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
-				if (!(is.hasItemMeta() || is.getItemMeta() != null))
-					return;
-				if (clicked.getType().equals(Material.CAULDRON)
-						&& plugin.getConfig().getBoolean("enable-erasers")) {
-					BookMeta bm = (BookMeta) is.getItemMeta();
-					if (p.hasPermission("booksuite.block.erase")) {
-						if (clicked.getData() < 1
-								&& !p.getGameMode().equals(GameMode.CREATIVE)
-								&& !p.hasPermission("booksuite.block.erase.free"))
-							p.sendMessage(ChatColor.DARK_RED
-									+ "You'll need some water to unsign this book.");
-						else if (bm.getAuthor().equalsIgnoreCase(p.getName())) {
-							plugin.functions.unsign(p);
-							if (!p.hasPermission("booksuite.block.erase.free")
-									&& !p.getGameMode().equals(
-											GameMode.CREATIVE))
-								clicked.setData((byte) (clicked.getData() - 1));
-						} else if (p
-								.hasPermission("booksuite.block.erase.other")) {
-							plugin.functions.unsign(p);
-							if (!p.hasPermission("booksuite.block.erase.free")
-									&& !p.getGameMode().equals(
-											GameMode.CREATIVE))
-								clicked.setData((byte) (clicked.getData() - 1));
-						} else
-							p.sendMessage(ChatColor.DARK_RED
-									+ "You can only unsign your own books.");
-						event.setCancelled(true);
-					} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
-						p.sendMessage(ChatColor.DARK_RED
-								+ "You do not have permission to use erasers.");
-						event.setCancelled(true);
+					else if (!(is.hasItemMeta() || is.getItemMeta() != null)) 
+					{
+						return;
 					}
 				}
 			}
-
-			// this is for checking mail
-			if (clicked.getType().equals(Material.CHEST))
-				if (blockUp.getType().equals(Material.SIGN)) {
-					Sign sign = (Sign) blockUp;
-					if (sign.getLine(0).equals(
-							ChatColor.DARK_RED
-									+ "No sign line can contain this string.")) {// rudimentary example
-						p.openInventory(plugin.mail.getMailBoxInv(p, plugin
-								.getDataFolder().getPath()));
-						event.setCancelled(true);
-					}
+			else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p))
+			{
+				blockUp.setTypeIdAndData(
+					is.getTypeId(),
+					plugin.functions.getCorrectStairOrientation(p),
+					true
+				);
+				if (is.getAmount() == 1)
+				{
+					p.setItemInHand(null);
 				}
+				else
+				{
+					is.setAmount(is.getAmount() - 1);
+				}
+				event.setCancelled(true);
+				p.updateInventory();
+			}
+			else if (plugin.functions.canErase(clicked, is))
+			{
+				BookMeta bm = (BookMeta) is.getItemMeta();
+				
+				if (p.hasPermission("booksuite.block.erase"))
+				{
+					if (clicked.getData() < 1 &&
+						!p.getGameMode().equals(GameMode.CREATIVE) &&
+						!p.hasPermission("booksuite.block.erase.free")
+					)
+					{
+						p.sendMessage(ChatColor.DARK_RED
+									  + "You'll need some water to unsign this book.");
+					}		
+					else if (bm.getAuthor().equalsIgnoreCase(p.getName()))
+					{
+						plugin.functions.unsign(p);
+						if (!p.hasPermission("booksuite.block.erase.free") &&
+							!p.getGameMode().equals(GameMode.CREATIVE)
+						)
+						{
+							clicked.setData((byte) (clicked.getData() - 1));
+						}
+					}
+					else if (p.hasPermission("booksuite.block.erase.other"))
+					{
+						plugin.functions.unsign(p);
+						if (!p.hasPermission("booksuite.block.erase.free") &&
+							!p.getGameMode().equals(GameMode.CREATIVE)
+						)
+						{
+							clicked.setData((byte) (clicked.getData() - 1));
+						}
+							
+					}
+					else
+					{
+						p.sendMessage(ChatColor.DARK_RED
+									  + "You can only unsign your own books.");
+					}
+					event.setCancelled(true);
 
+
+
+				}
+				else if (!p.hasPermission("booksuite.denynowarn.erase"))
+				{
+					p.sendMessage(ChatColor.DARK_RED
+								  + "You do not have permission to use erasers.");
+						event.setCancelled(true);
+				}
+			}
+			else if (plugin.functions.isMailBox(clicked))
+			{
+				p.openInventory(plugin.mail.getMailBoxInv(p, plugin.getDataFolder().getPath()));
+				event.setCancelled(true);
+			}
+			//else if (pluggins.functions.isLibrary(clicked)){}
 		}
 
 		// this is for taking a "package/envelope" that contains a "gift" and
 		// opening it into your inventory.
-		if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-			Player p = event.getPlayer();
-			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+		//meh ill clean it up later.
+		else if (event.getAction().equals(Action.RIGHT_CLICK_AIR))
+		{
+			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
+			{
 				if (!(p.getItemInHand().hasItemMeta() || p.getItemInHand()
 						.getItemMeta() != null))
 					return;
