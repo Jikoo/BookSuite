@@ -6,8 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.permissions;
 

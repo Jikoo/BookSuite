@@ -6,10 +6,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn - ideas and implementation
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
+
+import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -198,20 +200,44 @@ public class MainListener implements Listener {
 
 	@EventHandler
 	public void onBookEdit(PlayerEditBookEvent event) {
+		BookMeta obm = event.getPreviousBookMeta();
 		BookMeta bm = event.getNewBookMeta();
-		if ((bm.hasAuthor() && bm.getAuthor() != null)
-				&& !plugin.alias.getAliases(event.getPlayer()).contains(
-						bm.getAuthor())) {
-			if (!event.getPlayer().hasPermission("booksuite.edit.other")) {
-				event.getPlayer().sendMessage(
-						ChatColor.DARK_RED + "You'll need " + bm.getAuthor()
-								+ "'s permission to edit this book!");
-				event.setCancelled(true);
-			}
+		if (!event.getPlayer().hasPermission("booksuite.edit.other")
+				&& obm.hasAuthor() && obm.getAuthor() != null
+				&& !plugin.alias.getAliases(event.getPlayer())
+						.contains(obm.getAuthor())) {
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + "You'll need "
+					+ obm.getAuthor() + ChatColor.DARK_RED
+					+ "'s permission to edit this book!");
+			event.setCancelled(true);
+			return;
 		}
 
-		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.alias.lock"))// TODO better perm name
-			bm.setAuthor(plugin.alias.getActiveAlias(event.getPlayer()));
+		String alias = plugin.alias.getActiveAlias(event.getPlayer());
+		if (event.isSigning()) {
+			bm.setAuthor(alias);
+			if (bm.hasLore() && bm.getLore().contains(ChatColor.GRAY + "by " + alias)) {
+				ArrayList<String> lore = (ArrayList<String>) bm.getLore();
+				lore.remove(0);
+				if (lore.isEmpty()) {
+					lore = null;
+				}
+				bm.setLore(lore);
+			}
+		} else if (event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
+			bm.setAuthor(alias);
+			ArrayList<String> lore = new ArrayList<String>();
+			if (bm.hasLore()) {
+				if (!bm.getLore().contains(ChatColor.GRAY + "by " + alias)) {
+					lore.add(ChatColor.GRAY + "by " + alias);
+					lore.addAll(bm.getLore());
+					bm.setLore(lore);
+				}
+			} else {
+				lore.add(ChatColor.GRAY + "by " + alias);
+				bm.setLore(lore);
+			}
+		}
 		event.setNewBookMeta(bm);
 	}
 

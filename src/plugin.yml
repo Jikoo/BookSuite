@@ -17,6 +17,7 @@ permissions:
             booksuite.command.admin: true
             booksuite.mail.admin: true
             booksuite.block.erase.other: true
+            booksuite.alias.admin: true
     booksuite.default:
         description: Average Joe's permissions.
         default: false
@@ -271,6 +272,16 @@ permissions:
                                 default: false
                                 children:
                                     booksuite.command: true
+
+
+
+    booksuite.alias.admin:
+        description: all non-command alias functions
+        default: false
+        children:
+            booksuite.alias.lock.auto:
+                description: set book and quill author to player alias, require perm to edit. /book u to unlock
+                default: false
 
 
 

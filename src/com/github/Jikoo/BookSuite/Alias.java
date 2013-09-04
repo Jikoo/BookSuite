@@ -6,8 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn - ideas and implementation
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -23,10 +23,8 @@ import org.bukkit.entity.Player;
 
 public class Alias {
 	// TODO javadocs
-	// also TODO figure out NPE and save issue
 	BookSuite plugin = BookSuite.getInstance();
 
-	File aliasFile;
 	FileConfiguration aliasYML;
 
 	enum AliasType {
@@ -48,7 +46,7 @@ public class Alias {
 			type = AliasType.valueOf(plugin.getConfig().getString("alias-mode")
 					.toUpperCase());
 			if (type.equals(AliasType.MULTI)) {
-				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
+				File aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 				if (aliasFile.exists()) {
 					aliasYML = YamlConfiguration.loadConfiguration(aliasFile);
 				} else {
@@ -59,23 +57,15 @@ public class Alias {
 			type = AliasType.DEFAULT;
 			plugin.getConfig().set("alias-mode", "default");
 			plugin.saveConfig();
-			plugin.getLogger()
-					.warning(
-							ChatColor.DARK_RED
-									+ "Invalid alias type in config, using default setting.");
+			plugin.getLogger().warning(ChatColor.DARK_RED +
+					"Invalid alias type in config, using default setting.");
 		}
 	}
 
 	public void save() {
 		if (type.equals(AliasType.MULTI)) {
 			try {
-				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
-				if (!aliasFile.exists()) {
-					// TODO figure out if this fixes saving issues
-					aliasFile.getParentFile().mkdirs();
-					aliasFile.createNewFile();
-				}
-				aliasYML.save(aliasFile);
+				aliasYML.save(new File(plugin.getDataFolder(), "aliases.yml"));
 			} catch (IOException e) {
 				plugin.getLogger().warning(
 						ChatColor.DARK_RED + "Could not save aliases.yml!");
@@ -108,15 +98,17 @@ public class Alias {
 		} else {
 			s.sendMessage(ChatColor.DARK_GREEN + "Added alias \"" + newAlias
 					+ "\" to " + target.getName() + "!");
-			if (warn)
+			if (warn) {
 				target.sendMessage(ChatColor.DARK_GREEN + s.getName()
 						+ " added " + newAlias + " to your list of aliases!");
+			}
 		}
 	}
 
 	public boolean removeAlias(String pName, String oldAlias) {
-		if (!aliasYML.getStringList(pName).contains(oldAlias))
+		if (!aliasYML.getStringList(pName).contains(oldAlias)) {
 			return false;
+		}
 		ArrayList<String> aliasList = (ArrayList<String>) aliasYML
 				.getStringList(pName);
 		aliasList.remove(oldAlias);
@@ -139,9 +131,10 @@ public class Alias {
 		} else {
 			s.sendMessage(ChatColor.DARK_GREEN + "Added alias \"" + oldAlias
 					+ "\" to " + target.getName() + "!");
-			if (warn)
+			if (warn) {
 				target.sendMessage(ChatColor.DARK_GREEN + s.getName()
 						+ " added " + oldAlias + " to your list of aliases!");
+			}
 		}
 	}
 
@@ -159,20 +152,25 @@ public class Alias {
 		if (setActiveAlias(target, active)) {
 			s.sendMessage(ChatColor.DARK_GREEN + target.getName()
 					+ "'s active alias set to " + active + "!");
-			if (warn)
+			if (warn) {
 				target.sendMessage(ChatColor.DARK_GREEN + s.getName()
 						+ " set your active alias to " + active + "!");
-		} else
+			}
+		} else {
 			s.sendMessage(ChatColor.DARK_RED + target.getName()
 					+ "does not have the alias " + active + "!");
+		}
 	}
 
 	public String getActiveAlias(Player p) {
-		String current = aliasYML.getString("current." + p.getName());
-		if (getAliases(p).contains(current))
-			return current;
-		aliasYML.set("current." + p.getName(), p.getDisplayName());
-		save();
+		if (type.equals(AliasType.MULTI)) {
+			String current = aliasYML.getString("current." + p.getName());
+			if (getAliases(p).contains(current)) {
+				return current;
+			}
+			aliasYML.set("current." + p.getName(), p.getDisplayName());
+			save();
+		}
 		return p.getDisplayName();
 	}
 

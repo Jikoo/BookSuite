@@ -6,8 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn - ideas and implementation
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -216,8 +216,10 @@ public class Functions {
 
 	public boolean unsign(Player p) {
 		ItemStack unsign = p.getItemInHand();
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
+		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)
+				&& !p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
 			return false;
+		}
 		BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
 		unsignMeta.setAuthor(null);
 		unsignMeta.setTitle(null);

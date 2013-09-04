@@ -6,8 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn - ideas and implementation
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -485,7 +485,7 @@ public class FileManager {
 				// Server admins will just have to not be stupid.
 				if (bookList.length() > 32500) {
 					p.sendMessage(ChatColor.DARK_GREEN
-							+ bookList.substring(0, bookList.length() - 3));
+							+ bookList.substring(0, bookList.length() - 2));
 					bookList = new String();
 				}
 			}

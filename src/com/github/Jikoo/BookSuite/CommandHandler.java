@@ -6,8 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn - ideas and implementation
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -404,8 +404,10 @@ public class CommandHandler implements CommandExecutor {
 			plugin.update.disableNotifications();
 			plugin.update.enableNotifications();
 		} else {
-			if (plugin.update != null)
+			if (plugin.update != null) {
 				plugin.update.disableNotifications();
+				plugin.update = null;
+			}
 		}
 
 		plugin.alias.load();

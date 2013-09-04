@@ -6,8 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn - ideas and implementation
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -44,7 +44,6 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		getLogger().info("Initializing.");
 
 		instance = this;
 
@@ -94,7 +93,7 @@ public class BookSuite extends JavaPlugin {
 					update.enableNotifications();
 				}
 
-				getLogger().info("Starting update check...");
+				getLogger().info("Initiating update check.");
 
 				update.asyncUpdateCheck(null, false);
 			}

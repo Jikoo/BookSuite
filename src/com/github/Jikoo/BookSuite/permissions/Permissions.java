@@ -6,13 +6,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn- initial API and implementation
- *     Ted Meyer - mod architecture and IO specifications
+ *     Adam Gunn
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.permissions;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -22,8 +20,8 @@ import org.bukkit.permissions.PermissionAttachment;
 public class Permissions {
 
 	boolean enabled = false;
-	Map<String, PermissionAttachment> attachments =
-			new HashMap<String, PermissionAttachment>();
+	Map<Object, PermissionAttachment> attachments =
+			new HashMap<Object, PermissionAttachment>();
 
 	public void addDefaultPermissions(Player p) {
 		if (!attachments.containsKey(p.getName())) {
@@ -41,7 +39,7 @@ public class Permissions {
 		attachments.get(p.getName()).setPermission("booksuite.admin", true);
 	}
 
-	public void removePermissions(String pName) {
+	public void removePermissions(Object pName) {
 		try {
 			attachments.remove(pName).remove();
 		} catch (NullPointerException e) {
@@ -51,8 +49,9 @@ public class Permissions {
 	}
 
 	public void removeAllPermissions() {
-		for (Iterator<String> i = attachments.keySet().iterator(); i.hasNext();) {
-			this.removePermissions(i.next());
+		Object[] names = this.attachments.keySet().toArray();
+		for (int i = 0; i < names.length; i++) {
+			this.removePermissions(names[i]);
 		}
 	}
 }
