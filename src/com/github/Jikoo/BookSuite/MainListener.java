@@ -58,155 +58,110 @@ public class MainListener implements Listener {
 		// right click action
 		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 
-
 			// get information about the click
 			ItemStack is = p.getItemInHand();
 			Block clicked = event.getClickedBlock();
-			Block blockUp = clicked.getRelative(BlockFace.UP);
 
+			// if clicking a workbench, check to see if it is a press and act
+			// accordingly
+			if (plugin.functions.isPrintingPress(clicked)) {
+				PrintingPress press = new PrintingPress(plugin,
+						p.getName(), clicked);
 
-			// if clicking a workbench, check to see if it is a press and act accordingly
-			if (plugin.functions.isPrintingPress(clicked))
-			{
-				PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
-
-				if (!p.hasPermission("booksuite.denynowarn.press"))
-				{
-					if (is.getType().equals(Material.MAP))
-					{
-						if (plugin.functions.canObtainMap(p))
-						{
-							press.operatePress();
-							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Copied successfully!");
-						}
-						event.setCancelled(true);	
-					} 
-					else if (is.getType().equals(Material.WRITTEN_BOOK))
-					{
-						BookMeta bm = (BookMeta) is.getItemMeta();
-						
-						if (plugin.functions.checkCopyPermission(p, bm.getAuthor()) &&
-							plugin.functions.canObtainBook(p))
-						{
+				if (!p.hasPermission("booksuite.denynowarn.press")) {
+					if (is.getType().equals(Material.MAP)) {
+						if (plugin.functions.canObtainMap(p)) {
 							press.operatePress();
 							plugin.functions.copy(p);
 							p.sendMessage(ChatColor.DARK_GREEN
 									+ "Copied successfully!");
 						}
 						event.setCancelled(true);
-					} 
-					else if (is.getType().equals(Material.BOOK_AND_QUILL))
-					{
-						if (p.hasPermission("booksuite.copy.unsigned"))
-						{
-							if (plugin.functions.canObtainBook(p))
-							{
+					} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
+						BookMeta bm = (BookMeta) is.getItemMeta();
+
+						if (plugin.functions.checkCopyPermission(p,
+								bm.getAuthor())
+								&& plugin.functions.canObtainBook(p)) {
+							press.operatePress();
+							plugin.functions.copy(p);
+							p.sendMessage(ChatColor.DARK_GREEN
+									+ "Copied successfully!");
+						}
+						event.setCancelled(true);
+					} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
+						if (p.hasPermission("booksuite.copy.unsigned")) {
+							if (plugin.functions.canObtainBook(p)) {
 								press.operatePress();
 								plugin.functions.copy(p);
 								p.sendMessage(ChatColor.DARK_GREEN
 										+ "Copied successfully!");
 							}
-						}
-						else
-						{
+						} else {
 							p.sendMessage(ChatColor.DARK_RED
 									+ "You do not have permission to copy unsigned books!");
 						}
 						event.setCancelled(true);
-					}
-					else if (!(is.hasItemMeta() || is.getItemMeta() != null)) 
-					{
+					} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
 						return;
 					}
 				}
-			}
-			else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p))
-			{
-				blockUp.setTypeIdAndData(
-					is.getTypeId(),
-					plugin.functions.getCorrectStairOrientation(p),
-					true
-				);
-				if (is.getAmount() == 1)
-				{
+			} else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
+				clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
+						plugin.functions.getCorrectStairOrientation(p), true);
+				if (is.getAmount() == 1) {
 					p.setItemInHand(null);
-				}
-				else
-				{
+				} else {
 					is.setAmount(is.getAmount() - 1);
 				}
 				event.setCancelled(true);
 				p.updateInventory();
-			}
-			else if (plugin.functions.canErase(clicked, is))
-			{
+			} else if (plugin.functions.canErase(clicked, is)) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
-				
-				if (p.hasPermission("booksuite.block.erase"))
-				{
-					if (clicked.getData() < 1 &&
-						!p.getGameMode().equals(GameMode.CREATIVE) &&
-						!p.hasPermission("booksuite.block.erase.free")
-					)
-					{
+
+				if (p.hasPermission("booksuite.block.erase")) {
+					if (clicked.getData() < 1
+							&& !p.getGameMode().equals(GameMode.CREATIVE)
+							&& !p.hasPermission("booksuite.block.erase.free")) {
 						p.sendMessage(ChatColor.DARK_RED
-									  + "You'll need some water to unsign this book.");
-					}		
-					else if (bm.getAuthor().equalsIgnoreCase(p.getName()))
-					{
+								+ "You'll need some water to unsign this book.");
+					} else if (bm.getAuthor().equalsIgnoreCase(p.getName())) {
 						plugin.functions.unsign(p);
-						if (!p.hasPermission("booksuite.block.erase.free") &&
-							!p.getGameMode().equals(GameMode.CREATIVE)
-						)
-						{
+						if (!p.hasPermission("booksuite.block.erase.free")
+								&& !p.getGameMode().equals(GameMode.CREATIVE)) {
 							clicked.setData((byte) (clicked.getData() - 1));
 						}
-					}
-					else if (p.hasPermission("booksuite.block.erase.other"))
-					{
+					} else if (p.hasPermission("booksuite.block.erase.other")) {
 						plugin.functions.unsign(p);
-						if (!p.hasPermission("booksuite.block.erase.free") &&
-							!p.getGameMode().equals(GameMode.CREATIVE)
-						)
-						{
+						if (!p.hasPermission("booksuite.block.erase.free")
+								&& !p.getGameMode().equals(GameMode.CREATIVE)) {
 							clicked.setData((byte) (clicked.getData() - 1));
 						}
-							
-					}
-					else
-					{
+
+					} else {
 						p.sendMessage(ChatColor.DARK_RED
-									  + "You can only unsign your own books.");
+								+ "You can only unsign your own books.");
 					}
 					event.setCancelled(true);
 
-
-
-				}
-				else if (!p.hasPermission("booksuite.denynowarn.erase"))
-				{
+				} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
 					p.sendMessage(ChatColor.DARK_RED
-								  + "You do not have permission to use erasers.");
-						event.setCancelled(true);
+							+ "You do not have permission to use erasers.");
+					event.setCancelled(true);
 				}
-			}
-			else if (plugin.functions.isMailBox(clicked))
-			{
-				p.openInventory(plugin.mail.getMailBoxInv(p, plugin.getDataFolder().getPath()));
+			} else if (plugin.functions.isMailBox(clicked)) {
+				p.openInventory(plugin.mail.getMailBoxInv(p, plugin
+						.getDataFolder().getPath()));
 				event.setCancelled(true);
 			}
-			//else if (pluggins.functions.isLibrary(clicked)){}
+			// else if (pluggins.functions.isLibrary(clicked)){}
 		}
 
 		// this is for taking a "package/envelope" that contains a "gift" and
 		// opening it into your inventory.
-		//meh ill clean it up later.
-		else if (event.getAction().equals(Action.RIGHT_CLICK_AIR))
-		{
-			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
-			{
+		// meh ill clean it up later.
+		else if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
 				if (!(p.getItemInHand().hasItemMeta() || p.getItemInHand()
 						.getItemMeta() != null))
 					return;
@@ -236,20 +191,25 @@ public class MainListener implements Listener {
 		BookMeta obm = event.getPreviousBookMeta();
 		BookMeta bm = event.getNewBookMeta();
 		if (!event.getPlayer().hasPermission("booksuite.edit.other")
-				&& obm.hasAuthor() && obm.getAuthor() != null
-				&& !plugin.alias.getAliases(event.getPlayer())
-						.contains(obm.getAuthor())) {
-			event.getPlayer().sendMessage(ChatColor.DARK_RED + "You'll need "
-					+ obm.getAuthor() + ChatColor.DARK_RED
-					+ "'s permission to edit this book!");
+				&& obm.hasAuthor()
+				&& obm.getAuthor() != null
+				&& !plugin.alias.getAliases(event.getPlayer()).contains(
+						obm.getAuthor())) {
+			event.getPlayer().sendMessage(
+					ChatColor.DARK_RED + "You'll need " + obm.getAuthor()
+							+ ChatColor.DARK_RED
+							+ "'s permission to edit this book!");
 			event.setCancelled(true);
 			return;
+		} else {
+			// additional authors, TODO
 		}
 
 		String alias = plugin.alias.getActiveAlias(event.getPlayer());
 		if (event.isSigning()) {
 			bm.setAuthor(alias);
-			if (bm.hasLore() && bm.getLore().contains(ChatColor.GRAY + "by " + alias)) {
+			if (bm.hasLore()
+					&& bm.getLore().contains(ChatColor.GRAY + "by " + alias)) {
 				ArrayList<String> lore = (ArrayList<String>) bm.getLore();
 				lore.remove(0);
 				if (lore.isEmpty()) {

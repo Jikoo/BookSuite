@@ -32,8 +32,8 @@ public class Functions {
 	// TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
 	/*
 	 * Honestly what I planned to do for encryption was make the book one page -
-	 * a hash of a random UUID or something (�k<hash>), save the book as that if
-	 * untaken, then allow people to re-import it with the correct hash
+	 * a hash of a random UUID or something (SECTION_SIGNk<hash>), save the book as that
+	 * if untaken, then allow people to re-import it with the correct hash
 	 * (savename). As long as the ingame book editor doesn't improve, I foresee
 	 * no issues.
 	 */
@@ -390,7 +390,8 @@ public class Functions {
 	}
 
 	public boolean isPrintingPress(Block blockToCheck) {
-		if (!BookSuite.getInstance().getConfig().getBoolean("enable-printing-presses")) {
+		if (!BookSuite.getInstance().getConfig()
+				.getBoolean("enable-printing-presses")) {
 			return false;
 		}
 		if (blockToCheck.getType().equals(Material.WORKBENCH)) {
@@ -399,84 +400,67 @@ public class Functions {
 			}
 		}
 		if (isInvertedStairs(blockToCheck)) {
-			if (blockToCheck.getRelative(BlockFace.DOWN).getType().equals(Material.WORKBENCH)){
+			if (blockToCheck.getRelative(BlockFace.DOWN).getType()
+					.equals(Material.WORKBENCH)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean canMakePress(Block clicked, BlockFace clickedFace, ItemStack itemInHand, Player p)
-	{
-		if (! clickedFace.equals(BlockFace.UP))
-		{ // must have clicked on an upwards facing block face
+	public boolean canMakePress(Block clicked, BlockFace clickedFace,
+			ItemStack itemInHand, Player p) {
+		if (!clickedFace.equals(BlockFace.UP)) {
 			return false;
 		}
-		if (! clicked.getType().equals(Material.WORKBENCH))
-		{ // must click on a work bench
+		if (!clicked.getType().equals(Material.WORKBENCH)) {
 			return false;
 		}
-		if (! isCorrectStairType(itemInHand))
-		{ // must click with stairs
+		if (!p.hasPermission("booksuite.copy.createpress")) {
 			return false;
 		}
-		if (! p.hasPermission("booksuite.copy.createpress"))
-		{ // must have permissions
+		if (!isCorrectStairType(itemInHand)) {
 			return false;
 		}
-		if (clicked.getRelative(BlockFace.UP).getType() != Material.AIR)
-		{ // must have room to build it
+		if (clicked.getRelative(BlockFace.UP).getType() != Material.AIR) {
 			return false;
 		}
 		return true;
 	}
 
-	public boolean canErase(Block clicked, ItemStack itemInHand)
-	{
-		if (! itemInHand.getType().equals(Material.WRITTEN_BOOK))
-		{
+	public boolean canErase(Block clicked, ItemStack itemInHand) {
+		if (!itemInHand.getType().equals(Material.WRITTEN_BOOK)) {
 			return false;
 		}
-		if (! clicked.getType().equals(Material.CAULDRON))
-		{
+		if (!clicked.getType().equals(Material.CAULDRON)) {
 			return false;
 		}
-		if (! itemInHand.hasItemMeta())
-		{
+		if (!itemInHand.hasItemMeta()) {
 			return false;
 		}
-		if (itemInHand.getItemMeta() == null)
-		{
+		if (itemInHand.getItemMeta() == null) {
 			return false;
 		}
-		if (! BookSuite.getInstance().getConfig().getBoolean("enable-erasers"))
-		{
+		if (!BookSuite.getInstance().getConfig().getBoolean("enable-erasers")) {
 			return false;
 		}
 		return true;
 	}
-	
-	public boolean isMailBox(Block clicked)
-	{
+
+	public boolean isMailBox(Block clicked) {
 		Sign sign = null;
-		if (clicked.getType().equals(Material.SIGN))
-		{
+		if (clicked.getType().equals(Material.SIGN)) {
 			sign = (Sign) clicked;
-		}
-		else if (clicked.getType().equals(Material.CHEST))
-		{
+		} else if (clicked.getType().equals(Material.CHEST)) {
 			Block up = clicked.getRelative(BlockFace.UP);
-			if (up instanceof Sign)
-			{
-				sign = (Sign)up;
-			}
-			else
-			{
+			if (up instanceof Sign) {
+				sign = (Sign) up;
+			} else {
 				return false;
 			}
 		}
-		//rudimentary example
-		return sign.getLine(0).equals(ChatColor.DARK_RED +
-					                  "No sign line can contain this string.");
+		// rudimentary example
+		return sign.getLine(0).equals(
+				ChatColor.DARK_RED + "No sign line can contain this string.");
 	}
 }
