@@ -154,7 +154,7 @@ public class MainListener implements Listener {
 						.getDataFolder().getPath()));
 				event.setCancelled(true);
 			}
-			// else if (pluggins.functions.isLibrary(clicked)){}
+			// else if (pluggins.functions.isLibrary(clicked, p)){}
 		}
 
 		// this is for taking a "package/envelope" that contains a "gift" and

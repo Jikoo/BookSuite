@@ -463,4 +463,9 @@ public class Functions {
 		return sign.getLine(0).equals(
 				ChatColor.DARK_RED + "No sign line can contain this string.");
 	}
+
+	public boolean isLibrary(Block clicked, Player clicker)
+	{
+		
+	}
 }
