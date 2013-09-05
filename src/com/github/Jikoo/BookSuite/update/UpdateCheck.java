@@ -24,6 +24,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class UpdateCheck implements Listener {
@@ -68,12 +69,11 @@ public class UpdateCheck implements Listener {
 				return true;
 			}
 		} catch (MalformedURLException e) {
-			plugin.getLogger().warning("Error with update URL: " + e);
-			e.printStackTrace();
-			plugin.getLogger().warning(
-					"End error report. Please report this error!");
+			BSLogger.warn("Error with update URL.");
+			BSLogger.err(e);
 		} catch (IOException e) {
-			plugin.getLogger().warning("Error checking for updates!");
+			BSLogger.warn("Error checking for updates!");
+			BSLogger.err(e);
 		}
 		return false;
 	}
@@ -105,9 +105,8 @@ public class UpdateCheck implements Listener {
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			plugin.getLogger().warning(
-					"File check parsing error! Please report this error!");
-			plugin.getLogger().warning("Relevant information: \"" + s + "\"");
+			BSLogger.warn("File check parsing error! Please report this!");
+			BSLogger.warn("Relevant information: \"" + s + "\"");
 			return 0;
 		}
 	}

@@ -14,8 +14,6 @@ package com.github.Jikoo.BookSuite.Library;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import com.github.Jikoo.BookSuite.BookSuite;
-
 public class Voxel {
 	private final int X,Y,Z;
 

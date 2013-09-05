@@ -25,6 +25,7 @@ public class Alias {
 	// TODO javadocs
 	BookSuite plugin = BookSuite.getInstance();
 
+	File aliasFile;
 	FileConfiguration aliasYML;
 
 	enum AliasType {
@@ -46,7 +47,7 @@ public class Alias {
 			type = AliasType.valueOf(plugin.getConfig().getString("alias-mode")
 					.toUpperCase());
 			if (type.equals(AliasType.MULTI)) {
-				File aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
+				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 				if (aliasFile.exists()) {
 					aliasYML = YamlConfiguration.loadConfiguration(aliasFile);
 				} else {
@@ -57,18 +58,22 @@ public class Alias {
 			type = AliasType.DEFAULT;
 			plugin.getConfig().set("alias-mode", "default");
 			plugin.saveConfig();
-			plugin.getLogger().warning(ChatColor.DARK_RED +
-					"Invalid alias type in config, using default setting.");
+			BSLogger.warn("Invalid alias type in config, using default setting.");
 		}
 	}
 
 	public void save() {
 		if (type.equals(AliasType.MULTI)) {
 			try {
-				aliasYML.save(new File(plugin.getDataFolder(), "aliases.yml"));
+				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
+				if (!aliasFile.exists()) {
+					// TODO figure out if this fixes saving issues
+					aliasFile.getParentFile().mkdirs();
+					aliasFile.createNewFile();
+				}
+				aliasYML.save(aliasFile);
 			} catch (IOException e) {
-				plugin.getLogger().warning(
-						ChatColor.DARK_RED + "Could not save aliases.yml!");
+				BSLogger.warn("Could not save aliases.yml!");
 			}
 		}
 	}

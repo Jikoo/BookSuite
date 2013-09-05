@@ -12,7 +12,6 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,9 +20,11 @@ import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
+import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
-	protected final String version = "3.2.0";
+	final String version = "3.2.0";
+
 	public final int currentFile = 14;
 	public boolean hasUpdate;
 	public String updateString;
@@ -35,10 +36,10 @@ public class BookSuite extends JavaPlugin {
 
 	public Functions functions;
 	public FileManager filemanager;
+	public Alias alias;
 	MainListener listener;
 	CommandHandler command;
 	MailExecutor mail;
-	Alias alias;
 
 	private static BookSuite instance;
 
@@ -49,9 +50,12 @@ public class BookSuite extends JavaPlugin {
 
 		saveDefaultConfig();
 
-		if (new UpdateConfig(this).update())
-			getLogger().warning(
-					"Your configuration has been updated, please check it!");
+		if (new UpdateConfig(this).update()) {
+			BSLogger.warn("Your configuration has been updated, please check it!");
+		}
+		if (new UpdateStrings(this).update()) {
+			BSLogger.info("More customization has been added to strings.yml.");
+		}
 
 		mail = MailExecutor.getInstance();
 		functions = Functions.getInstance();
@@ -66,20 +70,19 @@ public class BookSuite extends JavaPlugin {
 
 		try {
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {
-				getLogger().info("Enabling inbuilt permissions.");
+				BSLogger.info("Enabling inbuilt permissions.");
 				perms = new PermissionsListener(this);
 				perms.enable();
 			}
 
 			if (getConfig().getBoolean("enable-metrics")) {
-				getLogger().info("Enabling metrics.");
+				BSLogger.info("Enabling metrics.");
 				try {
 					metrics = new Metrics(this);
 					metrics.start();
-				} catch (IOException e) {
-					getLogger().warning("Error enabling metrics: " + e);
-					e.printStackTrace();
-					getLogger().warning("End error report.");
+				} catch (Exception e) {
+					BSLogger.warn("Error enabling metrics.");
+					BSLogger.err(e);
 					if (metrics != null) {
 						metrics.disable();
 						metrics = null;
@@ -89,11 +92,11 @@ public class BookSuite extends JavaPlugin {
 
 			if (getConfig().getBoolean("update-check")) {
 				if (getConfig().getBoolean("login-update-check")) {
-					getLogger().info("Enabling login update check.");
+					BSLogger.info("Enabling login update check.");
 					update.enableNotifications();
 				}
 
-				getLogger().info("Initiating update check.");
+				BSLogger.info("Initiating update check.");
 
 				update.asyncUpdateCheck(null, false);
 			}
@@ -104,9 +107,8 @@ public class BookSuite extends JavaPlugin {
 			}
 
 		} catch (Exception e) {
-			getLogger().warning("Error loading configuration: " + e);
-			e.printStackTrace();
-			getLogger().warning("End error report.");
+			BSLogger.warn("Error loading configuration.");
+			BSLogger.err(e);
 		}
 
 		if (new File(getDataFolder(), "temp").exists())
@@ -117,7 +119,7 @@ public class BookSuite extends JavaPlugin {
 		command = CommandHandler.getInstance();
 		getCommand("book").setExecutor(command);
 
-		getLogger().info("v" + version + " enabled!");
+		BSLogger.info("v" + version + " enabled!");
 	}
 
 	@Override
@@ -129,8 +131,9 @@ public class BookSuite extends JavaPlugin {
 				metrics.disable();
 				metrics = null;
 			}
-		} catch (IOException e) {
-			getLogger().warning("Error disabling metrics.");
+		} catch (Exception e) {
+			BSLogger.warn("Error disabling metrics.");
+			BSLogger.err(e);
 		}
 
 		if (update != null) {
@@ -148,7 +151,7 @@ public class BookSuite extends JavaPlugin {
 		command = null;
 
 		if (mail != null) {
-			// TODO mail.disable()
+			mail.disable();
 			mail = null;
 		}
 
@@ -157,8 +160,10 @@ public class BookSuite extends JavaPlugin {
 			rules = null;
 		}
 
+		functions.disable();
 		functions = null;
 
+		filemanager.disable();
 		filemanager = null;
 
 		listener.disable();
@@ -166,7 +171,7 @@ public class BookSuite extends JavaPlugin {
 
 		instance = null;
 
-		getLogger().info("BookSuite v" + version + " disabled!");
+		BSLogger.info("BookSuite v" + version + " disabled!");
 	}
 
 	public static BookSuite getInstance() {

@@ -186,12 +186,17 @@ public class MailExecutor {// TODO keep meaning to completely redo this all in
 
 	}
 
-	private MailExecutor() {
-	}
-
-	public static MailExecutor getInstance() {
+	protected static MailExecutor getInstance() {
 		if (instance == null)
 			instance = new MailExecutor();
 		return instance;
+	}
+
+	/**
+	 * 
+	 */
+	protected void disable() {
+		// TODO Auto-generated method stub
+		instance = null;
 	}
 }
