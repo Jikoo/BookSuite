@@ -11,8 +11,6 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
-import java.util.ArrayList;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -38,7 +36,7 @@ public class MainListener implements Listener {
 
 	private static MainListener instance;
 
-	public static MainListener getInstance() {
+	protected static MainListener getInstance() {
 		if (instance == null)
 			instance = new MainListener();
 		return instance;
@@ -112,10 +110,12 @@ public class MainListener implements Listener {
 				clicked.getRelative(BlockFace.UP).setTypeIdAndData(
 						is.getTypeId(),
 						plugin.functions.getCorrectStairOrientation(p), true);
-				if (is.getAmount() == 1) {
-					p.setItemInHand(null);
-				} else {
-					is.setAmount(is.getAmount() - 1);
+				if (p.getGameMode() != GameMode.CREATIVE) {
+					if (is.getAmount() == 1) {
+						p.setItemInHand(null);
+					} else {
+						is.setAmount(is.getAmount() - 1);
+					}
 				}
 				event.setCancelled(true);
 				p.updateInventory();
@@ -155,8 +155,9 @@ public class MainListener implements Listener {
 			} else if (plugin.functions.isMailBox(clicked)) {
 				p.openInventory(plugin.mail.getMailBoxInv(p));
 				event.setCancelled(true);
-			}
-			// else if (pluggins.functions.isLibrary(clicked, p)){}
+			} /*else if (plugin.functions.isLibrary(clicked, p)){
+				
+			}*/
 		}
 
 		
@@ -194,50 +195,40 @@ public class MainListener implements Listener {
 		}
 	}
 
+	/**
+	 * When a player closes a book, this event is fired.
+	 * BookSuite introduces several literary protection features - all
+	 * players who work on a book are credited in order of edit.
+	 * 
+	 * @param event
+	 *            the PlayerBookEditEvent
+	 */
 	@EventHandler
 	public void onBookEdit(PlayerEditBookEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		BookMeta obm = event.getPreviousBookMeta();
 		BookMeta bm = event.getNewBookMeta();
+
 		if (!event.getPlayer().hasPermission("booksuite.edit.other")
 				&& obm.hasAuthor()
-				&& obm.getAuthor() != null
-				&& !plugin.alias.getAliases(event.getPlayer()).contains(
-						obm.getAuthor())) {
-			event.getPlayer().sendMessage(
-					ChatColor.DARK_RED + "You'll need " + obm.getAuthor()
-							+ ChatColor.DARK_RED
-							+ "'s permission to edit this book!");
+				&& obm.getAuthor() != null) {
 			event.setCancelled(true);
+			for (String author : plugin.functions.parseAuthors(obm.getAuthor())) {
+				if (plugin.alias.getAliases(event.getPlayer()).contains(author)) {
+					event.setCancelled(false);
 			return;
-		} else {
-			// additional authors, TODO
+				}
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + "You'll need " + obm.getAuthor()
+							+ ChatColor.DARK_RED + "'s permission to edit this book!");
+			}
 		}
 
 		String alias = plugin.alias.getActiveAlias(event.getPlayer());
-		if (event.isSigning()) {
-			bm.setAuthor(alias);
-			if (bm.hasLore()
-					&& bm.getLore().contains(ChatColor.GRAY + "by " + alias)) {
-				ArrayList<String> lore = (ArrayList<String>) bm.getLore();
-				lore.remove(0);
-				if (lore.isEmpty()) {
-					lore = null;
-				}
-				bm.setLore(lore);
-			}
-		} else if (event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
-			bm.setAuthor(alias);
-			ArrayList<String> lore = new ArrayList<String>();
-			if (bm.hasLore()) {
-				if (!bm.getLore().contains(ChatColor.GRAY + "by " + alias)) {
-					lore.add(ChatColor.GRAY + "by " + alias);
-					lore.addAll(bm.getLore());
-					bm.setLore(lore);
-				}
-			} else {
-				lore.add(ChatColor.GRAY + "by " + alias);
-				bm.setLore(lore);
-			}
+		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
+			bm = plugin.functions.addAuthor(bm, obm.getAuthor(), alias, event.isSigning());
 		}
 		event.setNewBookMeta(bm);
 	}

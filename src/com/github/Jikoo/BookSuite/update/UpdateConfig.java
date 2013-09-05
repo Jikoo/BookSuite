@@ -35,8 +35,7 @@ public class UpdateConfig {
 
 		for (String s : options) {
 			if (!current.contains(s)) {
-				plugin.getConfig().set(s,
-						plugin.getConfig().getDefaults().get(s));
+				plugin.getConfig().set(s, plugin.getConfig().getDefaults().get(s));
 				changed = true;
 			}
 		}

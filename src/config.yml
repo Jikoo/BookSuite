@@ -62,3 +62,7 @@ enable-metrics: true
 update-check: true
 allow-update-command: true
 login-update-check: true
+
+###  DEBUG  ###
+# This option will print out a trace of non-gamebreaking errors.
+debug-mode: false
