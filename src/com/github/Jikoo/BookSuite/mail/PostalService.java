@@ -46,7 +46,8 @@ public class PostalService {
 	public PostalService() {
 		try {
 			// use buffering
-			InputStream file = new FileInputStream("quarks.ser");
+			InputStream file = new FileInputStream(BookSuite.getInstance()
+					.getDataFolder() + "/mail.post");
 			InputStream buffer = new BufferedInputStream(file);
 			ObjectInput input = new ObjectInputStream(buffer);
 			@SuppressWarnings("unchecked")
@@ -104,6 +105,7 @@ public class PostalService {
 		} catch (IOException ex) {
 			BookSuite.getInstance().getServer().getLogger()
 					.log(Level.SEVERE, "none of the mail data was saved!!!");
+			ex.printStackTrace();
 		}
 	}
 }

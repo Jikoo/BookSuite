@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.Jikoo.BookSuite.mail.PostalService;
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 import com.github.Jikoo.BookSuite.rules.Rules;
@@ -122,6 +123,8 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		PostalService.getInstance().writeToFile();
+		
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
 		try {

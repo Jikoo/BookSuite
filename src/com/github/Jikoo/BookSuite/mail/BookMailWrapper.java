@@ -10,10 +10,15 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.mail;
 
+import java.io.Serializable;
+import java.util.List;
+
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class BookMailWrapper {
+public class BookMailWrapper implements Serializable{
 	/*
 	 * The structure for a letter or package is as follows:
 	 * 
@@ -36,25 +41,36 @@ public class BookMailWrapper {
 	 * should increase their inventory free space
 	 */
 
-	private BookMeta bm;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6365444142867806360L;
 
 	private boolean letter = false;
 	private boolean pack = false;
-
 	private String sender;
 	private String adressee;
+	
+	//replaces storing the bookmeta for serialization
+	private String title;
+	private List<String> pages;
+	private List<String> lore;
+	
 
 	public BookMailWrapper(BookMeta bm) {
-		this.bm = bm;
+		this.title = bm.getTitle();
+		this.adressee = bm.getPage(1).toString();
+		this.pages = bm.getPages();
+		if (bm.hasLore()){
+			this.lore = bm.getLore();
+		}
+		
 		this.sender = bm.getAuthor();
-		this.letter = "letter".equalsIgnoreCase(bm.getTitle());
-		this.pack = "package".equalsIgnoreCase(bm.getTitle());
+		this.letter = "letter".equalsIgnoreCase(title);
+		this.pack = "package".equalsIgnoreCase(title);
 	}
 
 	public String getAdressee() {
-		if (this.adressee == null) {
-			this.adressee = this.bm.getPage(1).toString();
-		}
 		return this.adressee;
 	}
 
@@ -71,7 +87,15 @@ public class BookMailWrapper {
 	}
 
 	public BookMeta getAllMeta() {
-		return this.bm;
+		ItemStack i = new ItemStack(Material.WRITTEN_BOOK);
+		BookMeta bm = (BookMeta) i.getItemMeta();
+		bm.setAuthor(sender);
+		if (lore!=null){
+			bm.setLore(lore);
+		}
+		bm.setPages(pages);
+		bm.setTitle(title);
+		return bm;
 	}
 
 	/*
