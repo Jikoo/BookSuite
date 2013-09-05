@@ -50,7 +50,7 @@ public class CommandHandler implements CommandExecutor {
 		return instance;
 	}
 
-	enum CommandPermissions {
+	public enum CommandPermissions {
 		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, EXPORT, LIST, DELETE, RELOAD, UPDATE;
 
 		public boolean checkPermission(CommandSender s) {

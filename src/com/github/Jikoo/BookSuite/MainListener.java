@@ -30,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.Jikoo.BookSuite.copy.PrintingPress;
+import com.github.Jikoo.BookSuite.mail.MailBox;
 
 public class MainListener implements Listener {
 
@@ -152,39 +153,44 @@ public class MainListener implements Listener {
 					event.setCancelled(true);
 				}
 			} else if (plugin.functions.isMailBox(clicked)) {
-				p.openInventory(plugin.mail.getMailBoxInv(p, plugin
-						.getDataFolder().getPath()));
+				p.openInventory(plugin.mail.getMailBoxInv(p));
 				event.setCancelled(true);
 			}
 			// else if (pluggins.functions.isLibrary(clicked, p)){}
 		}
 
+		
+		// this stuff was a feature, not sure if it works, so I'm going to replace it
 		// this is for taking a "package/envelope" that contains a "gift" and
 		// opening it into your inventory.
 		// meh ill clean it up later.
-		else if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-			if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				if (!(p.getItemInHand().hasItemMeta() || p.getItemInHand()
-						.getItemMeta() != null))
-					return;
-				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				if (bm.getTitle().contains("Package: ")) {
-					if (plugin.mail.loadMail(p, bm, plugin.getDataFolder()
-							.getPath()))
-						event.setCancelled(true);
-				} else if (p.hasPermission("booksuite.mail.send")
-						&& bm.getTitle().equalsIgnoreCase("package"))
-					if (plugin.mail.sendMail(p, bm, plugin.getDataFolder()
-							.getPath()))
-						event.setCancelled(true);
-			}
-		}
+		//else if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+		//	if (p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+		//		if (!(p.getItemInHand().hasItemMeta() || p.getItemInHand()
+		//				.getItemMeta() != null))
+		//			return;
+		//		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+		//		if (bm.getTitle().equalsIgnoreCase("package")) {
+		//			if (plugin.mail.loadMail(p, bm, plugin.getDataFolder()
+		//					.getPath())){
+		//				event.setCancelled(true);
+		//			}
+		//		} else if (p.hasPermission("booksuite.mail.send")
+		//				&& bm.getTitle().equalsIgnoreCase("package")){
+		//			if (plugin.mail.sendMail(p, bm, plugin.getDataFolder()
+		//					.getPath())){
+		//				event.setCancelled(true);
+		//			}
+		//		}
+		//	}
+		//}
 	}
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
 		if (event.getInventory().getTitle().contains("'s MailBox")) {
-			plugin.mail.WriteMailContents(event.getInventory());
+			//plugin.mail.WriteMailContents(event.getInventory());
+			MailBox.getMailBox(event.getPlayer().getName()).sendMail(event.getInventory());
 		}
 	}
 

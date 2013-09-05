@@ -21,6 +21,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -34,7 +35,7 @@ public class Functions {
 	 * Honestly what I planned to do for encryption was make the book one page -
 	 * a hash of a random UUID or something (SECTION_SIGNk<hash>), save the book as that
 	 * if untaken, then allow people to re-import it with the correct hash
-	 * (savename). As long as the ingame book editor doesn't improve, I foresee
+	 * (savename). As long as the in game book editor doesn't improve, I foresee
 	 * no issues.
 	 */
 	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135,
@@ -535,10 +536,10 @@ public class Functions {
 	 */
 	public boolean isMailBox(Block clicked) {
 		Sign sign = null;
-		if (clicked.getType().equals(Material.SIGN)) {
-			sign = (Sign) clicked;
+		if (clicked.getState() instanceof Sign) {
+			sign = (Sign) clicked.getState();
 		} else if (clicked.getType().equals(Material.CHEST)) {
-			Block up = clicked.getRelative(BlockFace.UP);
+			BlockState up = clicked.getRelative(BlockFace.UP).getState();
 			if (up instanceof Sign) {
 				sign = (Sign) up;
 			} else {
@@ -546,8 +547,7 @@ public class Functions {
 			}
 		}
 		// rudimentary example
-		return sign.getLine(0).equals(
-				ChatColor.DARK_RED + "No sign line can contain this string.");
+		return sign!=null && "mail".equals(sign.getLine(0));
 	}
 
 	/**

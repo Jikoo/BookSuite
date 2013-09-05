@@ -17,6 +17,8 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import com.github.Jikoo.BookSuite.BookSuite;
+
 public class PostalService {
 	Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
 
@@ -40,6 +42,7 @@ public class PostalService {
 			this.inventory.put(bmw.getAdressee(),
 					new LinkedList<BookMailWrapper>());
 		}
+		
 		this.inventory.get(bmw.getAdressee()).add(bmw);
 	}
 

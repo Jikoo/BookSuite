@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 public class MailBox {
 	private static Map<String, MailBox> boxes = new HashMap<String, MailBox>();
@@ -30,7 +31,7 @@ public class MailBox {
 
 	public static MailBox getMailBox(String p) {
 		if (boxes.get(p) == null) {
-			boxes.put(p, new MailBox(p, 5));
+			boxes.put(p, new MailBox(p, 9));
 		}
 		return boxes.get(p);
 	}
@@ -44,14 +45,28 @@ public class MailBox {
 		this.maxSize = size;
 	}
 
-	public void sendMail() {
-
+	public void sendMail(Inventory y) {
+		List<BookMailWrapper> inv = new LinkedList<BookMailWrapper>();
+		for (ItemStack i : y) {
+			if (i != null && i.getType().equals(Material.WRITTEN_BOOK)) {
+				BookMeta b = (BookMeta) i.getItemMeta();
+				boolean l = "letter".equalsIgnoreCase(b.getTitle());
+				boolean p = "package".equalsIgnoreCase(b.getTitle());
+				if (l || p) {
+					PostalService.getInstance().collect(new BookMailWrapper(b));
+				}
+				else {
+					inv.add(new BookMailWrapper(b));
+				}
+			}
+		}
+		this.inventory = inv;
 	}
 
 	public void getMail() {
 		if (this.inventory.size() < this.maxSize) {
-			PostalService.getInstance().distribute(user,
-					this.maxSize - this.inventory.size());
+			this.inventory.addAll(PostalService.getInstance().distribute(user,
+					this.maxSize - this.inventory.size()));
 		}
 	}
 
@@ -60,10 +75,12 @@ public class MailBox {
 				+ "'s MailBox");
 		getMail();
 
-		for (BookMailWrapper bwm : this.inventory) {
-			ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-			is.setItemMeta(bwm.getAllMeta());
-			mailbox.addItem(is);
+		if (p.getName().equals(this.user)) {
+			for (BookMailWrapper bwm : this.inventory) {
+				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
+				is.setItemMeta(bwm.getAllMeta());
+				mailbox.addItem(is);
+			}
 		}
 
 		return mailbox;

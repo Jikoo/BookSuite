@@ -22,6 +22,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
+import com.github.Jikoo.BookSuite.mail.MailBox;
+
 public class MailExecutor {// TODO keep meaning to completely redo this all in
 							// favor of mailboxes/postboxes
 	private Functions functions = Functions.getInstance();
@@ -132,30 +134,8 @@ public class MailExecutor {// TODO keep meaning to completely redo this all in
 		return false;
 	}
 
-	public Inventory getMailBoxInv(Player p, String pluginDataFolder) {
-		Inventory mailbox = Bukkit.createInventory(p, 2, p.getName()
-				+ "'s MailBox");
-
-		Scanner s;
-		try {
-			s = new Scanner(pluginDataFolder + "/Mail/" + p.getName()
-					+ "/index.bsm");
-			while (s.hasNext()) {
-				if (mailbox.firstEmpty() != -1) {
-					ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-					is.setItemMeta(filemanager.makeBookMetaFromText(p,
-							s.nextLine() + ".book", pluginDataFolder + "/Mail/"
-									+ p.getName() + "/Books/", false));
-					mailbox.addItem(is);
-				}
-
-			}
-			s.close();
-		} catch (Exception e) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You have not receved any mail yet.");
-		}
-		return mailbox;
+	public Inventory getMailBoxInv(Player p) {
+		return MailBox.getMailBox(p).open(p);
 	}
 
 	public String[] parseSendingData(String firstPage) {
@@ -184,9 +164,6 @@ public class MailExecutor {// TODO keep meaning to completely redo this all in
 	public void WriteMailContents(Inventory inventory) {
 		// TODO Auto-generated method stub
 
-	}
-
-	private MailExecutor() {
 	}
 
 	public static MailExecutor getInstance() {
