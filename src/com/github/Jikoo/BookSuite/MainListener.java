@@ -65,8 +65,8 @@ public class MainListener implements Listener {
 			// if clicking a workbench, check to see if it is a press and act
 			// accordingly
 			if (plugin.functions.isPrintingPress(clicked)) {
-				PrintingPress press = new PrintingPress(plugin,
-						p.getName(), clicked);
+				PrintingPress press = new PrintingPress(plugin, p.getName(),
+						clicked);
 
 				if (!p.hasPermission("booksuite.denynowarn.press")) {
 					if (is.getType().equals(Material.MAP)) {
@@ -106,8 +106,10 @@ public class MainListener implements Listener {
 						return;
 					}
 				}
-			} else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
-				clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
+			} else if (plugin.functions.canMakePress(clicked,
+					event.getBlockFace(), is, p)) {
+				clicked.getRelative(BlockFace.UP).setTypeIdAndData(
+						is.getTypeId(),
 						plugin.functions.getCorrectStairOrientation(p), true);
 				if (is.getAmount() == 1) {
 					p.setItemInHand(null);
