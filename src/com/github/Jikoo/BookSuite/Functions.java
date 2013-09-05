@@ -40,6 +40,7 @@ public class Functions {
 	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135,
 			136, 156 };
 
+	
 	/**
 	 * master method for checking if the player can obtain the books
 	 * 
@@ -88,11 +89,22 @@ public class Functions {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param p the player
+	 * @return whether p (the player) has enough room to store a book
+	 */
 	public boolean hasRoom(Player p) {
 		return p.getInventory().firstEmpty() != -1 || hasStackingRoom(p);
 	}
 
-	public boolean hasStackingRoom(Player p) {
+	/**
+	 * HELPER FUNCTION for hasRoom
+	 * 
+	 * @param p the player
+	 * @return whether p (the player) has enough room to store a book
+	 */
+	private boolean hasStackingRoom(Player p) {
 		if (!p.hasPermission("booksuite.copy.stack"))
 			return false;
 
@@ -173,6 +185,12 @@ public class Functions {
 			return false;
 	}
 
+	/**
+	 * 
+	 * copies the book that the player is currently holding
+	 * 
+	 * @param p the player
+	 */
 	@SuppressWarnings("deprecation")
 	public void copy(Player p) {
 		if (p.hasPermission("booksuite.copy.stack")
@@ -210,12 +228,21 @@ public class Functions {
 		p.updateInventory();
 	}
 
+	/**
+	 * 
+	 * @param p the player in whose inventory the duplication will be done
+	 */
 	public void newDuplicate(Player p) {
 		ItemStack duplicate = p.getItemInHand().clone();
 		duplicate.setAmount(1);
 		p.getInventory().addItem(duplicate);
 	}
 
+	/**
+	 * 
+	 * @param p the player who triggers the unsign event
+	 * @return  whether the unsigning was successful
+	 */
 	public boolean unsign(Player p) {
 		ItemStack unsign = p.getItemInHand();
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)
@@ -230,6 +257,12 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param p the player who triggers the event
+	 * @param newAuthor the name of the author to set as the book's author
+	 * @return whether the change of author was successful
+	 */
 	public boolean setAuthor(Player p, String newAuthor) {
 		ItemStack book = p.getItemInHand();
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
@@ -240,6 +273,12 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param p the player who triggers the event
+	 * @param newTitle the new title of the book to be set
+	 * @return whether the setting of the title was completed successfully
+	 */
 	public boolean setTitle(Player p, String newTitle) {
 		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
 			return false;
@@ -250,6 +289,13 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param p the player wo triggers the event
+	 * @param pageNumber the place the page is to be inserted
+	 * @param text the text that goes on the page
+	 * @return the whether the user was successfull in their attempt at inserting a page
+	 */
 	public boolean insertPageAt(Player p, String pageNumber, String text) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
 			p.sendMessage(ChatColor.DARK_RED
@@ -285,6 +331,12 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param p the player who triggers the event
+	 * @param pageNumber the page to be deleted
+	 * @return whether the player was successful in deleting the page
+	 */
 	public boolean deletePageAt(Player p, String pageNumber) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
 			p.sendMessage(ChatColor.DARK_RED
@@ -319,6 +371,11 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param p the player who triggered the event and whom is to be tested for this property
+	 * @return whether p (the player) can obtain a map
+	 */
 	public boolean canObtainMap(Player p) {
 		if (p.hasPermission("booksuite.copy.map")) {
 			Inventory inv = p.getInventory();
@@ -364,6 +421,11 @@ public class Functions {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param is the stack of stairs to be tested
+	 * @return whether the item is an acceptable type of stair
+	 */
 	public boolean isCorrectStairType(ItemStack is) {
 		for (int i : ACCEPTABLE)
 			if (i == is.getTypeId())
@@ -371,6 +433,11 @@ public class Functions {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param p the player who triggered the event
+	 * @return the proper orientation byte for the stair
+	 */
 	public byte getCorrectStairOrientation(Player p) {
 		byte playerFace = (byte) Math.round(p.getLocation().getYaw() / 90);
 		if (playerFace == 0 || playerFace == -4 || playerFace == 4)
@@ -382,13 +449,13 @@ public class Functions {
 		else
 			return 4;// open west
 	}
+	
 
-	public static Functions getInstance() {
-		if (instance == null)
-			instance = new Functions();
-		return instance;
-	}
-
+	/**
+	 * 
+	 * @param blockToCheck the block to check
+	 * @return whether this block is a stair or crafting table part of a printing press
+	 */
 	public boolean isPrintingPress(Block blockToCheck) {
 		if (!BookSuite.getInstance().getConfig()
 				.getBoolean("enable-printing-presses")) {
@@ -408,6 +475,14 @@ public class Functions {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param clicked the clicked block
+	 * @param clickedFace the face of the block that was clicked
+	 * @param itemInHand the item in the hand of the player
+	 * @param p the player who clicked
+	 * @return whether the player is allowed and has met the criteria for creating a printing press
+	 */
 	public boolean canMakePress(Block clicked, BlockFace clickedFace,
 			ItemStack itemInHand, Player p) {
 		if (!clickedFace.equals(BlockFace.UP)) {
@@ -428,6 +503,12 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param clicked the block that was clicked
+	 * @param itemInHand the item the user was holding when the event was triggered
+	 * @return whether the user who triggered the event is able to erase this book (note: permissions are factored in later)
+	 */
 	public boolean canErase(Block clicked, ItemStack itemInHand) {
 		if (!itemInHand.getType().equals(Material.WRITTEN_BOOK)) {
 			return false;
@@ -447,6 +528,11 @@ public class Functions {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param clicked the block that was clicked
+	 * @return whether the block is a sign or chest that is part of a mailbox
+	 */
 	public boolean isMailBox(Block clicked) {
 		Sign sign = null;
 		if (clicked.getType().equals(Material.SIGN)) {
@@ -464,8 +550,28 @@ public class Functions {
 				ChatColor.DARK_RED + "No sign line can contain this string.");
 	}
 
-	public boolean isLibrary(Block clicked, Player clicker)
-	{
-		
+	/**
+	 * 
+	 * TODO: MAKE THIS WORK
+	 * 
+	 * @param clicked the block that was clicked
+	 * @param clicker the player who clicked the block
+	 * @return whether block that the player clicked is part of a library
+	 */
+	public boolean isLibrary(Block clicked, Player clicker) {
+		return false;
 	}
+
+	/**
+	 * 
+	 * SINGLETON
+	 * 
+	 * @return an instance of the functions file for use in other classes
+	 */
+	public static Functions getInstance() {
+		if (instance == null)
+			instance = new Functions();
+		return instance;
+	}
+
 }
