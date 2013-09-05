@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("unused")
 public class Library {
 
 	Map<Player, List<Book>> checkouts = new HashMap<Player, List<Book>>();

@@ -23,23 +23,25 @@ import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
-	final String version = "3.2.0";
+	protected final String version = "3.2.0";
 
 	public final int currentFile = 14;
 	public boolean hasUpdate;
 	public String updateString;
 
-	UpdateCheck update;
-	PermissionsListener perms;
-	Rules rules;
-	Metrics metrics;
+	protected UpdateCheck update;
+	protected PermissionsListener perms;
+	protected Rules rules;
+	protected Metrics metrics;
 
 	public Functions functions;
 	public FileManager filemanager;
 	public Alias alias;
-	MainListener listener;
-	CommandHandler command;
-	MailExecutor mail;
+	public MailExecutor mail;
+
+	private MainListener listener;
+	private CommandHandler command;
+
 
 	private static BookSuite instance;
 

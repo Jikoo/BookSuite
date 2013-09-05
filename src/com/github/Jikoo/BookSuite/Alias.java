@@ -25,7 +25,6 @@ public class Alias {
 	// TODO javadocs
 	BookSuite plugin = BookSuite.getInstance();
 
-	File aliasFile;
 	FileConfiguration aliasYML;
 
 	enum AliasType {
@@ -47,7 +46,7 @@ public class Alias {
 			type = AliasType.valueOf(plugin.getConfig().getString("alias-mode")
 					.toUpperCase());
 			if (type.equals(AliasType.MULTI)) {
-				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
+				File aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
 				if (aliasFile.exists()) {
 					aliasYML = YamlConfiguration.loadConfiguration(aliasFile);
 				} else {
@@ -65,13 +64,7 @@ public class Alias {
 	public void save() {
 		if (type.equals(AliasType.MULTI)) {
 			try {
-				aliasFile = new File(plugin.getDataFolder(), "aliases.yml");
-				if (!aliasFile.exists()) {
-					// TODO figure out if this fixes saving issues
-					aliasFile.getParentFile().mkdirs();
-					aliasFile.createNewFile();
-				}
-				aliasYML.save(aliasFile);
+				aliasYML.save(new File(plugin.getDataFolder(), "aliases.yml"));
 			} catch (IOException e) {
 				BSLogger.warn("Could not save aliases.yml!");
 			}
