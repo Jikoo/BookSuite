@@ -29,18 +29,10 @@ import org.bukkit.inventory.meta.BookMeta;
 
 public class Functions {
 	private static Functions instance = null;
-	// TODO "encryption" function ADDED A SKIEN ENCRYPTION to .misc
-	/*
-	 * Honestly what I planned to do for encryption was make the book one page -
-	 * a hash of a random UUID or something (SECTION_SIGNk<hash>), save the book as that
-	 * if untaken, then allow people to re-import it with the correct hash
-	 * (savename). As long as the ingame book editor doesn't improve, I foresee
-	 * no issues.
-	 */
+	private final char SECTION_SIGN = '\u00A7';
 	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135,
 			136, 156 };
 
-	
 	/**
 	 * master method for checking if the player can obtain the books
 	 * 
@@ -54,38 +46,24 @@ public class Functions {
 		if (p.hasPermission("booksuite.book.free")
 				|| p.getGameMode().equals(GameMode.CREATIVE)) {
 			if (!hasRoom(p)) {
-				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
+				p.sendMessage(Msgs.FAILURE_SPACE.getMessage());
 				return false;
 			}
 			return true;
 		}
 		String supplies = checkBookSupplies(inv);
-		if (supplies.equals("crafted")) {
+		if (supplies == null) {
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.BOOK, 1));
 			if (!hasRoom(p)) {
-				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
+				p.sendMessage(Msgs.FAILURE_SPACE.getMessage());
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.addItem(new ItemStack(Material.BOOK, 1));
 				return false;
 			}
 			return true;
 		}
-		if (supplies.equals("uncrafted")) {
-			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
-			inv.removeItem(new ItemStack(Material.PAPER, 3));
-			inv.removeItem(new ItemStack(Material.LEATHER, 1));
-			if (!hasRoom(p)) {
-				p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
-				inv.addItem(new ItemStack(Material.INK_SACK, 1));
-				inv.removeItem(new ItemStack(Material.PAPER, 3));
-				inv.removeItem(new ItemStack(Material.LEATHER, 1));
-				return false;
-			}
-			return true;
-		}
-		p.sendMessage(ChatColor.DARK_RED + "To create a book, you need "
-				+ supplies + ".");
+		p.sendMessage(supplies);
 		return false;
 	}
 
@@ -134,17 +112,13 @@ public class Functions {
 	 */
 	public String checkBookSupplies(Inventory inv) {
 		if (inv.contains(Material.BOOK) && inv.contains(Material.INK_SACK)) {
-			return "crafted";
+			return null;
 		} else if (inv.contains(Material.INK_SACK)) {
-			if (inv.contains(new ItemStack(Material.PAPER, 3))
-					&& inv.contains(Material.LEATHER)) {
-				return "uncrafted";
-			}
-			return "a book";
+			return Msgs.FAILURE_COPY_BOOK.getMessage();
 		} else if (inv.contains(Material.BOOK)) {
-			return "an ink sack";
+			return Msgs.FAILURE_COPY_INK.getMessage();
 		}
-		return "a book and an ink sack";
+		return Msgs.FAILURE_COPY_BOTH.getMessage();
 	}
 
 	/**
@@ -158,11 +132,9 @@ public class Functions {
 		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
 			return true;
 		else if (p.hasPermission("booksuite.copy.self"))
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You do not have permission to copy others' books.");
+			p.sendMessage(Msgs.FAILURE_PERMISSION_COPY_OTHER.getMessage());
 		else
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You do not have permission to copy books.");
+			p.sendMessage(Msgs.FAILURE_PERMISSION_COPY.getMessage());
 		return false;
 	}
 
@@ -178,8 +150,7 @@ public class Functions {
 				&& (a.equals(null) || a.equals(p.getName())))
 			return true;
 		else if (p.hasPermission("booksuite.command.copy")) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You do not have permission to copy others' books.");
+			p.sendMessage(Msgs.FAILURE_PERMISSION_COPY_OTHER.getMessage());
 			return false;
 		} else
 			return false;
@@ -298,8 +269,7 @@ public class Functions {
 	 */
 	public boolean insertPageAt(Player p, String pageNumber, String text) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You must be holding a book and quill to use this command!");
+			p.sendMessage(Msgs.FAILURE_EDIT_NOBAQ.getMessage());
 			return false;
 		}
 		ItemStack book = p.getItemInHand();
@@ -314,18 +284,13 @@ public class Functions {
 			}
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "Correct usage is \"/book addpage <page number> [optional page text]\"");
+			p.sendMessage(Msgs.FAILURE_USAGE.getMessage() + Msgs.USAGE_EDIT_ADDPAGE.getMessage());
 			return false;
 		} catch (IndexOutOfBoundsException e1) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "Please enter a number between 1 and "
-					+ (bm.getPageCount() - 1) + ".");
+			p.sendMessage(Msgs.FAILURE_EDIT_INVALIDNUMBER.getMessage());
 			return false;
 		} catch (Exception e2) {
-			System.err.println("[BookSuite] Functions.insertPageAt: " + e2);
-			e2.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+			BSLogger.err(e2);
 		}
 		book.setItemMeta(bm);
 		return true;
@@ -339,8 +304,7 @@ public class Functions {
 	 */
 	public boolean deletePageAt(Player p, String pageNumber) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You must be holding a book and quill to use this command!");
+			p.sendMessage(Msgs.FAILURE_EDIT_NOBAQ.getMessage());
 			return false;
 		}
 		ItemStack book = p.getItemInHand();
@@ -354,18 +318,13 @@ public class Functions {
 			}
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "Correct usage is \"/book delpage <page number>\"");
+			p.sendMessage(Msgs.FAILURE_USAGE.getMessage() + Msgs.USAGE_EDIT_DELPAGE.getMessage());
 			return false;
 		} catch (IndexOutOfBoundsException e1) {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "Please enter a number between 1 and "
-					+ (bm.getPageCount() - 1) + ".");
+			p.sendMessage(Msgs.FAILURE_EDIT_INVALIDNUMBER.getMessage());
 			return false;
 		} catch (Exception e2) {
-			System.err.println("[BookSuite] Functions.insertPageAt: " + e2);
-			e2.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+			BSLogger.err(e2);
 		}
 		book.setItemMeta(bm);
 		return true;
@@ -383,7 +342,7 @@ public class Functions {
 					|| p.getGameMode().equals(GameMode.CREATIVE)) {
 				if (inv.firstEmpty() == -1
 						&& p.getItemInHand().getAmount() == 64) {
-					p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
+					p.sendMessage(Msgs.FAILURE_SPACE.getMessage());
 					return false;
 				} else
 					return true;
@@ -391,18 +350,16 @@ public class Functions {
 				inv.remove(new ItemStack(Material.PAPER, 9));
 				if (inv.firstEmpty() == -1) {
 					inv.addItem(new ItemStack(Material.PAPER, 9));
-					p.sendMessage(ChatColor.DARK_RED + "Inventory full!");
+					p.sendMessage(Msgs.FAILURE_SPACE.getMessage());
 					return false;
 				} else
 					return true;
 			} else {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You need 9 paper to copy a map.");
+				p.sendMessage(Msgs.FAILURE_COPY_MAP.getMessage());
 				return false;
 			}
 		} else {
-			p.sendMessage(ChatColor.DARK_RED
-					+ "You do not have permission to copy maps.");
+			p.sendMessage(Msgs.FAILURE_PERMISSION_COPY.getMessage());
 			return false;
 		}
 	}
@@ -563,15 +520,116 @@ public class Functions {
 	}
 
 	/**
+	 * Parses file text.
+	 * 
+	 * @param text
+	 *            the <code>String</code> to parse
+	 * @return the <code>String</code> after parsing
+	 */
+	public String parseBML(String text) {
+		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", SECTION_SIGN
+				+ "o");
+		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", SECTION_SIGN + "l");
+		text = text
+				.replaceAll("(<|\\[)u(nderline)?(>|\\])", SECTION_SIGN + "n");
+		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", SECTION_SIGN
+				+ "m");
+		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])",
+				SECTION_SIGN + "k");
+
+		text = text.replaceAll("(<|\\[)color=", "<");
+		text = text.replaceAll("(<|\\[)black(>|\\])", SECTION_SIGN + "0");
+		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", SECTION_SIGN + "1");
+		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", SECTION_SIGN + "2");
+		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", SECTION_SIGN + "3");
+		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", SECTION_SIGN + "4");
+		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", SECTION_SIGN
+				+ "5");
+		text = text.replaceAll("(<|\\[)gold(>|\\])", SECTION_SIGN + "6");
+		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", SECTION_SIGN + "7");
+		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", SECTION_SIGN
+				+ "8");
+		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])",
+				SECTION_SIGN + "9");
+		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])",
+				SECTION_SIGN + "a");
+		text = text.replaceAll("(<|\\[)aqua(>|\\])", SECTION_SIGN + "b");
+		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", SECTION_SIGN
+				+ "c");
+		text = text.replaceAll("(<|\\[)pink(>|\\])", SECTION_SIGN + "d");
+		text = text.replaceAll("(<|\\[)yellow(>|\\])", SECTION_SIGN + "e");
+		text = text.replaceAll("(<|\\[)white(>|\\])", SECTION_SIGN + "f");
+
+		text = text.replaceAll("&([a-fk-orA-FK-OR0-9])", SECTION_SIGN + "$1");
+
+		text = text.replaceAll(
+				"(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?"
+						+ "|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])",
+				SECTION_SIGN + "r");
+		text = text.replaceAll("(<|\\[)/color(>|\\])", SECTION_SIGN + "0");
+		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
+		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
+		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
+		text = text.replaceAll("<plugin.version>", BookSuite.getInstance().version);
+		return text;
+	}
+
+	public String[] parseAuthors(String authors) {
+		return authors.replaceAll(", and", ", ").split(", ");
+	}
+
+	/**
+	 * Adds an author to a book. Adds/edits fake lore if not a signing event,
+	 * otherwise removes existing faked lore
+	 * 
+	 * @param bm
+	 * the <code>BookMeta</code> to edit
+	 * @param author
+	 * name to add as an author
+	 * @param signing
+	 * true if the book being converted into a written book
+	 */
+	public BookMeta addAuthor(BookMeta bm, String oldAuthors, String author, boolean signing) {
+		// TODO Auto-generated method stub
+		if (bm.hasLore()
+				&& bm.getLore().contains(ChatColor.GRAY + "by " + author)) {
+			ArrayList<String> lore = (ArrayList<String>) bm.getLore();
+			lore.remove(0);
+			if (lore.isEmpty()) {
+				lore = null;
+			}
+			bm.setLore(lore);
+		}
+		
+
+		bm.setAuthor(author);
+		ArrayList<String> lore = new ArrayList<String>();
+		if (bm.hasLore()) {
+			if (!bm.getLore().contains(ChatColor.GRAY + "by " + author)) {
+				lore.add(ChatColor.GRAY + "by " + author);
+				lore.addAll(bm.getLore());
+				bm.setLore(lore);
+			}
+		} else {
+			lore.add(ChatColor.GRAY + "by " + author);
+			bm.setLore(lore);
+		}
+		return bm;
+	}
+
+	protected void disable() {
+		instance = null;
+	}
+
+	/**
 	 * 
 	 * SINGLETON
 	 * 
 	 * @return an instance of the functions file for use in other classes
 	 */
-	public static Functions getInstance() {
+	protected static Functions getInstance() {
 		if (instance == null)
 			instance = new Functions();
 		return instance;
 	}
-
 }

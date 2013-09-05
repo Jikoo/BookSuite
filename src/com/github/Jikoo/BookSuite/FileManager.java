@@ -12,10 +12,8 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -35,8 +33,6 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author tmathmeyer
  */
 public class FileManager {
-
-	private final char SECTION_SIGN = '\u00A7';
 
 	/**
 	 * Makes a <code>BookMeta</code> from text. Text is read from a plaintext
@@ -103,7 +99,7 @@ public class FileManager {
 					} else if (line.contains("<page>")) {
 						page = "";
 					} else if (line.contains("</page>")) {
-						text.addPage(parseBookText(page));
+						text.addPage(BookSuite.getInstance().functions.parseBML(page));
 					} else {
 						page += line + "<n>";
 					}
@@ -113,13 +109,8 @@ public class FileManager {
 			if (!text.hasAuthor())
 				text.setAuthor(p.getName());
 			return text;
-		} catch (FileNotFoundException e) {
-			return null;
 		} catch (Exception e) {
-			System.err.println("[BookSuite] Error report:"
-					+ "\nFileManager.makeBookMetaFromText: " + e);
-			e.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+			BSLogger.err(e);
 			return null;
 		}
 	}
@@ -178,7 +169,8 @@ public class FileManager {
 			s.close();
 			is.setItemMeta(im);
 			return is;
-		} catch (Exception ex) {
+		} catch (Exception e) {
+			BSLogger.err(e);
 			im.setDisplayName("Item file error! My condolences.");
 			is.setItemMeta(im);
 			return is;
@@ -207,8 +199,9 @@ public class FileManager {
 			File bookFile = new File(bookLocation, filename + ".book");
 			if (!bookFile.exists()) {
 				bookFile.createNewFile();
-			} else
+			} else {
 				return false;
+			}
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<book>\n");
 			file.append("<author>" + bm.getAuthor() + "</author>\n");
@@ -219,10 +212,7 @@ public class FileManager {
 			file.close();
 			return true;
 		} catch (Exception e) {
-			System.err.println("[BookSuite] Error report:"
-					+ "\nFileManager.makeFileFromBookMeta: " + e);
-			e.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+			BSLogger.err(e);
 			return true;
 		}
 	}
@@ -248,8 +238,9 @@ public class FileManager {
 			File itemFile = new File(itemLocation, filename + ".item");
 			if (!itemFile.exists()) {
 				itemFile.createNewFile();
-			} else
+			} else {
 				return false;
+			}
 			FileWriter file = new FileWriter(itemFile);
 			file.write("<Type>" + is.getType().name() + "</Type>\n");
 			file.append("<Amount>" + is.getAmount() + "</Amount>");
@@ -277,67 +268,10 @@ public class FileManager {
 			}
 			file.close();
 			return false;
-		} catch (IOException e) {
-			System.err.println("[BookSuite] Error report:"
-					+ "\nFileManager.makeFileFromItemStack: " + e);
-			e.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+		} catch (Exception e) {
+			BSLogger.err(e);
 			return true;
 		}
-	}
-
-	/**
-	 * Parses file text.
-	 * 
-	 * @param text
-	 *            the <code>String</code> to parse
-	 * @return the <code>String</code> after parsing
-	 */
-	public String parseBookText(String text) {
-		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", SECTION_SIGN
-				+ "o");
-		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", SECTION_SIGN + "l");
-		text = text
-				.replaceAll("(<|\\[)u(nderline)?(>|\\])", SECTION_SIGN + "n");
-		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", SECTION_SIGN
-				+ "m");
-		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])",
-				SECTION_SIGN + "k");
-
-		text = text.replaceAll("(<|\\[)color=", "<");
-		text = text.replaceAll("(<|\\[)black(>|\\])", SECTION_SIGN + "0");
-		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", SECTION_SIGN + "1");
-		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", SECTION_SIGN + "2");
-		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", SECTION_SIGN + "3");
-		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", SECTION_SIGN + "4");
-		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", SECTION_SIGN
-				+ "5");
-		text = text.replaceAll("(<|\\[)gold(>|\\])", SECTION_SIGN + "6");
-		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", SECTION_SIGN + "7");
-		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", SECTION_SIGN
-				+ "8");
-		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])",
-				SECTION_SIGN + "9");
-		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])",
-				SECTION_SIGN + "a");
-		text = text.replaceAll("(<|\\[)aqua(>|\\])", SECTION_SIGN + "b");
-		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", SECTION_SIGN
-				+ "c");
-		text = text.replaceAll("(<|\\[)pink(>|\\])", SECTION_SIGN + "d");
-		text = text.replaceAll("(<|\\[)yellow(>|\\])", SECTION_SIGN + "e");
-		text = text.replaceAll("(<|\\[)white(>|\\])", SECTION_SIGN + "f");
-
-		text = text.replaceAll("&([a-fk-orA-FK-OR0-9])", SECTION_SIGN + "$1");
-
-		text = text.replaceAll(
-				"(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?"
-						+ "|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])",
-				SECTION_SIGN + "r");
-		text = text.replaceAll("(<|\\[)/color(>|\\])", SECTION_SIGN + "0");
-		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
-		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
-		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
-		return text;
 	}
 
 	/**
@@ -366,11 +300,8 @@ public class FileManager {
 			}
 			index.close();
 			return true;
-		} catch (IOException e) {
-			System.err.println("[BookSuite] Error report:"
-					+ "\nFileManager.appendMailIndex: " + e);
-			e.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+		} catch (Exception e) {
+			BSLogger.err(e);
 			return false;
 		}
 
@@ -405,16 +336,8 @@ public class FileManager {
 			writer.write(indexContents);
 			writer.close();
 			delete(directory, mail + ".book");
-		} catch (FileNotFoundException e) {
-			System.err.println("[BookSuite] Error report:"
-					+ "\nFileManager.removeMailAndIndex: " + e);
-			e.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
-		} catch (IOException e) {
-			System.err.println("[BookSuite] Error report:"
-					+ "\nFileManager.appendMailIndex: " + e);
-			e.printStackTrace();
-			System.err.println("[BookSuite] End error report.");
+		} catch (Exception e) {
+			BSLogger.err(e);
 			return false;
 		}
 		return true;
@@ -447,7 +370,7 @@ public class FileManager {
 	public void listBookFilesIn(String directory, Player p) {
 		final File file = new File(directory);
 		if (!file.exists()) {
-			p.sendMessage(ChatColor.DARK_RED + "No books found.");
+			p.sendMessage(Msgs.FAILURE_LIST_NOBOOKS.getMessage());
 			file.mkdirs();
 			return;
 		}
@@ -468,12 +391,12 @@ public class FileManager {
 			}
 		}
 		if (publicBooks == null && privateBooks == null) {
-			p.sendMessage(ChatColor.DARK_RED + "No books found.");
+			p.sendMessage(Msgs.FAILURE_LIST_NOBOOKS.getMessage());
 			return;
 		}
 		String bookList = new String();
 		if (publicBooks != null && publicBooks.length != 0) {
-			p.sendMessage(ChatColor.DARK_GREEN + "Publicly saved books:");
+			p.sendMessage(Msgs.SUCCESS_LIST_PRIVATE.getMessage());
 			for (File bookFile : publicBooks) {
 				bookList += bookFile.getName().replace(".book", "") + ", ";
 				// Maximum allowed characters in a server-to-client chat message
@@ -494,7 +417,7 @@ public class FileManager {
 		}
 		if (privateBooks != null && privateBooks.length != 0) {
 			bookList = new String();
-			p.sendMessage(ChatColor.GOLD + "privately saved books:");
+			p.sendMessage(Msgs.SUCCESS_LIST_PRIVATE.getMessage());
 			for (File bookFile : privateBooks) {
 				bookList += bookFile.getName().replace(".book", "") + ", ";
 
@@ -507,6 +430,10 @@ public class FileManager {
 		}
 	}
 
+	protected void disable() {
+		instance = null;
+	}
+
 	/** The <code>FileManager</code> instance. */
 	private static FileManager instance;
 
@@ -515,7 +442,7 @@ public class FileManager {
 	 * 
 	 * @return single instance of <code>FileManager</code>
 	 */
-	public static FileManager getInstance() {
+	protected static FileManager getInstance() {
 		if (instance == null)
 			instance = new FileManager();
 		return instance;
