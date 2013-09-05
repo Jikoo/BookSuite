@@ -124,7 +124,7 @@ public class BookSuite extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		PostalService.getInstance().writeToFile();
-		
+
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
 		try {
@@ -169,7 +169,9 @@ public class BookSuite extends JavaPlugin {
 
 		instance = null;
 
-		getLogger().info("BookSuite v" + version + " disabled!");
+		getLogger().info(
+				new StringBuilder("BookSuite v").append(version)
+						.append(" disabled").toString());
 	}
 
 	public static BookSuite getInstance() {
