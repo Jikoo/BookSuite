@@ -10,10 +10,22 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.mail;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
@@ -31,6 +43,24 @@ public class PostalService {
 		return instance;
 	}
 
+	public PostalService() {
+		try {
+			// use buffering
+			InputStream file = new FileInputStream("quarks.ser");
+			InputStream buffer = new BufferedInputStream(file);
+			ObjectInput input = new ObjectInputStream(buffer);
+			@SuppressWarnings("unchecked")
+			Map<String, List<BookMailWrapper>> recovered = (Map<String, List<BookMailWrapper>>) input
+					.readObject();
+			this.inventory = recovered;
+			input.close();
+
+		} catch (Exception e) {
+			BookSuite.getInstance().getServer().getLogger()
+					.log(Level.FINE, "no previous mail");
+		}
+	}
+
 	public void collect(List<BookMailWrapper> mail) {
 		for (BookMailWrapper bmw : mail) {
 			this.collect(bmw);
@@ -42,7 +72,7 @@ public class PostalService {
 			this.inventory.put(bmw.getAdressee(),
 					new LinkedList<BookMailWrapper>());
 		}
-		
+
 		this.inventory.get(bmw.getAdressee()).add(bmw);
 	}
 
@@ -58,5 +88,22 @@ public class PostalService {
 		}
 
 		return mail;
+	}
+
+	public void writeToFile() {
+		try {
+			OutputStream file = new FileOutputStream(BookSuite.getInstance()
+					.getDataFolder() + "/mail.post");
+			OutputStream buffer = new BufferedOutputStream(file);
+			ObjectOutput output = new ObjectOutputStream(buffer);
+			try {
+				output.writeObject(inventory);
+			} finally {
+				output.close();
+			}
+		} catch (IOException ex) {
+			BookSuite.getInstance().getServer().getLogger()
+					.log(Level.SEVERE, "none of the mail data was saved!!!");
+		}
 	}
 }
