@@ -48,6 +48,7 @@ public class BookMailWrapper {
 	
 	private Inventory packageData;
 	private String sender;
+	private String adressee;
 	
 	
 	
@@ -70,6 +71,15 @@ public class BookMailWrapper {
 		}
 		
 		
+	}
+	
+	public String getAdressee()
+	{
+		if (this.adressee == null)
+		{
+			this.adressee = this.bm.getPage(0).toString();
+		}
+		return this.adressee;
 	}
 	
 	public boolean isLetter()
@@ -125,6 +135,7 @@ public class BookMailWrapper {
 			mi.addItem(item);
 		}
 		
+		stringParser.close();
 		return mi;
 	}
 }
