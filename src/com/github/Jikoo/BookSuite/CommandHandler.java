@@ -306,6 +306,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public boolean unsign(Player p) {
+		// TODO multi-author alias + crediting support
 		if (CommandPermissions.UNSIGN.checkPermission(p)) {
 			if (p.getName().equals(
 					((BookMeta) p.getItemInHand().getItemMeta()).getAuthor())) {

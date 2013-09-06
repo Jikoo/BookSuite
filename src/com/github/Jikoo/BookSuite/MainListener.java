@@ -199,9 +199,8 @@ public class MainListener implements Listener {
 			}
 		}
 
-		String alias = plugin.alias.getActiveAlias(event.getPlayer());
 		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
-			bm = plugin.functions.addAuthor(bm, obm.getAuthor(), alias, event.isSigning());
+			bm = plugin.functions.addAuthor(bm, obm.getAuthor(), event.getPlayer(), event.isSigning());
 		}
 		event.setNewBookMeta(bm);
 	}
