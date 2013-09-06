@@ -29,6 +29,7 @@ import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
+import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class PostalService {
@@ -57,8 +58,7 @@ public class PostalService {
 			input.close();
 
 		} catch (Exception e) {
-			BookSuite.getInstance().getServer().getLogger()
-					.log(Level.FINE, "no previous mail");
+			BSLogger.debugInfo("no previous mail");
 		}
 	}
 

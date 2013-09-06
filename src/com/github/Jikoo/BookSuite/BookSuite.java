@@ -38,7 +38,6 @@ public class BookSuite extends JavaPlugin {
 	public Functions functions;
 	public FileManager filemanager;
 	public Alias alias;
-	public MailExecutor mail;
 
 	private MainListener listener;
 	private CommandHandler command;
@@ -60,7 +59,6 @@ public class BookSuite extends JavaPlugin {
 			BSLogger.info("More customization has been added to strings.yml.");
 		}
 
-		mail = MailExecutor.getInstance();
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();
 
@@ -155,11 +153,6 @@ public class BookSuite extends JavaPlugin {
 
 		command = null;
 
-		if (mail != null) {
-			mail.disable();
-			mail = null;
-		}
-
 		if (rules != null) {
 			rules.disable();
 			rules = null;
@@ -176,7 +169,7 @@ public class BookSuite extends JavaPlugin {
 
 		instance = null;
 
-		getLogger().info(
+		BSLogger.info(
 				new StringBuilder("BookSuite v").append(version)
 						.append(" disabled").toString());
 	}

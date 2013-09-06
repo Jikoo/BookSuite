@@ -1,5 +1,7 @@
 ;3.2.0
-:added strings.yml for customization/localization!
+:added mail at last!
+:added libraries (TODO)
+:added strings.yml for customization/localization
 : - If you make one for another language, I'll link it and credit you.
 :added aliases TODO finish/fix
 :added private saves (and relevant config + permissions) TODO perms + commands

@@ -10,7 +10,7 @@ FAILURE_EDIT_INVALIDNUMBER: "<darkred>You must enter a number between 1 and the 
 FAILURE_EDIT_NOBAQ: "<darkred>You must be holding a book and quill to use this command!"
 FAILURE_LIST_NOBOOKS: "<darkred>No books are saved!"
 FAILURE_PERMISSION_COPY: "<darkred>You do not have permission to copy that!"
-FAILURE_PERMISSION_COPY_OTHER: "You do not have permission to copy others' books."
+FAILURE_PERMISSION_COPY_OTHER: "<darkred>You do not have permission to copy others' books."
 FAILURE_SPACE: "<darkred>No free inventory space!"
 FAILURE_USAGE: "<darkred>Proper usage: "
 SUCCESS_COPY: "<darkgreen>Copied successfully!"

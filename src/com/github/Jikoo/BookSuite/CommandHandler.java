@@ -66,8 +66,6 @@ public class CommandHandler implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
-		// TODO finish command rework. This will get a lot messier before it
-		// gets pretty.
 		if (args.length >= 1) {
 			args[0] = args[0].toLowerCase();
 
@@ -80,177 +78,6 @@ public class CommandHandler implements CommandExecutor {
 					&& CommandPermissions.UPDATE.checkPermission(sender)) {
 				plugin.update.delayUpdateCheck(sender, true, 0L);
 				return true;
-			}
-
-			// PLAYER-ONLY COMMANDS
-			if (sender instanceof Player) {
-				Player p = (Player) sender;
-
-				// command: /book <usage|help> - prints out usage and help based
-				// on additional args
-				if (args[0].equals("usage") || args[0].equals("help")) {
-					if (usage(p, args))
-						return true;
-				}
-
-				if (args.length == 1) {
-					// command: /book <l(ist)|ls> - list all files in
-					// /SavedBooks/
-					if (args[0].equals("l") || args[0].equals("list")
-							|| args[0].equals("ls")) {
-						if (CommandPermissions.LIST.checkPermission(p)) {
-							if (args.length == 1) {
-								plugin.filemanager.listBookFilesIn(plugin.getDataFolder()
-										+ "/SavedBooks/", p);
-								return true;
-							}
-						}
-					}
-
-					// command: /book u(nsign) - attempt to unsign book
-					if (args[0].equals("u") || args[0].equals("unsign")) {
-						if (unsign(p))
-							return true;
-					}
-				}
-
-				// command: /book copy (quantity) - attempts to make specified
-				// quantity of copies, default 1.
-				if (args[0].equals("copy")) {
-					if (copyItem(p, args))
-						return true;
-				}
-
-				/*
-				 * command: /book overwrite (book) - if a save was attempted,
-				 * will save over file with book in hand. If no save was
-				 * attempted, will save and overwrite any book by the specified
-				 * name. Usage instead of /book save is discouraged for obvious
-				 * reasons.
-				 */
-				if (args[0].equals("overwrite")) {
-					if (overwrite(p, args))
-						return true;
-				}
-
-				if (args.length >= 2) {
-					if (args.length == 2) {
-						// command: /book <e(xport)|s(ave)> <filename> - attempt
-						// to save book in hand to file
-						if (args[0].equals("e") || args[0].equals("export")
-								|| args[0].equals("s")
-								|| args[0].equals("save")) {
-							if (export(p, args))
-								return true;
-						}
-
-						// command: /book <u(rl)|<f(ile)|l(oad)>> <url|filename>
-						// - attempt to import a book from location
-						if ((args[0].equals("f") || args[0].equals("file")
-								|| args[0].equals("l") || args[0]
-									.equals("load"))
-								&& CommandPermissions.IMPORT.checkPermission(p)) {
-							ItemStack newbook = new ItemStack(
-									Material.WRITTEN_BOOK, 1);
-							newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(
-									p, args[1], plugin.getDataFolder()
-											+ "/SavedBooks/", true));
-							if (!newbook.hasItemMeta()
-									|| newbook.getItemMeta() == null) {
-								p.sendMessage(ChatColor.DARK_RED
-										+ "Error reading book file. Does it exist?");
-							} else {
-								if (plugin.functions.canObtainBook(p)) {
-									p.getInventory().addItem(newbook);
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Imported " + args[1]
-											+ " successfully!");
-								}
-							}
-							return true;
-						} else if ((args[0].equals("u") || args[0]
-								.equals("url"))
-								&& CommandPermissions.IMPORT.checkPermission(p)) {
-							if (!plugin.functions.canObtainBook(p))
-								return true;
-							else
-								asyncBookImport(p.getName(), args[1], plugin
-										.getDataFolder().getPath());
-							return true;
-						}
-
-						// command: /book d(elete) <filename> - attempt to
-						// delete file
-						if (args[0].equals("d") || args[0].equals("delete")) {
-							if (CommandPermissions.DELETE.checkPermission(p)) {
-								if (args[1].contains("."))
-									plugin.filemanager.delete(plugin.getDataFolder()
-											+ "/SavedBooks/", args[1]);
-								else
-									plugin.filemanager.delete(plugin.getDataFolder()
-											+ "/SavedBooks/", args[1] + ".book");
-								p.sendMessage(ChatColor.DARK_GREEN + "Deleted!");
-								return true;
-							}
-						}
-					}
-
-					// command: /book t(itle) <args> - attempt to change title
-					// with additional args. Include spaces.
-					if (args[0].equals("t") || args[0].equals("title")) {
-						if (title(p, args))
-							return true;
-					}
-
-					// command: /book addpage <number> (optional text) - add a
-					// page to a book and quill
-					if (args[0].equals("addpage")) {
-						if (CommandPermissions.EDIT.checkPermission(p)) {
-							String text = "";
-							for (int i = 2; i < args.length; i++) {
-								if (i != (args.length - 1))
-									text += args[i] + " ";
-								else
-									text += args[i];
-							}
-							if (plugin.functions.insertPageAt(p, args[1], text))
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Page added!");
-							return true;
-						}
-					}
-
-					// command: /book delpage <number> - remove a page from a
-					// book and quill
-					if (args[0].equals("delpage")) {
-						if (CommandPermissions.EDIT.checkPermission(p)) {
-							if (plugin.functions.deletePageAt(p, args[1]))
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Page deleted!");
-							return true;
-						}
-					}
-
-					// command: /book a(uthor) <args> - attempt to change author
-					// with additional args. Include spaces.
-					if (args[0].equals("a") || args[0].equals("author")) {
-						if (CommandPermissions.AUTHOR.checkPermission(p)) {
-							String newAuthor = "";
-							for (int i = 1; i < args.length; i++)
-								if (i != (args.length - 1))
-									newAuthor += args[i] + " ";
-								else
-									newAuthor += args[i];
-							if (plugin.functions.setAuthor(p, newAuthor))
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Author changed!");
-							else
-								p.sendMessage(ChatColor.DARK_RED
-										+ "You must be holding a written book to use this command!");
-							return true;
-						}
-					}
-				}
 			}
 		}
 
@@ -265,18 +92,182 @@ public class CommandHandler implements CommandExecutor {
 			return true;
 		}
 
-		sender.sendMessage(ChatColor.AQUA + "BookSuite v"
-				+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
-				+ " is enabled!");
-		if (listPermittedCommands(sender).length() > 0) {
-			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use "
-					+ ChatColor.AQUA + "/book help <topic(s)>"
-					+ ChatColor.DARK_GREEN + ".");
-			sender.sendMessage(ChatColor.DARK_GREEN + "Possible topics: "
-					+ listPermittedCommands(sender));
+		// PLAYER-ONLY COMMANDS
+		Player p = (Player) sender;
+
+		if (args.length >= 1) {
+			// command: /book <usage|help> - prints out usage and help based
+			// on additional args
+			if (args[0].equals("usage") || args[0].equals("help")) {
+				if (usage(p, args))
+					return true;
+			}
+
+			// command: /book copy (quantity) - attempts to make specified
+			// quantity of copies, default 1.
+			if (args[0].equals("copy")) {
+				if (copyItem(p, args))
+					return true;
+			}
+
+			/*
+			 * command: /book overwrite (book) - if a save was attempted,
+			 * will save over file with book in hand. If no save was
+			 * attempted, will save and overwrite any book by the specified
+			 * name. Usage instead of /book save is discouraged for obvious
+			 * reasons.
+			 */
+			if (args[0].equals("overwrite")) {
+				if (overwrite(p, args))
+					return true;
+			}
+		} else {
+			return this.invalidCommand(sender);
 		}
 
-		return true;
+		if (args.length == 1) {
+			// command: /book <l(ist)|ls> - list all files in
+			// /SavedBooks/
+			if (args[0].equals("l") || args[0].equals("list")
+					|| args[0].equals("ls")) {
+				if (CommandPermissions.LIST.checkPermission(p)) {
+					if (args.length == 1) {
+						plugin.filemanager.listBookFilesIn(plugin.getDataFolder()
+								+ "/SavedBooks/", p);
+						return true;
+					}
+				}
+			}
+
+			// command: /book u(nsign) - attempt to unsign book
+			if (args[0].equals("u") || args[0].equals("unsign")) {
+				if (unsign(p))
+					return true;
+			}
+			return this.invalidCommand(sender);
+		}
+		if (args.length == 2) {
+			// command: /book <e(xport)|s(ave)> <filename> - attempt
+			// to save book in hand to file
+			if (args[0].equals("e") || args[0].equals("export")
+					|| args[0].equals("s")
+					|| args[0].equals("save")) {
+				if (export(p, args))
+					return true;
+			}
+
+			// command: /book <u(rl)|<f(ile)|l(oad)>> <url|filename>
+			// - attempt to import a book from location
+			if ((args[0].equals("f") || args[0].equals("file")
+					|| args[0].equals("l") || args[0]
+						.equals("load"))
+					&& CommandPermissions.IMPORT.checkPermission(p)) {
+				ItemStack newbook = new ItemStack(
+						Material.WRITTEN_BOOK, 1);
+				newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(
+						p, args[1], plugin.getDataFolder()
+								+ "/SavedBooks/", true));
+				if (!newbook.hasItemMeta()
+						|| newbook.getItemMeta() == null) {
+					p.sendMessage(ChatColor.DARK_RED
+							+ "Error reading book file. Does it exist?");
+				} else {
+					if (plugin.functions.canObtainBook(p)) {
+						p.getInventory().addItem(newbook);
+						p.sendMessage(ChatColor.DARK_GREEN
+								+ "Imported " + args[1]
+								+ " successfully!");
+					}
+				}
+				return true;
+			} else if ((args[0].equals("u") || args[0]
+					.equals("url"))
+					&& CommandPermissions.IMPORT.checkPermission(p)) {
+				if (!plugin.functions.canObtainBook(p))
+					return true;
+				else
+					asyncBookImport(p.getName(), args[1], plugin
+							.getDataFolder().getPath());
+				return true;
+			}
+
+			// command: /book d(elete) <filename> - attempt to
+			// delete file
+			if (args[0].equals("d") || args[0].equals("delete")) {
+				if (CommandPermissions.DELETE.checkPermission(p)) {
+					if (args[1].contains("."))
+						plugin.filemanager.delete(plugin.getDataFolder()
+								+ "/SavedBooks/", args[1]);
+					else
+						plugin.filemanager.delete(plugin.getDataFolder()
+								+ "/SavedBooks/", args[1] + ".book");
+					p.sendMessage(ChatColor.DARK_GREEN + "Deleted!");
+					return true;
+				}
+			}
+			return this.invalidCommand(sender);
+		}
+
+		if (args.length >= 2) {
+
+			// command: /book t(itle) <args> - attempt to change title
+			// with additional args. Include spaces.
+			if (args[0].equals("t") || args[0].equals("title")) {
+				if (title(p, args))
+					return true;
+			}
+
+			// command: /book addpage <number> (optional text) - add a
+			// page to a book and quill
+			if (args[0].equals("addpage")) {
+				if (CommandPermissions.EDIT.checkPermission(p)) {
+					String text = "";
+					for (int i = 2; i < args.length; i++) {
+						if (i != (args.length - 1))
+							text += args[i] + " ";
+						else
+							text += args[i];
+					}
+					if (plugin.functions.insertPageAt(p, args[1], text))
+						p.sendMessage(ChatColor.DARK_GREEN
+								+ "Page added!");
+					return true;
+				}
+			}
+
+			// command: /book delpage <number> - remove a page from a
+			// book and quill
+			if (args[0].equals("delpage")) {
+				if (CommandPermissions.EDIT.checkPermission(p)) {
+					if (plugin.functions.deletePageAt(p, args[1]))
+						p.sendMessage(ChatColor.DARK_GREEN
+								+ "Page deleted!");
+					return true;
+				}
+			}
+
+			// command: /book a(uthor) <args> - attempt to change author
+			// with additional args. Include spaces.
+			if (args[0].equals("a") || args[0].equals("author")) {
+				if (CommandPermissions.AUTHOR.checkPermission(p)) {
+					String newAuthor = "";
+					for (int i = 1; i < args.length; i++)
+						if (i != (args.length - 1))
+							newAuthor += args[i] + " ";
+						else
+							newAuthor += args[i];
+					if (plugin.functions.setAuthor(p, newAuthor))
+						p.sendMessage(ChatColor.DARK_GREEN
+								+ "Author changed!");
+					else
+						p.sendMessage(ChatColor.DARK_RED
+								+ "You must be holding a written book to use this command!");
+					return true;
+				}
+			}
+		}
+
+		return this.invalidCommand(sender);
 	}
 
 	public boolean title(Player p, String[] args) {
@@ -805,6 +796,20 @@ public class CommandHandler implements CommandExecutor {
 		}
 
 		return sb.substring(0, sb.length() - 2);
+	}
+
+	public boolean invalidCommand(CommandSender sender) {
+		sender.sendMessage(ChatColor.AQUA + "BookSuite v"
+				+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
+				+ " is enabled!");
+		if (listPermittedCommands(sender).length() > 0) {
+			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use "
+					+ ChatColor.AQUA + "/book help <topic(s)>"
+					+ ChatColor.DARK_GREEN + ".");
+			sender.sendMessage(ChatColor.DARK_GREEN + "Possible topics: "
+					+ listPermittedCommands(sender));
+		}
+		return true;
 	}
 
 	@SuppressWarnings("deprecation")
