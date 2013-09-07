@@ -63,7 +63,7 @@ public class BookSuite extends JavaPlugin {
 		filemanager = FileManager.getInstance();
 
 		alias = Alias.getInstance();
-		alias.load();
+		alias.enable();
 
 		if (getConfig().getBoolean("update-check")
 				|| getConfig().getBoolean("allow-update-command"))
@@ -120,7 +120,8 @@ public class BookSuite extends JavaPlugin {
 		command = CommandHandler.getInstance();
 		getCommand("book").setExecutor(command);
 
-		BSLogger.info("v" + version + " enabled!");
+		BSLogger.info(new StringBuilder("BookSuite v").append(version)
+				.append(" enabled").toString());
 	}
 
 	@Override

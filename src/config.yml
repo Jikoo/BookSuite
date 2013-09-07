@@ -47,6 +47,10 @@ enable-printing-presses: true
 # Same deal as presses.
 enable-erasers: true
 
+###  MAIL  ###
+# You know the drill.
+enable-mail: true
+
 ###  RULES  ###
 # If true, /rules, /book rules, and /? will give player
 # a copy of the saved rulebook. Set false to slightly

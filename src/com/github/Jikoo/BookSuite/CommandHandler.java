@@ -272,49 +272,39 @@ public class CommandHandler implements CommandExecutor {
 
 	public boolean title(Player p, String[] args) {
 		if (CommandPermissions.TITLE.checkPermission(p)) {
-			if (p.getName().equals(
-					((BookMeta) p.getItemInHand().getItemMeta()).getAuthor())) {
+			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+				p.sendMessage(ChatColor.DARK_RED
+						+ "You must be holding a written book to use this command!");
+			}
+			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
+					|| p.hasPermission("booksuite.command.title.other")) {
 				String newTitle = "";
-				for (int i = 1; i < args.length; i++)
-					if (i != (args.length - 1))
-						newTitle += args[i] + " ";
-					else
-						newTitle += args[i];
-				if (plugin.functions.setTitle(p, newTitle)) {
-					p.sendMessage(ChatColor.DARK_GREEN + "Title changed!");
-				} else
-					p.sendMessage(ChatColor.DARK_RED
-							+ "You must be holding a written book to use this command!");
-			} else if (p.hasPermission("booksuite.command.title.other")) {
-				String newTitle = "";
-				for (int i = 1; i < args.length; i++)
-					if (i != (args.length - 1))
-						newTitle += args[i] + " ";
-					else
-						newTitle += args[i];
-				if (plugin.functions.setTitle(p, newTitle)) {
-					p.sendMessage(ChatColor.DARK_GREEN + "Title changed!");
-				} else
-					p.sendMessage(ChatColor.DARK_RED
-							+ "You must be holding a written book to use this command!");
-			} else
+				for (int i = 1; i < args.length; i++) {
+					newTitle += args[i];
+					if (i == (args.length - 1))
+						newTitle += " ";
+				}
+				plugin.functions.setTitle(p, newTitle);
+				p.sendMessage(ChatColor.DARK_GREEN + "Title changed!");
+			} else {
 				p.sendMessage(ChatColor.DARK_RED
 						+ "You do not have permission to rename others' books!");
+			}
 			return true;
-		} else
-			return false;
+		}
+		return false;
 	}
 
 	public boolean unsign(Player p) {
-		// TODO multi-author alias + crediting support
 		if (CommandPermissions.UNSIGN.checkPermission(p)) {
-			if (p.getName().equals(
-					((BookMeta) p.getItemInHand().getItemMeta()).getAuthor())) {
-				if (plugin.functions.unsign(p))
-					p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
-				else
-					p.sendMessage(ChatColor.DARK_RED
-							+ "You must be holding a written book to use this command!");
+			if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)
+					&& !p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+				p.sendMessage(ChatColor.DARK_RED
+						+ "You must be holding a book to use this command!");
+			}
+			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())) {
+				plugin.functions.unsign(p);
+				p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
 			} else if (p.hasPermission("booksuite.command.unsign.other")) {
 				if (plugin.functions.unsign(p))
 					p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
@@ -389,7 +379,7 @@ public class CommandHandler implements CommandExecutor {
 			}
 		}
 
-		plugin.alias.load();
+		plugin.alias.enable();
 
 		if (plugin.getConfig().getBoolean("book-rules")) {
 			if (plugin.rules == null) {

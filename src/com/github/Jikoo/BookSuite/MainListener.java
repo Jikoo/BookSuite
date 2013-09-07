@@ -64,28 +64,24 @@ public class MainListener implements Listener {
 			// if clicking a workbench, check to see if it is a press and act
 			// accordingly
 			if (plugin.functions.isPrintingPress(clicked)) {
-				PrintingPress press = new PrintingPress(plugin, p.getName(),
-						clicked);
+				PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
 
 				if (!p.hasPermission("booksuite.denynowarn.press")) {
 					if (is.getType().equals(Material.MAP)) {
 						if (plugin.functions.canObtainMap(p)) {
 							press.operatePress();
 							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Copied successfully!");
+							p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
 						}
 						event.setCancelled(true);
 					} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
 						BookMeta bm = (BookMeta) is.getItemMeta();
 
-						if (plugin.functions.checkCopyPermission(p,
-								bm.getAuthor())
+						if (plugin.functions.checkCopyPermission(p, bm.getAuthor())
 								&& plugin.functions.canObtainBook(p)) {
 							press.operatePress();
 							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Copied successfully!");
+							p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
 						}
 						event.setCancelled(true);
 					} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
@@ -93,8 +89,7 @@ public class MainListener implements Listener {
 							if (plugin.functions.canObtainBook(p)) {
 								press.operatePress();
 								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Copied successfully!");
+								p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
 							}
 						} else {
 							p.sendMessage(ChatColor.DARK_RED
@@ -105,10 +100,8 @@ public class MainListener implements Listener {
 						return;
 					}
 				}
-			} else if (plugin.functions.canMakePress(clicked,
-					event.getBlockFace(), is, p)) {
-				clicked.getRelative(BlockFace.UP).setTypeIdAndData(
-						is.getTypeId(),
+			} else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
+				clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
 						plugin.functions.getCorrectStairOrientation(p), true);
 				if (p.getGameMode() != GameMode.CREATIVE) {
 					if (is.getAmount() == 1) {
@@ -123,12 +116,11 @@ public class MainListener implements Listener {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 
 				if (p.hasPermission("booksuite.block.erase")) {
-					if (clicked.getData() < 1
-							&& !p.getGameMode().equals(GameMode.CREATIVE)
+					if (clicked.getData() < 1 && !p.getGameMode().equals(GameMode.CREATIVE)
 							&& !p.hasPermission("booksuite.block.erase.free")) {
 						p.sendMessage(ChatColor.DARK_RED
 								+ "You'll need some water to unsign this book.");
-					} else if (bm.getAuthor().equalsIgnoreCase(p.getName())) {
+					} else if (plugin.functions.isAuthor(p, bm.getAuthor())) {
 						plugin.functions.unsign(p);
 						if (!p.hasPermission("booksuite.block.erase.free")
 								&& !p.getGameMode().equals(GameMode.CREATIVE)) {
@@ -142,14 +134,12 @@ public class MainListener implements Listener {
 						}
 
 					} else {
-						p.sendMessage(ChatColor.DARK_RED
-								+ "You can only unsign your own books.");
+						p.sendMessage(ChatColor.DARK_RED + "You can only unsign your own books.");
 					}
 					event.setCancelled(true);
 
 				} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
-					p.sendMessage(ChatColor.DARK_RED
-							+ "You do not have permission to use erasers.");
+					p.sendMessage(ChatColor.DARK_RED + "You do not have permission to use erasers.");
 					event.setCancelled(true);
 				}
 			} else if (plugin.functions.isMailBox(clicked)) {
@@ -169,9 +159,9 @@ public class MainListener implements Listener {
 	}
 
 	/**
-	 * When a player closes a book, this event is fired.
-	 * BookSuite introduces several literary protection features - all
-	 * players who work on a book are credited in order of edit.
+	 * When a player closes a book, this event is fired. BookSuite introduces
+	 * several literary protection features - all players who work on a book are
+	 * credited in order of edit.
 	 * 
 	 * @param event
 	 *            the PlayerBookEditEvent
@@ -185,24 +175,26 @@ public class MainListener implements Listener {
 		BookMeta obm = event.getPreviousBookMeta();
 		BookMeta bm = event.getNewBookMeta();
 
-		if (!event.getPlayer().hasPermission("booksuite.edit.other")
-				&& obm.hasAuthor()
+		if (!event.getPlayer().hasPermission("booksuite.edit.other") && obm.hasAuthor()
 				&& obm.getAuthor() != null) {
 			event.setCancelled(true);
 			for (String author : plugin.functions.parseAuthors(obm.getAuthor())) {
 				if (plugin.alias.getAliases(event.getPlayer()).contains(author)) {
 					event.setCancelled(false);
-			return;
-				}
-			event.getPlayer().sendMessage(ChatColor.DARK_RED + "You'll need " + obm.getAuthor()
-							+ ChatColor.DARK_RED + "'s permission to edit this book!");
-			}
-		}
 
-		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
-			bm = plugin.functions.addAuthor(bm, obm.getAuthor(), event.getPlayer(), event.isSigning());
+					if (event.isSigning()
+							|| event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
+						bm = plugin.functions.addAuthor(bm, obm.getAuthor(), event.getPlayer(),
+								event.isSigning());
+					}
+					event.setNewBookMeta(bm);
+					return;
+				}
+			}
+			event.getPlayer().sendMessage(
+					ChatColor.DARK_RED + "You'll need " + obm.getAuthor().replace(" and ", " or ")
+					+ ChatColor.DARK_RED + "'s permission to edit this book!");
 		}
-		event.setNewBookMeta(bm);
 	}
 
 	public void disable() {

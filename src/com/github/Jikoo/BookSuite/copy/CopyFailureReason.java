@@ -2,7 +2,6 @@ package com.github.Jikoo.BookSuite.copy;
 
 public enum CopyFailureReason {
 	PERMISSION, SPACE, SUPPLIES_ALL, SUPPLIES_INK, SUPPLIES_MAP, SUPPLIES_PRINTABLE, UNCOPIABLE;
-	// TODO localization
 
 	public String getFailureReason() {
 		switch (this) {

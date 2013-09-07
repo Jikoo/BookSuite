@@ -31,8 +31,7 @@ import org.bukkit.inventory.meta.BookMeta;
 public class Functions {
 	private static Functions instance = null;
 	private final char SECTION_SIGN = '\u00A7';
-	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135,
-			136, 156 };
+	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135, 136, 156 };
 
 	/**
 	 * master method for checking if the player can obtain the books
@@ -44,8 +43,7 @@ public class Functions {
 	public boolean canObtainBook(Player p) {
 		Inventory inv = p.getInventory();
 
-		if (p.hasPermission("booksuite.book.free")
-				|| p.getGameMode().equals(GameMode.CREATIVE)) {
+		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
 			if (!hasRoom(p)) {
 				p.sendMessage(Msgs.FAILURE_SPACE.getMessage());
 				return false;
@@ -70,7 +68,8 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player
+	 * @param p
+	 *            the player
 	 * @return whether p (the player) has enough room to store a book
 	 */
 	public boolean hasRoom(Player p) {
@@ -80,7 +79,8 @@ public class Functions {
 	/**
 	 * HELPER FUNCTION for hasRoom
 	 * 
-	 * @param p the player
+	 * @param p
+	 *            the player
 	 * @return whether p (the player) has enough room to store a book
 	 */
 	private boolean hasStackingRoom(Player p) {
@@ -93,8 +93,7 @@ public class Functions {
 			return p.getItemInHand().getAmount() < 64;
 		} else {
 			for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
-				if (e.getValue().getItemMeta()
-						.equals(p.getItemInHand().getItemMeta())) {
+				if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
 					if (e.getValue().getAmount() < 64) {
 						return true;
 					}
@@ -147,8 +146,7 @@ public class Functions {
 	public boolean checkCommandCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.command.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.command.copy")
-				&& (a.equals(null) || a.equals(p.getName())))
+		if (p.hasPermission("booksuite.command.copy") && (a.equals(null) || a.equals(p.getName())))
 			return true;
 		else if (p.hasPermission("booksuite.command.copy")) {
 			p.sendMessage(Msgs.FAILURE_PERMISSION_COPY_OTHER.getMessage());
@@ -161,23 +159,22 @@ public class Functions {
 	 * 
 	 * copies the book that the player is currently holding
 	 * 
-	 * @param p the player
+	 * @param p
+	 *            the player
 	 */
 	@SuppressWarnings("deprecation")
 	public void copy(Player p) {
 		if (p.hasPermission("booksuite.copy.stack")
 				&& !p.getItemInHand().getType().equals(Material.MAP)) {
 			if (p.getItemInHand().getAmount() == 64) {
-				HashMap<Integer, ? extends ItemStack> allBooks = p
-						.getInventory().all(p.getItemInHand().getType());
+				HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(
+						p.getItemInHand().getType());
 				if (allBooks.size() == 1) {
 					newDuplicate(p);
 				} else {
 					boolean copiedSuccessfully = false;
-					for (Entry<Integer, ? extends ItemStack> e : allBooks
-							.entrySet()) {
-						if (e.getValue().getItemMeta()
-								.equals(p.getItemInHand().getItemMeta())) {
+					for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
+						if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
 							if (e.getValue().getAmount() < 64) {
 								ItemStack book = e.getValue();
 								book.setAmount(e.getValue().getAmount() + 1);
@@ -201,10 +198,12 @@ public class Functions {
 	}
 
 	/**
+	 * Helper method for copying. Adds an <code>ItemStack</code> of size 1 to the specified player's inventory.
 	 * 
-	 * @param p the player in whose inventory the duplication will be done
+	 * @param p
+	 *            the <code>Player</code> in whose inventory the duplication will be done
 	 */
-	public void newDuplicate(Player p) {
+	private void newDuplicate(Player p) {
 		ItemStack duplicate = p.getItemInHand().clone();
 		duplicate.setAmount(1);
 		p.getInventory().addItem(duplicate);
@@ -212,18 +211,20 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggers the unsign event
-	 * @return  whether the unsigning was successful
+	 * @param p
+	 *            the player who triggers the unsign event
+	 * @return whether the unsigning was successful
 	 */
 	public boolean unsign(Player p) {
 		ItemStack unsign = p.getItemInHand();
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)
-				&& !p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
+		if (!unsign.getType().equals(Material.WRITTEN_BOOK)
+				&& !unsign.getType().equals(Material.BOOK_AND_QUILL)) {
 			return false;
 		}
 		BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
-		unsignMeta.setAuthor(null);
 		unsignMeta.setTitle(null);
+		
+		unsignMeta.setAuthor(null);
 		unsign.setItemMeta(unsignMeta);
 		unsign.setType(Material.BOOK_AND_QUILL);
 		return true;
@@ -231,8 +232,10 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggers the event
-	 * @param newAuthor the name of the author to set as the book's author
+	 * @param p
+	 *            the player who triggers the event
+	 * @param newAuthor
+	 *            the name of the author to set as the book's author
 	 * @return whether the change of author was successful
 	 */
 	public boolean setAuthor(Player p, String newAuthor) {
@@ -247,8 +250,10 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggers the event
-	 * @param newTitle the new title of the book to be set
+	 * @param p
+	 *            the player who triggers the event
+	 * @param newTitle
+	 *            the new title of the book to be set
 	 * @return whether the setting of the title was completed successfully
 	 */
 	public boolean setTitle(Player p, String newTitle) {
@@ -263,10 +268,14 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player wo triggers the event
-	 * @param pageNumber the place the page is to be inserted
-	 * @param text the text that goes on the page
-	 * @return the whether the user was successfull in their attempt at inserting a page
+	 * @param p
+	 *            the player wo triggers the event
+	 * @param pageNumber
+	 *            the place the page is to be inserted
+	 * @param text
+	 *            the text that goes on the page
+	 * @return the whether the user was successfull in their attempt at
+	 *         inserting a page
 	 */
 	public boolean insertPageAt(Player p, String pageNumber, String text) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
@@ -299,8 +308,10 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggers the event
-	 * @param pageNumber the page to be deleted
+	 * @param p
+	 *            the player who triggers the event
+	 * @param pageNumber
+	 *            the page to be deleted
 	 * @return whether the player was successful in deleting the page
 	 */
 	public boolean deletePageAt(Player p, String pageNumber) {
@@ -333,16 +344,16 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggered the event and whom is to be tested for this property
+	 * @param p
+	 *            the player who triggered the event and whom is to be tested
+	 *            for this property
 	 * @return whether p (the player) can obtain a map
 	 */
 	public boolean canObtainMap(Player p) {
 		if (p.hasPermission("booksuite.copy.map")) {
 			Inventory inv = p.getInventory();
-			if (p.hasPermission("booksuite.book.free")
-					|| p.getGameMode().equals(GameMode.CREATIVE)) {
-				if (inv.firstEmpty() == -1
-						&& p.getItemInHand().getAmount() == 64) {
+			if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
+				if (inv.firstEmpty() == -1 && p.getItemInHand().getAmount() == 64) {
 					p.sendMessage(Msgs.FAILURE_SPACE.getMessage());
 					return false;
 				} else
@@ -381,7 +392,8 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param is the stack of stairs to be tested
+	 * @param is
+	 *            the stack of stairs to be tested
 	 * @return whether the item is an acceptable type of stair
 	 */
 	public boolean isCorrectStairType(ItemStack is) {
@@ -393,7 +405,8 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggered the event
+	 * @param p
+	 *            the player who triggered the event
 	 * @return the proper orientation byte for the stair
 	 */
 	public byte getCorrectStairOrientation(Player p) {
@@ -407,16 +420,16 @@ public class Functions {
 		else
 			return 4;// open west
 	}
-	
 
 	/**
 	 * 
-	 * @param blockToCheck the block to check
-	 * @return whether this block is a stair or crafting table part of a printing press
+	 * @param blockToCheck
+	 *            the block to check
+	 * @return whether this block is a stair or crafting table part of a
+	 *         printing press
 	 */
 	public boolean isPrintingPress(Block blockToCheck) {
-		if (!BookSuite.getInstance().getConfig()
-				.getBoolean("enable-printing-presses")) {
+		if (!BookSuite.getInstance().getConfig().getBoolean("enable-printing-presses")) {
 			return false;
 		}
 		if (blockToCheck.getType().equals(Material.WORKBENCH)) {
@@ -425,8 +438,7 @@ public class Functions {
 			}
 		}
 		if (isInvertedStairs(blockToCheck)) {
-			if (blockToCheck.getRelative(BlockFace.DOWN).getType()
-					.equals(Material.WORKBENCH)) {
+			if (blockToCheck.getRelative(BlockFace.DOWN).getType().equals(Material.WORKBENCH)) {
 				return true;
 			}
 		}
@@ -435,14 +447,18 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param clicked the clicked block
-	 * @param clickedFace the face of the block that was clicked
-	 * @param itemInHand the item in the hand of the player
-	 * @param p the player who clicked
-	 * @return whether the player is allowed and has met the criteria for creating a printing press
+	 * @param clicked
+	 *            the clicked block
+	 * @param clickedFace
+	 *            the face of the block that was clicked
+	 * @param itemInHand
+	 *            the item in the hand of the player
+	 * @param p
+	 *            the player who clicked
+	 * @return whether the player is allowed and has met the criteria for
+	 *         creating a printing press
 	 */
-	public boolean canMakePress(Block clicked, BlockFace clickedFace,
-			ItemStack itemInHand, Player p) {
+	public boolean canMakePress(Block clicked, BlockFace clickedFace, ItemStack itemInHand, Player p) {
 		if (!clickedFace.equals(BlockFace.UP)) {
 			return false;
 		}
@@ -463,9 +479,12 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param clicked the block that was clicked
-	 * @param itemInHand the item the user was holding when the event was triggered
-	 * @return whether the user who triggered the event is able to erase this book (note: permissions are factored in later)
+	 * @param clicked
+	 *            the block that was clicked
+	 * @param itemInHand
+	 *            the item the user was holding when the event was triggered
+	 * @return whether the user who triggered the event is able to erase this
+	 *         book (note: permissions are factored in later)
 	 */
 	public boolean canErase(Block clicked, ItemStack itemInHand) {
 		if (!itemInHand.getType().equals(Material.WRITTEN_BOOK)) {
@@ -488,10 +507,14 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param clicked the block that was clicked
+	 * @param clicked
+	 *            the block that was clicked
 	 * @return whether the block is a sign or chest that is part of a mailbox
 	 */
 	public boolean isMailBox(Block clicked) {
+		if (!BookSuite.getInstance().getConfig().getBoolean("enable-mail")) {
+			return false;
+		}
 		Sign sign = null;
 		if (clicked.getState() instanceof Sign) {
 			sign = (Sign) clicked.getState();
@@ -503,16 +526,17 @@ public class Functions {
 				return false;
 			}
 		}
-		// rudimentary example
-		return sign!=null && "mail".equals(sign.getLine(0));
+		return sign != null && "mail".equalsIgnoreCase(sign.getLine(0));
 	}
 
 	/**
 	 * 
 	 * TODO: MAKE THIS WORK
 	 * 
-	 * @param clicked the block that was clicked
-	 * @param clicker the player who clicked the block
+	 * @param clicked
+	 *            the block that was clicked
+	 * @param clicker
+	 *            the player who clicked the block
 	 * @return whether block that the player clicked is part of a library
 	 */
 	public boolean isLibrary(Block clicked, Player clicker) {
@@ -527,15 +551,11 @@ public class Functions {
 	 * @return the <code>String</code> after parsing
 	 */
 	public String parseBML(String text) {
-		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", SECTION_SIGN
-				+ "o");
+		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", SECTION_SIGN + "o");
 		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", SECTION_SIGN + "l");
-		text = text
-				.replaceAll("(<|\\[)u(nderline)?(>|\\])", SECTION_SIGN + "n");
-		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", SECTION_SIGN
-				+ "m");
-		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])",
-				SECTION_SIGN + "k");
+		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", SECTION_SIGN + "n");
+		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", SECTION_SIGN + "m");
+		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])", SECTION_SIGN + "k");
 
 		text = text.replaceAll("(<|\\[)color=", "<");
 		text = text.replaceAll("(<|\\[)black(>|\\])", SECTION_SIGN + "0");
@@ -543,35 +563,38 @@ public class Functions {
 		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", SECTION_SIGN + "2");
 		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", SECTION_SIGN + "3");
 		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", SECTION_SIGN + "4");
-		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", SECTION_SIGN
-				+ "5");
+		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", SECTION_SIGN + "5");
 		text = text.replaceAll("(<|\\[)gold(>|\\])", SECTION_SIGN + "6");
 		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", SECTION_SIGN + "7");
-		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", SECTION_SIGN
-				+ "8");
-		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])",
-				SECTION_SIGN + "9");
-		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])",
-				SECTION_SIGN + "a");
+		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", SECTION_SIGN + "8");
+		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", SECTION_SIGN + "9");
+		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", SECTION_SIGN + "a");
 		text = text.replaceAll("(<|\\[)aqua(>|\\])", SECTION_SIGN + "b");
-		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", SECTION_SIGN
-				+ "c");
+		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", SECTION_SIGN + "c");
 		text = text.replaceAll("(<|\\[)pink(>|\\])", SECTION_SIGN + "d");
 		text = text.replaceAll("(<|\\[)yellow(>|\\])", SECTION_SIGN + "e");
 		text = text.replaceAll("(<|\\[)white(>|\\])", SECTION_SIGN + "f");
 
 		text = text.replaceAll("&([a-fk-orA-FK-OR0-9])", SECTION_SIGN + "$1");
 
-		text = text.replaceAll(
-				"(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?"
-						+ "|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])",
-				SECTION_SIGN + "r");
+		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?"
+				+ "|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])", SECTION_SIGN + "r");
 		text = text.replaceAll("(<|\\[)/color(>|\\])", SECTION_SIGN + "0");
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
 		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
 		text = text.replaceAll("<plugin.version>", BookSuite.getInstance().version);
 		return text;
+	}
+
+	boolean isAuthor(Player p, String author) {
+		ArrayList<String> aliases = BookSuite.getInstance().alias.getAliases(p);
+		for (String s : parseAuthors(author)) {
+			if (aliases.contains(s)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public String[] parseAuthors(String authors) {
@@ -594,11 +617,11 @@ public class Functions {
 	 * otherwise removes existing faked lore
 	 * 
 	 * @param bm
-	 * the <code>BookMeta</code> to edit
+	 *            the <code>BookMeta</code> to edit
 	 * @param author
-	 * name to add as an author
+	 *            name to add as an author
 	 * @param signing
-	 * true if the book being converted into a written book
+	 *            true if the book is being converted into a written book
 	 */
 	public BookMeta addAuthor(BookMeta bm, String oldAuthors, Player author, boolean signing) {
 		String newAuthors = BookSuite.getInstance().alias.getActiveAlias(author);
@@ -625,16 +648,17 @@ public class Functions {
 					lore = null;
 				}
 			} else if (!isCredited) {
-				lore.set(0, new StringBuilder().append(ChatColor.GRAY)
-						.append("by ").append(newAuthors).toString());
+				lore.set(0,
+						new StringBuilder().append(ChatColor.GRAY).append("by ").append(newAuthors)
+								.toString());
 			}
 		} else {
 			lore = new ArrayList<String>();
-			lore.add(new StringBuilder().append(ChatColor.GRAY)
-					.append("by ").append(newAuthors).toString());
-			 if (bm.hasLore()) {
+			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ").append(newAuthors)
+					.toString());
+			if (bm.hasLore()) {
 				lore.addAll(bm.getLore());
-			 }
+			}
 		}
 		bm.setLore(lore);
 
