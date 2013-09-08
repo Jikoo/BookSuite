@@ -83,11 +83,9 @@ public class CommandHandler implements CommandExecutor {
 
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(Msgs.VERSION.toString()
-					.replaceAll("<plugin.version>", plugin.version));
-			sender.sendMessage(ChatColor.AQUA + "book reload"
-					+ ChatColor.DARK_GREEN + " - reload the plugin.");
-			sender.sendMessage(ChatColor.AQUA + "book update"
-					+ ChatColor.DARK_GREEN + " - check for plugin updates.");
+					.replace("<plugin.version>", plugin.version));
+			sender.sendMessage(Msgs.HELP_CONSOLE_RELOAD.getMessage());
+			sender.sendMessage(Msgs.HELP_CONSOLE_UPDATE.getMessage());
 			return true;
 		}
 
@@ -168,14 +166,12 @@ public class CommandHandler implements CommandExecutor {
 								+ "/SavedBooks/", true));
 				if (!newbook.hasItemMeta()
 						|| newbook.getItemMeta() == null) {
-					p.sendMessage(ChatColor.DARK_RED
-							+ "Error reading book file. Does it exist?");
+					p.sendMessage(Msgs.FAILURE_FILE_NONEXISTANT.getMessage());
 				} else {
 					if (plugin.functions.canObtainBook(p)) {
 						p.getInventory().addItem(newbook);
-						p.sendMessage(ChatColor.DARK_GREEN
-								+ "Imported " + args[1]
-								+ " successfully!");
+						p.sendMessage(Msgs.SUCCESS_IMPORT.getMessage()
+								.replace("<book.savename>", args[1]));
 					}
 				}
 				return true;
@@ -184,9 +180,11 @@ public class CommandHandler implements CommandExecutor {
 					&& CommandPermissions.IMPORT.checkPermission(p)) {
 				if (!plugin.functions.canObtainBook(p))
 					return true;
-				else
+				else {
 					asyncBookImport(p.getName(), args[1], plugin
 							.getDataFolder().getPath());
+					p.sendMessage(Msgs.SUCCESS_IMPORT_INITIATED.getMessage());
+				}
 				return true;
 			}
 
@@ -200,7 +198,7 @@ public class CommandHandler implements CommandExecutor {
 					else
 						plugin.filemanager.delete(plugin.getDataFolder()
 								+ "/SavedBooks/", args[1] + ".book");
-					p.sendMessage(ChatColor.DARK_GREEN + "Deleted!");
+					p.sendMessage(Msgs.SUCCESS_DELETE.getMessage().replace("<file.name>", args[1]));
 					return true;
 				}
 			}
@@ -228,8 +226,7 @@ public class CommandHandler implements CommandExecutor {
 							text += args[i];
 					}
 					if (plugin.functions.insertPageAt(p, args[1], text))
-						p.sendMessage(ChatColor.DARK_GREEN
-								+ "Page added!");
+						p.sendMessage(Msgs.SUCCESS_EDIT_ADDPAGE.getMessage());
 					return true;
 				}
 			}
@@ -239,8 +236,7 @@ public class CommandHandler implements CommandExecutor {
 			if (args[0].equals("delpage")) {
 				if (CommandPermissions.EDIT.checkPermission(p)) {
 					if (plugin.functions.deletePageAt(p, args[1]))
-						p.sendMessage(ChatColor.DARK_GREEN
-								+ "Page deleted!");
+						p.sendMessage(Msgs.SUCCESS_EDIT_DELPAGE.getMessage());
 					return true;
 				}
 			}
@@ -256,11 +252,9 @@ public class CommandHandler implements CommandExecutor {
 						else
 							newAuthor += args[i];
 					if (plugin.functions.setAuthor(p, newAuthor))
-						p.sendMessage(ChatColor.DARK_GREEN
-								+ "Author changed!");
+						p.sendMessage(Msgs.SUCCESS_AUTHOR.getMessage());
 					else
-						p.sendMessage(ChatColor.DARK_RED
-								+ "You must be holding a written book to use this command!");
+						p.sendMessage(Msgs.FAILURE_COMMAND_NEEDBOOK.getMessage());
 					return true;
 				}
 			}
@@ -272,8 +266,7 @@ public class CommandHandler implements CommandExecutor {
 	public boolean title(Player p, String[] args) {
 		if (CommandPermissions.TITLE.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You must be holding a written book to use this command!");
+				p.sendMessage(Msgs.FAILURE_COMMAND_NEEDBOOK.getMessage());
 			}
 			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
 					|| p.hasPermission("booksuite.command.title.other")) {
@@ -284,10 +277,9 @@ public class CommandHandler implements CommandExecutor {
 						newTitle += " ";
 				}
 				plugin.functions.setTitle(p, newTitle);
-				p.sendMessage(ChatColor.DARK_GREEN + "Title changed!");
+				p.sendMessage(Msgs.SUCCESS_TITLE.getMessage());
 			} else {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You do not have permission to rename others' books!");
+				p.sendMessage(Msgs.FAILURE_PERMISSION_TITLE_OTHER.getMessage());
 			}
 			return true;
 		}
@@ -298,21 +290,14 @@ public class CommandHandler implements CommandExecutor {
 		if (CommandPermissions.UNSIGN.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)
 					&& !p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You must be holding a book to use this command!");
+				p.sendMessage(Msgs.FAILURE_COMMAND_NEEDEITHER.getMessage());
 			}
-			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())) {
+			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
+					|| p.hasPermission("booksuite.command.unsign.other")) {
 				plugin.functions.unsign(p);
-				p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
-			} else if (p.hasPermission("booksuite.command.unsign.other")) {
-				if (plugin.functions.unsign(p))
-					p.sendMessage(ChatColor.DARK_GREEN + "Book unsigned!");
-				else
-					p.sendMessage(ChatColor.DARK_RED
-							+ "You must be holding a written book to use this command!");
+				p.sendMessage(Msgs.SUCCESS_UNSIGN.getMessage());
 			} else
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You do not have permission to unsign others' books!");
+				p.sendMessage(Msgs.FAILURE_PERMISSION_UNSIGN_OTHER.getMessage());
 			return true;
 		} else
 			return false;
@@ -431,11 +416,10 @@ public class CommandHandler implements CommandExecutor {
 					}
 				}
 				if (completed)
-					p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
+					p.sendMessage(Msgs.SUCCESS_COPY.getMessage());
 				return true;
 			} else if (!is.hasItemMeta() || is.getItemMeta() == null) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "There doesn't seem to be any writing to copy.");
+				p.sendMessage(Msgs.FAILURE_COPY_UNCOPIABLE.getMessage());
 			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 				if (plugin.functions.checkCommandCopyPermission(p, bm.getAuthor())) {
@@ -448,8 +432,7 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}
 					if (completed)
-						p.sendMessage(ChatColor.DARK_GREEN
-								+ "Copied successfully!");
+						p.sendMessage(Msgs.SUCCESS_COPY.getMessage());
 				}
 				return true;
 			} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
@@ -463,15 +446,12 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}
 					if (completed)
-						p.sendMessage(ChatColor.DARK_GREEN
-								+ "Copied successfully!");
+						p.sendMessage(Msgs.SUCCESS_COPY.getMessage());
 				} else
-					p.sendMessage(ChatColor.DARK_RED
-							+ "You do not have permission to copy unsigned books!");
+					p.sendMessage(Msgs.FAILURE_PERMISSION_COPY.getMessage());
 				return true;
 			} else
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You must be holding a copiable item to use this command!");
+				p.sendMessage(Msgs.FAILURE_COPY_UNCOPIABLE.getMessage());
 			return true;
 		} else
 			return false;
@@ -480,21 +460,19 @@ public class CommandHandler implements CommandExecutor {
 	public boolean export(Player p, String[] args) {
 		if (CommandPermissions.EXPORT.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You must be holding a written book to export it!");
+				p.sendMessage(Msgs.FAILURE_COMMAND_NEEDBOOK.getMessage());
 				return true;
 			}
 			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 			if (plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder()
 					+ "/SavedBooks/", args[1])) {
-				p.sendMessage(ChatColor.DARK_GREEN + "Book saved successfully!");
+				p.sendMessage(Msgs.SUCCESS_EXPORT.getMessage()
+						.replace("<book.savename>", args[1]));
 			} else {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "A book by this name already exists!");
+				p.sendMessage(Msgs.FAILURE_FILE_EXISTANT.getMessage());
 				if (p.hasPermission("booksuite.command.delete")) {
-					p.sendMessage(ChatColor.DARK_RED + "To overwrite it, do \""
-							+ ChatColor.DARK_AQUA + "/book overwrite"
-							+ ChatColor.DARK_RED + "\" within 10 seconds.");
+					p.sendMessage(Msgs.OVERWRITE_FILE.getMessage()
+							.replace("<book.savename>", args[1]));
 					overwritable.put(p.getName(), args[1]);
 					syncOverwriteTimer(p);
 				}
@@ -508,8 +486,7 @@ public class CommandHandler implements CommandExecutor {
 		if (CommandPermissions.DELETE.checkPermission(p)
 				&& CommandPermissions.EXPORT.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "You must be holding a written book overwrite an existing book!");
+				p.sendMessage(Msgs.FAILURE_COMMAND_NEEDBOOK.getMessage());
 				return true;
 			} else {
 				if (overwritable.containsKey(p.getName())) {
@@ -520,8 +497,8 @@ public class CommandHandler implements CommandExecutor {
 								.getItemInHand().getItemMeta(),
 								plugin.getDataFolder() + "/SavedBooks/",
 								overwritable.get(p.getName()))) {
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Book updated successfully!");
+							p.sendMessage(Msgs.SUCCESS_EXPORT.getMessage()
+									.replace("<book.savename>", overwritable.get(p.getName())));
 						}
 					}
 					overwritable.remove(p.getName());
@@ -530,19 +507,16 @@ public class CommandHandler implements CommandExecutor {
 					if (args.length == 2) {
 						if (!plugin.filemanager.delete(plugin.getDataFolder()
 								+ "/SavedBooks/", args[1])) {
-							p.sendMessage(ChatColor.DARK_RED
-									+ "You shouldn't make a habit of using overwrite instead of save.");
+							p.sendMessage(Msgs.OVERWRITE_WARN.getMessage());
 						}
 						if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p
 								.getItemInHand().getItemMeta(),
 								plugin.getDataFolder() + "/SavedBooks/",
 								args[1])) {
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Book updated successfully!");
+							p.sendMessage(Msgs.SUCCESS_EXPORT.getMessage());
 						}
 					} else
-						p.sendMessage(ChatColor.DARK_RED
-								+ "What are you trying to overwrite? Use the save function.");
+						p.sendMessage(Msgs.FAILURE_OVERWRITE.getMessage());
 					return true;
 				}
 			}
@@ -553,10 +527,7 @@ public class CommandHandler implements CommandExecutor {
 	public boolean usage(Player p, String[] args) {
 		if (listPermittedCommands(p).length() > 0) {
 			if (args.length == 1) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "Please specify a help topic!");
-				p.sendMessage(ChatColor.DARK_RED
-						+ "Possible topics are as follows:");
+				p.sendMessage(Msgs.USAGE.getMessage());
 				p.sendMessage(ChatColor.DARK_RED + listPermittedCommands(p));
 			} else {
 				boolean failure = false;
@@ -570,32 +541,20 @@ public class CommandHandler implements CommandExecutor {
 							if (cdp.checkPermission(p)) {
 								switch (cdp) {
 								case EDIT:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book addpage <number> (text)"
-											+ ChatColor.DARK_GREEN
-											+ " - add a page to a book");
-									p.sendMessage(ChatColor.AQUA
-											+ "/book delpage <number>"
-											+ ChatColor.DARK_GREEN
-											+ " - delete page from book");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book addpage 1 It was a dark and stormy night.");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book delpage 1");
+									p.sendMessage(Msgs.USAGE_EDIT_ADDPAGE.getMessage()
+											+ Msgs.USAGE_EDIT_ADDPAGE_EXPLANATION.getMessage());
+									p.sendMessage(Msgs.USAGE_EXAMPLE.getMessage()
+											+ Msgs.USAGE_EDIT_ADDPAGE_EXAMPLE.getMessage());
+									p.sendMessage(Msgs.USAGE_EDIT_DELPAGE.getMessage()
+											+ Msgs.USAGE_EDIT_DELPAGE_EXPLANATION.getMessage());
+									p.sendMessage(Msgs.USAGE_EXAMPLE.getMessage()
+											+ Msgs.USAGE_EDIT_DELPAGE_EXAMPLE.getMessage());
 									break;
 								case AUTHOR:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book a(uthor) <new author>"
-											+ ChatColor.DARK_GREEN
-											+ " - change author of book in hand.");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book a Jikoo, aka Planar Warp");
+									p.sendMessage(Msgs.USAGE_AUTHOR.getMessage()
+											+ Msgs.USAGE_AUTHOR_EXPLANATION.getMessage());
+									p.sendMessage(Msgs.USAGE_EXAMPLE.getMessage()
+											+ Msgs.USAGE_AUTHOR_EXAMPLE.getMessage());
 									break;
 								case TITLE:
 									p.sendMessage(ChatColor.AQUA
