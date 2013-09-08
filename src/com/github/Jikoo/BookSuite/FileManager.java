@@ -13,12 +13,10 @@ package com.github.Jikoo.BookSuite;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -357,77 +355,6 @@ public class FileManager {
 		if (!file.exists())
 			return false;
 		return file.delete();
-	}
-
-	/**
-	 * Lists book files in directory
-	 * 
-	 * @param directory
-	 *            the directory
-	 * @param p
-	 *            the <code>Player</code> to obtain file list
-	 */
-	public void listBookFilesIn(String directory, Player p) {
-		final File file = new File(directory);
-		if (!file.exists()) {
-			p.sendMessage(Msgs.FAILURE_LIST_NOBOOKS.getMessage());
-			file.mkdirs();
-			return;
-		}
-		File[] publicBooks = file.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				if (new File(dir, name).isDirectory()) {
-					return false;
-				}
-				return true;
-			}
-		});
-		File[] privateBooks = null;
-		if (BookSuite.getInstance().getConfig()
-				.getBoolean("allow-private-saving")) {
-			File privateFile = new File(file, p.getName());
-			if (privateFile.exists()) {
-				privateBooks = privateFile.listFiles();
-			}
-		}
-		if (publicBooks == null && privateBooks == null) {
-			p.sendMessage(Msgs.FAILURE_LIST_NOBOOKS.getMessage());
-			return;
-		}
-		String bookList = new String();
-		if (publicBooks != null && publicBooks.length != 0) {
-			p.sendMessage(Msgs.SUCCESS_LIST_PRIVATE.getMessage());
-			for (File bookFile : publicBooks) {
-				bookList += bookFile.getName().replace(".book", "") + ", ";
-				// Maximum allowed characters in a server-to-client chat message
-				// is 32767.
-				// In the event that people actively try to mess things up or
-				// there are an obscene amount of books, we'll cut it off.
-				//
-				// Maximum book name from in-game save is 92 characters.
-				// Server admins will just have to not be stupid.
-				if (bookList.length() > 32500) {
-					p.sendMessage(ChatColor.DARK_GREEN
-							+ bookList.substring(0, bookList.length() - 2));
-					bookList = new String();
-				}
-			}
-			p.sendMessage(ChatColor.DARK_GREEN
-					+ bookList.substring(0, bookList.length() - 3));
-		}
-		if (privateBooks != null && privateBooks.length != 0) {
-			bookList = new String();
-			p.sendMessage(Msgs.SUCCESS_LIST_PRIVATE.getMessage());
-			for (File bookFile : privateBooks) {
-				bookList += bookFile.getName().replace(".book", "") + ", ";
-
-				if (bookList.length() > 32500) {
-					p.sendMessage(ChatColor.DARK_GREEN
-							+ bookList.substring(0, bookList.length() - 2));
-					bookList = new String();
-				}
-			}
-		}
 	}
 
 	protected void disable() {

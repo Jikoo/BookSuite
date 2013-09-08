@@ -18,60 +18,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
  * @author Jikoo
  * 
  */
-public enum Msgs {
-	FAILURE_COMMAND_NEEDBAQ,
-	FAILURE_COMMAND_NEEDBOOK,
-	FAILURE_COMMAND_NEEDEITHER,
-	FAILURE_COPY_BOOK,
-	FAILURE_COPY_BOTH,
-	FAILURE_COPY_INK,
-	FAILURE_COPY_MAP,
-	FAILURE_COPY_UNCOPIABLE,
-	FAILURE_EDIT_INVALIDNUMBER,
-	FAILURE_EDIT_NOBAQ,
-	FAILURE_FILE_EXISTANT,
-	FAILURE_FILE_NONEXISTANT,
-	FAILURE_LIST_NOBOOKS,
-	FAILURE_OVERWRITE,
-	FAILURE_PERMISSION_COPY,
-	FAILURE_PERMISSION_COPY_OTHER,
-	FAILURE_PERMISSION_TITLE_OTHER,
-	FAILURE_PERMISSION_UNSIGN_OTHER,
-	FAILURE_SPACE,
-	FAILURE_USAGE,
-	HELP_CONSOLE_RELOAD,
-	HELP_CONSOLE_UPDATE,
-	OVERWRITE_FILE,
-	OVERWRITE_WARN,
-	SUCCESS_AUTHOR,
-	SUCCESS_COPY,
-	SUCCESS_DELETE,
-	SUCCESS_EDIT_ADDPAGE,
-	SUCCESS_EDIT_DELPAGE,
-	SUCCESS_EXPORT,
-	SUCCESS_IMPORT,
-	SUCCESS_IMPORT_INITIATED,
-	SUCCESS_LIST_PUBLIC,
-	SUCCESS_LIST_PRIVATE,
-	SUCCESS_TITLE,
-	SUCCESS_UNSIGN,
-	USAGE,
-	USAGE_EXAMPLE,
-	USAGE_AUTHOR,
-	USAGE_AUTHOR_EXAMPLE,
-	USAGE_AUTHOR_EXPLANATION,
-	USAGE_EDIT_ADDPAGE,
-	USAGE_EDIT_ADDPAGE_EXAMPLE,
-	USAGE_EDIT_ADDPAGE_EXPLANATION,
-	USAGE_EDIT_DELPAGE,
-	USAGE_EDIT_DELPAGE_EXAMPLE,
-	USAGE_EDIT_DELPAGE_EXPLANATION,
-	VERSION;
-
-	private YamlConfiguration strings;
-	private String content;
-
-	Msgs() {
+public class Msgs {
+	private static YamlConfiguration strings;
+	public Msgs() {
 		String defaultLocation = "plugins" + File.pathSeparatorChar + "BookSuite"
 				+ File.pathSeparatorChar;
 		BookSuite.getInstance().saveResource("strings.yml", false);
@@ -82,22 +31,10 @@ public enum Msgs {
 			strings = YamlConfiguration.loadConfiguration(BookSuite.getInstance().getResource(
 					"strings.yml"));
 		}
-		
-		//load them into memory once:
-		//this resolves the possibility of reading them in multiple times (bad)
-		//or trying to access the same file at the same time (worse)
-		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(this.name()
-				.toLowerCase()));
-		content = msg.equals("null") ? null : msg;
 	}
 
-	public String getMessage() {
-		return this.content;
-	}
-
-	public String toString() {
-		return BookSuite.getInstance().functions.parseBML(YamlConfiguration.loadConfiguration(
-				BookSuite.getInstance().getResource("strings.yml")).getString(
-				this.name().toLowerCase()));
+	public String get(String s) {
+		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(s));
+		return msg.equals("null") ? null : msg;
 	}
 }

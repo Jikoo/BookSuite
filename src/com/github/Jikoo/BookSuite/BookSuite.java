@@ -34,6 +34,7 @@ public class BookSuite extends JavaPlugin {
 	protected PermissionsListener perms;
 	protected Rules rules;
 	protected Metrics metrics;
+	protected Msgs msgs;
 
 	public Functions functions;
 	public FileManager filemanager;
@@ -58,6 +59,7 @@ public class BookSuite extends JavaPlugin {
 		if (new UpdateStrings(this).update()) {
 			BSLogger.info("More customization has been added to strings.yml.");
 		}
+		msgs = new Msgs();
 
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();
