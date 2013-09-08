@@ -23,7 +23,6 @@ import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
-@SuppressWarnings("unused")
 public class BookSuite extends JavaPlugin {
 	protected final String version = "3.2.0";
 

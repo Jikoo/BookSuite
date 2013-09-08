@@ -69,6 +69,7 @@ public enum Msgs {
 	VERSION;
 
 	private YamlConfiguration strings;
+	private String content;
 
 	Msgs() {
 		String defaultLocation = "plugins" + File.pathSeparatorChar + "BookSuite"
@@ -81,12 +82,17 @@ public enum Msgs {
 			strings = YamlConfiguration.loadConfiguration(BookSuite.getInstance().getResource(
 					"strings.yml"));
 		}
+		
+		//load them into memory once:
+		//this resolves the possibility of reading them in multiple times (bad)
+		//or trying to access the same file at the same time (worse)
+		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(this.name()
+				.toLowerCase()));
+		content = msg.equals("null") ? null : msg;
 	}
 
 	public String getMessage() {
-		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(this.name()
-				.toLowerCase()));
-		return msg.equals("null") ? null : msg;
+		return this.content;
 	}
 
 	public String toString() {
