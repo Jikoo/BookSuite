@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
@@ -103,9 +102,8 @@ public class PostalService {
 				output.close();
 			}
 		} catch (IOException ex) {
-			BookSuite.getInstance().getServer().getLogger()
-					.log(Level.SEVERE, "none of the mail data was saved!!!");
-			ex.printStackTrace();
+			BSLogger.severe("None of the mail data was saved!");
+			BSLogger.err(ex);
 		}
 	}
 }

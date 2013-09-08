@@ -3,7 +3,9 @@
 :added libraries (TODO)
 :added strings.yml for customization/localization
 : - If you make one for another language, I'll link it and credit you.
-:added aliases TODO finish/fix
+:added aliases TODO finish commands
+: - multi-author support
+: - lock 
 :added private saves (and relevant config + permissions) TODO perms + commands
 :added debug mode and cleaned up message logging
 :fixed making a press using the inbuilt function consuming stairs when in creative

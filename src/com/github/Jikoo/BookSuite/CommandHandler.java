@@ -82,9 +82,8 @@ public class CommandHandler implements CommandExecutor {
 		}
 
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.AQUA + "BookSuite v"
-					+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
-					+ " is enabled!");
+			sender.sendMessage(Msgs.VERSION.toString()
+					.replaceAll("<plugin.version>", plugin.version));
 			sender.sendMessage(ChatColor.AQUA + "book reload"
 					+ ChatColor.DARK_GREEN + " - reload the plugin.");
 			sender.sendMessage(ChatColor.AQUA + "book update"
@@ -790,9 +789,8 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public boolean invalidCommand(CommandSender sender) {
-		sender.sendMessage(ChatColor.AQUA + "BookSuite v"
-				+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
-				+ " is enabled!");
+		sender.sendMessage(Msgs.VERSION.toString()
+				.replaceAll("<plugin.version>", plugin.version));
 		if (listPermittedCommands(sender).length() > 0) {
 			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use "
 					+ ChatColor.AQUA + "/book help <topic(s)>"

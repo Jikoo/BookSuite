@@ -1,18 +1,7 @@
 A multipurpose book-based suite
-Current features (3.1.1):
+Current features (3.1.2):
 	- right click a "press" (crafting table with inverted stairs above) with a written book to duplicate it.
 	- right click an "eraser" (sponge) with a written book to unsign it.
-	- mail a "package" by right clicking air while holding it
-		Valid packages meet the following conditions.
-		Title is "Package" (Capitalization does not matter)
-		First page contains:
-			package: <title of book message>
-			to: <name of recipient>
-			item: <Name of item>
-		Item attachment is optional. Attached items MUST be custom named with an anvil.
-		Anything written on the first page after sending data WILL be consumed. Start your message on the second.
-	- unpack a "package" by right clicking while holding it
-		Openable packages are titled "Package: <title of book message>"
 	- /book args[]
 		invalid command: Displays help/usage based on player permissions
 		addpage <number> (page text): adds a page to book and quill in hand

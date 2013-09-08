@@ -279,7 +279,7 @@ permissions:
         description: all non-command alias functions
         default: false
         children:
-            booksuite.alias.lock.auto:
+            booksuite.alias.sign:
                 description: set book and quill author to player alias, require perm to edit. /book u to unlock
                 default: false
 

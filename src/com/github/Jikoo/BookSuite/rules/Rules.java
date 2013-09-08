@@ -58,9 +58,9 @@ public class Rules implements CommandExecutor, Listener {
 						Integer entryNumber = Integer.parseInt(entry);
 
 						newRules.put(entryNumber, ruleYML.getString("books." + entry));
-					} catch (NumberFormatException e) {}// if it isn't an int,
-														// it doesn't belong
-														// anyway. Delete entry.
+					} catch (NumberFormatException e) {
+						// if it isn't an int, it doesn't belong anyway. Delete entry.
+					}
 				}
 				// make rules.yml entry
 				// make file

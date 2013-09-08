@@ -57,12 +57,19 @@ public class PermissionsListener implements Listener {
 			if (command[0].equals("op") || command[0].equals("deop")) {
 				// While vanilla would use getPlayerExact, we need to
 				// compensate for autofill from plugins
+				if (command.length == 1) {
+					int taskID = syncOpPermissionsCheck(event.getPlayer(), event.getPlayer().isOp());
+					if (taskID != -1) {
+						tasks.put(event.getPlayer().getName(), taskID);
+					}
+					return;
+				}
 				List<Player> pList = Bukkit.matchPlayer(command[1]);
 				for (Player p : pList) {
 					if (p != null) {
 						int taskID = syncOpPermissionsCheck(p, p.isOp());
 						if (taskID != -1) {
-							tasks.put(event.getPlayer().getName(), taskID);
+							tasks.put(p.getName(), taskID);
 						}
 					}
 				}

@@ -223,8 +223,8 @@ public class Functions {
 		}
 		BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
 		unsignMeta.setTitle(null);
-		
-		unsignMeta.setAuthor(null);
+		if (unsign.getType().equals(Material.BOOK_AND_QUILL))
+			unsignMeta.setAuthor(null);
 		unsign.setItemMeta(unsignMeta);
 		unsign.setType(Material.BOOK_AND_QUILL);
 		return true;
@@ -583,11 +583,10 @@ public class Functions {
 		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
 		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
-		text = text.replaceAll("<plugin.version>", BookSuite.getInstance().version);
 		return text;
 	}
 
-	boolean isAuthor(Player p, String author) {
+	public boolean isAuthor(Player p, String author) {
 		ArrayList<String> aliases = BookSuite.getInstance().alias.getAliases(p);
 		for (String s : parseAuthors(author)) {
 			if (aliases.contains(s)) {
@@ -598,14 +597,14 @@ public class Functions {
 	}
 
 	public String[] parseAuthors(String authors) {
-		return authors.replaceAll(",? and", ", ").split(", ");
+		return authors.replaceAll(",? and", ", ").split("(" + ChatColor.GRAY + ")?,\\s+");
 	}
 
 	public String getAuthors(String[] old, String author) {
 		StringBuilder sb = new StringBuilder();
 		if (old != null) {
 			for (int i = 0; i < old.length; i++) {
-				sb.append(old[i]).append(", ");
+				sb.append(old[i]).append(ChatColor.GRAY).append(", ");
 			}
 			sb.deleteCharAt(sb.lastIndexOf(",")).append("and ");
 		}
@@ -625,20 +624,14 @@ public class Functions {
 	 */
 	public BookMeta addAuthor(BookMeta bm, String oldAuthors, Player author, boolean signing) {
 		String newAuthors = BookSuite.getInstance().alias.getActiveAlias(author);
-		boolean isCredited = true;
+		boolean isCredited = false;
 		if (oldAuthors != null) {
-			isCredited = false;
-			String[] old = this.parseAuthors(oldAuthors);
-			for (String s : old) {
-				if (BookSuite.getInstance().alias.getAliases(author).contains(s)) {
-					isCredited = true;
-				}
-			}
+			isCredited = this.isAuthor(author, oldAuthors);
 			if (!isCredited) {
-				newAuthors = this.getAuthors(old, newAuthors);
+				newAuthors = this.getAuthors(this.parseAuthors(oldAuthors), newAuthors);
 			}
 		}
-		bm.setAuthor(newAuthors);
+		bm.setAuthor(isCredited ? oldAuthors : newAuthors);
 
 		ArrayList<String> lore = bm.hasLore() ? (ArrayList<String>) bm.getLore() : null;
 		if (bm.hasLore() && lore.get(0).equals(ChatColor.GRAY + "by " + oldAuthors)) {
@@ -654,7 +647,7 @@ public class Functions {
 			}
 		} else {
 			lore = new ArrayList<String>();
-			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ").append(newAuthors)
+			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ").append(isCredited ? oldAuthors : newAuthors)
 					.toString());
 			if (bm.hasLore()) {
 				lore.addAll(bm.getLore());

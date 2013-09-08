@@ -51,6 +51,9 @@ public class MainListener implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 
 		Player p = event.getPlayer();
 
@@ -181,20 +184,21 @@ public class MainListener implements Listener {
 			for (String author : plugin.functions.parseAuthors(obm.getAuthor())) {
 				if (plugin.alias.getAliases(event.getPlayer()).contains(author)) {
 					event.setCancelled(false);
-
-					if (event.isSigning()
-							|| event.getPlayer().hasPermission("booksuite.alias.lock.auto")) {
-						bm = plugin.functions.addAuthor(bm, obm.getAuthor(), event.getPlayer(),
-								event.isSigning());
-					}
-					event.setNewBookMeta(bm);
-					return;
 				}
 			}
-			event.getPlayer().sendMessage(
-					ChatColor.DARK_RED + "You'll need " + obm.getAuthor().replace(" and ", " or ")
-					+ ChatColor.DARK_RED + "'s permission to edit this book!");
+			if (event.isCancelled()) {
+				event.getPlayer().sendMessage(
+						ChatColor.DARK_RED + "You'll need " + obm.getAuthor().replace(" and ", " or ")
+						+ ChatColor.DARK_RED + "'s permission to edit this book!");
+				return;
+			}
 		}
+		if (event.isSigning()
+				|| event.getPlayer().hasPermission("booksuite.alias.sign")) {
+			bm = plugin.functions.addAuthor(bm, obm.hasAuthor() ? obm.getAuthor() : null,
+					event.getPlayer(), event.isSigning());
+		}
+		event.setNewBookMeta(bm);
 	}
 
 	public void disable() {

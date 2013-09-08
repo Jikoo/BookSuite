@@ -37,14 +37,14 @@ public class BSLogger {
 		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
 			return;
 		}
-		Bukkit.getConsoleSender().sendMessage("[BookSuite] " + msg);
+		Bukkit.getConsoleSender().sendMessage("[BookSuite Debug] " + msg);
 	}
 
 	public static void debugWarn(String msg) {
 		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
 			return;
 		}
-		Bukkit.getLogger().warning("[BookSuite] " + msg);
+		Bukkit.getLogger().warning("[BookSuite Debug] " + msg);
 	}
 
 	public static void err(Exception e) {
@@ -55,8 +55,8 @@ public class BSLogger {
 		for (StackTraceElement ste : e.getStackTrace()) {
 			trace += "\n\tat " + ste.toString();
 		}
-		warn("Error report:\n" + trace);
-		warn("End of error report.");
+		debugWarn("Error report:\n" + trace);
+		debugWarn("End of error report.");
 	}
 
 	public static void criticalErr(Exception e) {

@@ -23,6 +23,7 @@ import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
+@SuppressWarnings("unused")
 public class BookSuite extends JavaPlugin {
 	protected final String version = "3.2.0";
 
@@ -126,7 +127,7 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		PostalService.getInstance().writeToFile();
+		//PostalService.getInstance().writeToFile();
 
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
