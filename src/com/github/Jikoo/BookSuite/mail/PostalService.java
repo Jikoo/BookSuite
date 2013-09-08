@@ -106,4 +106,11 @@ public class PostalService {
 			BSLogger.err(ex);
 		}
 	}
+
+	public static void disable() {
+		if (instance != null)
+		{
+			getInstance().writeToFile();
+		}
+	}
 }

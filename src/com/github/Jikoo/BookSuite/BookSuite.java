@@ -127,7 +127,7 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		//PostalService.getInstance().writeToFile();
+		PostalService.disable();
 
 		if (new File(getDataFolder(), "temp").exists())
 			filemanager.delete(getDataFolder().getPath(), "temp");
