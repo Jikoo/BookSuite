@@ -78,7 +78,7 @@ public class Alias {
 	/**
 	 * Saves aliases to file if in the correct mode. Mode is set in config.yml.
 	 */
-	public void save() {
+	public void disable() {
 		if (type.equals(AliasType.MULTI)) {
 			try {
 				aliasYML.save(new File(dataFolder, "aliases.yml"));
@@ -86,6 +86,9 @@ public class Alias {
 				BSLogger.warn("Could not save aliases.yml!");
 			}
 		}
+		this.type = null;
+		this.aliasYML = null;
+		this.dataFolder = null;
 	}
 
 	/**
@@ -103,7 +106,6 @@ public class Alias {
 		ArrayList<String> aliasList = (ArrayList<String>) aliasYML.getStringList(pName);
 		aliasList.add(newAlias);
 		aliasYML.set(pName, aliasList);
-		save();
 		return true;
 	}
 
@@ -155,7 +157,6 @@ public class Alias {
 		ArrayList<String> aliasList = (ArrayList<String>) aliasYML.getStringList(pName);
 		aliasList.remove(oldAlias);
 		aliasYML.set(pName, aliasList);
-		save();
 		return true;
 	}
 
@@ -204,7 +205,6 @@ public class Alias {
 	public boolean setActiveAlias(Player p, String active) {
 		if (getAliases(p).contains(active)) {
 			aliasYML.set("current." + p.getName(), active);
-			save();
 			return true;
 		}
 		return false;
@@ -253,7 +253,6 @@ public class Alias {
 				return current;
 			}
 			aliasYML.set("current." + p.getName(), p.getDisplayName());
-			save();
 		case DEFAULT:
 		default:
 			return p.getDisplayName();

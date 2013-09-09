@@ -313,6 +313,7 @@ public class CommandHandler implements CommandExecutor {
 			BSLogger.info("More customization has been added to strings.yml.");
 		}
 		plugin.msgs = new Msgs();
+		plugin.alias.enable();
 
 		if (plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
 			if (plugin.perms != null) {

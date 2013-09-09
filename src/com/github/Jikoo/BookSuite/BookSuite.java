@@ -151,7 +151,7 @@ public class BookSuite extends JavaPlugin {
 			perms.disable();
 		perms = null;
 
-		alias.save();
+		alias.disable();
 		alias = null;
 
 		command = null;
