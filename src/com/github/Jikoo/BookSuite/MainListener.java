@@ -194,10 +194,8 @@ public class MainListener implements Listener {
 							+ "You do not have permission to use erasers.");
 					event.setCancelled(true);
 				}
-			} else if (plugin.functions.isMailBox(clicked)) {
-				p.openInventory(MailBox.getMailBox(p).open(p));
-				event.setCancelled(true);
-			} /*
+			}
+			/*
 			 * else if (plugin.functions.isLibrary(clicked, p)){
 			 * 
 			 * }
@@ -207,9 +205,10 @@ public class MainListener implements Listener {
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
-		if (event.getInventory().getTitle().contains("'s MailBox")) {
-			MailBox.getMailBox(event.getPlayer().getName()).sendMail(
-					event.getInventory());
+		for (BookSuiteModule bsm : modules) {
+			if (bsm.isTriggeredByEvent(event)) {
+				// meh
+			}
 		}
 	}
 

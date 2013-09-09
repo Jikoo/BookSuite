@@ -147,6 +147,10 @@ public class JsonValue implements Iterable<JsonValue> {
 	public Iterator<JsonValue> iterator() {
 		return new LinkedList<JsonValue>().iterator();
 	}
+
+	public String valueOf() {
+		return "";
+	}
 }
 
 class I {

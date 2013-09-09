@@ -26,12 +26,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.Jikoo.BookSuite.module.BookSuiteModule;
 
-public class PostalService {
+public class PostalService implements BookSuiteModule{
 
 	// the inventory of the postal service
 	private Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
@@ -122,8 +128,9 @@ public class PostalService {
 	/**
 	 * writes the postal service object to file so that it can be retrieved
 	 * later
+	 * @throws Exception 
 	 */
-	public void writeToFile() {
+	public void writeToFile() throws Exception {
 		try {
 			OutputStream file = new FileOutputStream(BookSuite.getInstance()
 					.getDataFolder() + "/mail.post");
@@ -131,6 +138,7 @@ public class PostalService {
 			ObjectOutput output = new ObjectOutputStream(buffer);
 			try {
 				output.writeObject(inventory);
+				throw new Exception();
 			} finally {
 				output.close();
 			}
@@ -140,13 +148,50 @@ public class PostalService {
 		}
 	}
 
-	/**
-	 * disables the module of the pluggin: if postal service has been accessed,
-	 * save it to file, otherwise, do nothing
-	 */
-	public static void disable() {
+	@Override
+	public int disable() {
 		if (instance != null) {
-			getInstance().writeToFile();
+			try {
+				getInstance().writeToFile();
+			} catch (Exception e) {
+				return 1;
+			}
 		}
+		return 0;
 	}
+	
+	@Override
+	public boolean isEnabled() {
+		return instance!=null;
+	}
+
+	@Override
+	public boolean isTriggeredByEvent(Event e) {
+		
+		if (e instanceof PlayerInteractEvent){
+			PlayerInteractEvent pie = (PlayerInteractEvent)e;
+			if (BookSuite.getInstance().functions.isMailBox(pie.getClickedBlock())) {
+				Player p = pie.getPlayer();
+				p.openInventory(MailBox.getMailBox(p).open(p));
+				pie.setCancelled(true);
+				return true;
+			}
+		} else if (e instanceof InventoryCloseEvent){
+			InventoryCloseEvent event = (InventoryCloseEvent)e;
+			if (event.getInventory().getTitle().contains("'s MailBox")) {
+				MailBox.getMailBox(event.getPlayer().getName()).sendMail(
+						event.getInventory());
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isTriggeringCommand(Command c, String[] args,
+			CommandSender sender, String label) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -1,7 +1,7 @@
 [
 	{
 		"name":"mail",
-		"classpath":"com.github.jikoo.BookSuite",
+		"classpath":"com.github.Jikoo.BookSuite.mail.PostmasterGeneral",
 		"default":"enabled"
 	}
 ]

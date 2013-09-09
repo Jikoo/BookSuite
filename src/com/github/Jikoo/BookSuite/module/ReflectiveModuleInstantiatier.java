@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
+import com.github.Jikoo.BookSuite.BookSuite;
 import com.github.Jikoo.BookSuite.MainListener;
 import com.github.Jikoo.BookSuite.io.json.JsonValue;
 
@@ -14,10 +15,11 @@ public class ReflectiveModuleInstantiatier {
 				.getClassLoader();
 		JsonValue modules;
 		try {
-			modules = JsonValue.getJsonValue(readFile("modules.json"));
+			modules = JsonValue.getJsonValue(readFile(BookSuite.getInstance()
+					.getDataFolder() + "/modules.json"));
 			for (JsonValue jv : modules) {
 				Class<?> aClass = classLoader.loadClass(jv.get("classpath")
-						.toString());
+						.valueOf());
 				ModuleManager ob = (ModuleManager) aClass.newInstance();
 				ml.addModule(ob.getManagedModule());
 			}
