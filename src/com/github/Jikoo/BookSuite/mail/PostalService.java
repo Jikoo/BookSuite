@@ -83,7 +83,7 @@ public class PostalService {
 	public List<BookMailWrapper> distribute(String p, int amount) {
 		List<BookMailWrapper> mail = new LinkedList<BookMailWrapper>();
 		List<BookMailWrapper> allMail = this.inventory.get(p);
-		while (mail.size() <= amount && allMail != null && allMail.size() > 0) {
+		while (mail.size() < amount && allMail != null && allMail.size() > 0) {
 			mail.add(allMail.remove(0));
 		}
 
