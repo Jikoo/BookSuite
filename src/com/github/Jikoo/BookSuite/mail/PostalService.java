@@ -32,8 +32,13 @@ import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class PostalService {
-	Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
 
+	// the inventory of the postal service
+	private Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
+
+	/*
+	 * Singleton instance
+	 */
 	private static PostalService instance;
 
 	public static PostalService getInstance() {
@@ -43,6 +48,10 @@ public class PostalService {
 		return instance;
 	}
 
+	/**
+	 * creates a new instance of the postal service if there was not one already
+	 * in existence in file.
+	 */
 	public PostalService() {
 		try {
 			// use buffering
@@ -61,12 +70,22 @@ public class PostalService {
 		}
 	}
 
+	/**
+	 * 
+	 * @param mail
+	 *            a list of mail wrappers that can be added to the inventory
+	 */
 	public void collect(List<BookMailWrapper> mail) {
 		for (BookMailWrapper bmw : mail) {
 			this.collect(bmw);
 		}
 	}
 
+	/**
+	 * 
+	 * @param bmw
+	 *            a single mail wrapper that can be added to the inventory
+	 */
 	public void collect(BookMailWrapper bmw) {
 		if (this.inventory.get(bmw.getAdressee()) == null) {
 			this.inventory.put(bmw.getAdressee(),
@@ -76,6 +95,16 @@ public class PostalService {
 		this.inventory.get(bmw.getAdressee()).add(bmw);
 	}
 
+	/**
+	 * 
+	 * @param p
+	 *            the player to whom the mail is being distributed
+	 * @param amount
+	 *            the amount of space that the mailbox has free and is to be
+	 *            filled
+	 * @return a list of book wrappers that is less than or equal to the
+	 *         provided maximum amount, and all addressed to the player provided
+	 */
 	public List<BookMailWrapper> distribute(Player p, int amount) {
 		return this.distribute(p.getName(), amount);
 	}
@@ -90,6 +119,10 @@ public class PostalService {
 		return mail;
 	}
 
+	/**
+	 * writes the postal service object to file so that it can be retrieved
+	 * later
+	 */
 	public void writeToFile() {
 		try {
 			OutputStream file = new FileOutputStream(BookSuite.getInstance()
@@ -107,9 +140,12 @@ public class PostalService {
 		}
 	}
 
+	/**
+	 * disables the module of the pluggin: if postal service has been accessed,
+	 * save it to file, otherwise, do nothing
+	 */
 	public static void disable() {
-		if (instance != null)
-		{
+		if (instance != null) {
 			getInstance().writeToFile();
 		}
 	}

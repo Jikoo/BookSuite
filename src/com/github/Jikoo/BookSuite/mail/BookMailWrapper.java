@@ -18,7 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class BookMailWrapper implements Serializable{
+public class BookMailWrapper implements Serializable {
 	/*
 	 * The structure for a letter or package is as follows:
 	 * 
@@ -28,8 +28,8 @@ public class BookMailWrapper implements Serializable{
 	 * 
 	 * Page 1: To
 	 * 
-	 * Page 2: (optional, though must be blank for sending items) Associated
-	 * Message
+	 * Page 2: (optional, though must be blank for sending items)
+	 * 		   Associated Message
 	 * 
 	 * Page 3: (optional) Item Names
 	 * 
@@ -42,7 +42,7 @@ public class BookMailWrapper implements Serializable{
 	 */
 
 	/**
-	 * 
+	 * serialization ID for saving to file
 	 */
 	private static final long serialVersionUID = -6365444142867806360L;
 
@@ -50,47 +50,74 @@ public class BookMailWrapper implements Serializable{
 	private boolean pack = false;
 	private String sender;
 	private String adressee;
-	
-	//replaces storing the bookmeta for serialization
+
+	// replaces storing the bookmeta for serialization
 	private String title;
 	private List<String> pages;
 	private List<String> lore;
-	
 
+	/**
+	 * 
+	 * BookMailWrapper is generally a wrapper that allows for serialization,
+	 * though later will support package sending too.
+	 * 
+	 * @param bm
+	 *            the book meta to be stripped out for serialization purposes
+	 */
 	public BookMailWrapper(BookMeta bm) {
 		this.title = bm.getTitle();
 		this.adressee = bm.getPage(1).toString();
 		this.pages = bm.getPages();
-		if (bm.hasLore()){
+		if (bm.hasLore()) {
 			this.lore = bm.getLore();
 		}
-		
+
 		this.sender = bm.getAuthor();
 		this.letter = "letter".equalsIgnoreCase(title);
 		this.pack = "package".equalsIgnoreCase(title);
 	}
 
+	/**
+	 * 
+	 * @return the name of the player to whom this letter is addressed
+	 */
 	public String getAdressee() {
 		return this.adressee;
 	}
 
+	/**
+	 * 
+	 * @return whether this is a wrapper for a letter
+	 */
 	public boolean isLetter() {
 		return this.letter;
 	}
 
+	/**
+	 * 
+	 * @return whether this is a wrapper for a package
+	 */
 	public boolean isPackage() {
 		return this.pack;
 	}
 
+	/**
+	 * 
+	 * @return the name of the player from whom this letter was sent
+	 */
 	public String getSender() {
 		return this.sender;
 	}
 
+	/**
+	 * 
+	 * @return a BookMeta that is identical to the original
+	 */
 	public BookMeta getAllMeta() {
 		ItemStack i = new ItemStack(Material.WRITTEN_BOOK);
 		BookMeta bm = (BookMeta) i.getItemMeta();
 		bm.setAuthor(sender);
-		if (lore!=null){
+		if (lore != null) {
 			bm.setLore(lore);
 		}
 		bm.setPages(pages);
