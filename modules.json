@@ -1,0 +1,7 @@
+[
+	{
+		"name":"mail",
+		"classpath":"com.github.jikoo.BookSuite",
+		"default":"enabled"
+	}
+]
