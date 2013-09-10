@@ -22,12 +22,9 @@ public class ReflectiveModuleInstantiatier {
 						.valueOf());
 				ModuleManager ob = (ModuleManager) aClass.newInstance();
 				if ("enabled".equals(jv.get("defualt"))){
-					ob.getManagedModule().enable();
+					ml.addModule(ob.getManagedModule());
 				}
-				else {
-					ob.getManagedModule().disable();
-				}
-				ml.addModule(ob.getManagedModule());
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
