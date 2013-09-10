@@ -10,10 +10,8 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.mail;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -23,19 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 public class MailBox {
-	private static Map<String, MailBox> boxes = new HashMap<String, MailBox>();
-
-	public static MailBox getMailBox(Player p) {
-		return MailBox.getMailBox(p.getName());
-	}
-
-	public static MailBox getMailBox(String p) {
-		if (boxes.get(p) == null) {
-			boxes.put(p, new MailBox(p, 9));
-		}
-		return boxes.get(p);
-	}
-
 	private String user;
 	private int maxSize;
 	private List<BookMailWrapper> inventory = new LinkedList<BookMailWrapper>();

@@ -11,30 +11,41 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
-import org.bukkit.configuration.file.YamlConfiguration;
+import com.github.Jikoo.BookSuite.io.json.JsonException;
+import com.github.Jikoo.BookSuite.io.json.JsonString;
+import com.github.Jikoo.BookSuite.io.json.JsonValue;
 
-/**
- * @author Jikoo
- * 
- */
 public class Msgs {
-	private static YamlConfiguration strings;
-	public Msgs() {
-		String defaultLocation = "plugins" + File.pathSeparatorChar + "BookSuite"
-				+ File.pathSeparatorChar;
-		BookSuite.getInstance().saveResource("strings.yml", false);
-		File f = new File(defaultLocation, "strings.yml");
-		if (f.exists()) {
-			strings = YamlConfiguration.loadConfiguration(f);
-		} else {
-			strings = YamlConfiguration.loadConfiguration(BookSuite.getInstance().getResource(
-					"strings.yml"));
+	private static JsonValue messages;
+
+	private static void parse() throws FileNotFoundException {
+		String path = BookSuite.getInstance().getDataFolder() + "/msgs.json";
+		Scanner reader = new Scanner(new File(path));
+		StringBuilder sb = new StringBuilder();
+		while (reader.hasNext()) {
+			sb.append(reader.next());
 		}
+		reader.close();
+		String s = sb.toString();
+		messages = JsonValue.getJsonValue(s);
 	}
 
-	public String get(String s) {
-		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(s));
-		return msg.equals("null") ? null : msg;
+	public static String getMessage(String s) {
+		if (messages == null) {
+			try {
+				parse();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			return messages.get(new JsonString(s)).valueOf();
+		} catch (JsonException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 }

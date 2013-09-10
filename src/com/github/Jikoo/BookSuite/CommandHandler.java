@@ -82,10 +82,10 @@ public class CommandHandler implements CommandExecutor {
 		}
 
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(plugin.msgs.get("VERSION")
+			sender.sendMessage(Msgs.getMessage("VERSION")
 					.replace("<plugin.version>", plugin.version));
-			sender.sendMessage(plugin.msgs.get("HELP_CONSOLE_RELOAD"));
-			sender.sendMessage(plugin.msgs.get("HELP_CONSOLE_UPDATE"));
+			sender.sendMessage(Msgs.getMessage("HELP_CONSOLE_RELOAD"));
+			sender.sendMessage(Msgs.getMessage("HELP_CONSOLE_UPDATE"));
 			return true;
 		}
 
@@ -166,11 +166,11 @@ public class CommandHandler implements CommandExecutor {
 								+ "/SavedBooks/", true));
 				if (!newbook.hasItemMeta()
 						|| newbook.getItemMeta() == null) {
-					p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
+					p.sendMessage(Msgs.getMessage("FAILURE_FILE_NONEXISTANT"));
 				} else {
 					if (plugin.functions.canObtainBook(p)) {
 						p.getInventory().addItem(newbook);
-						p.sendMessage(plugin.msgs.get("SUCCESS_IMPORT")
+						p.sendMessage(Msgs.getMessage("SUCCESS_IMPORT")
 								.replace("<book.savename>", args[1]));
 					}
 				}
@@ -183,7 +183,7 @@ public class CommandHandler implements CommandExecutor {
 				else {
 					asyncBookImport(p.getName(), args[1], plugin
 							.getDataFolder().getPath());
-					p.sendMessage(plugin.msgs.get("SUCCESS_IMPORT_INITIATED"));
+					p.sendMessage(Msgs.getMessage("SUCCESS_IMPORT_INITIATED"));
 				}
 				return true;
 			}
@@ -198,7 +198,7 @@ public class CommandHandler implements CommandExecutor {
 					else
 						plugin.filemanager.delete(plugin.getDataFolder()
 								+ "/SavedBooks/", args[1] + ".book");
-					p.sendMessage(plugin.msgs.get("SUCCESS_DELETE").replace("<file.name>", args[1]));
+					p.sendMessage(Msgs.getMessage("SUCCESS_DELETE").replace("<file.name>", args[1]));
 					return true;
 				}
 			}
@@ -226,7 +226,7 @@ public class CommandHandler implements CommandExecutor {
 							text += args[i];
 					}
 					if (plugin.functions.insertPageAt(p, args[1], text))
-						p.sendMessage(plugin.msgs.get("SUCCESS_EDIT_ADDPAGE"));
+						p.sendMessage(Msgs.getMessage("SUCCESS_EDIT_ADDPAGE"));
 					return true;
 				}
 			}
@@ -236,7 +236,7 @@ public class CommandHandler implements CommandExecutor {
 			if (args[0].equals("delpage")) {
 				if (CommandPermissions.EDIT.checkPermission(p)) {
 					if (plugin.functions.deletePageAt(p, args[1]))
-						p.sendMessage(plugin.msgs.get("SUCCESS_EDIT_DELPAGE"));
+						p.sendMessage(Msgs.getMessage("SUCCESS_EDIT_DELPAGE"));
 					return true;
 				}
 			}
@@ -252,9 +252,9 @@ public class CommandHandler implements CommandExecutor {
 						else
 							newAuthor += args[i];
 					if (plugin.functions.setAuthor(p, newAuthor))
-						p.sendMessage(plugin.msgs.get("SUCCESS_AUTHOR"));
+						p.sendMessage(Msgs.getMessage("SUCCESS_AUTHOR"));
 					else
-						p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+						p.sendMessage(Msgs.getMessage("FAILURE_COMMAND_NEEDBOOK"));
 					return true;
 				}
 			}
@@ -266,7 +266,7 @@ public class CommandHandler implements CommandExecutor {
 	public boolean title(Player p, String[] args) {
 		if (CommandPermissions.TITLE.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+				p.sendMessage(Msgs.getMessage("FAILURE_COMMAND_NEEDBOOK"));
 			}
 			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
 					|| p.hasPermission("booksuite.command.title.other")) {
@@ -277,9 +277,9 @@ public class CommandHandler implements CommandExecutor {
 						newTitle += " ";
 				}
 				plugin.functions.setTitle(p, newTitle);
-				p.sendMessage(plugin.msgs.get("SUCCESS_TITLE"));
+				p.sendMessage(Msgs.getMessage("SUCCESS_TITLE"));
 			} else {
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_TITLE_OTHER"));
+				p.sendMessage(Msgs.getMessage("FAILURE_PERMISSION_TITLE_OTHER"));
 			}
 			return true;
 		}
@@ -290,14 +290,14 @@ public class CommandHandler implements CommandExecutor {
 		if (CommandPermissions.UNSIGN.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)
 					&& !p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDEITHER"));
+				p.sendMessage(Msgs.getMessage("FAILURE_COMMAND_NEEDEITHER"));
 			}
 			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
 					|| p.hasPermission("booksuite.command.unsign.other")) {
 				plugin.functions.unsign(p);
-				p.sendMessage(plugin.msgs.get("SUCCESS_UNSIGN"));
+				p.sendMessage(Msgs.getMessage("SUCCESS_UNSIGN"));
 			} else
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_UNSIGN_OTHER"));
+				p.sendMessage(Msgs.getMessage("FAILURE_PERMISSION_UNSIGN_OTHER"));
 			return true;
 		} else
 			return false;
@@ -418,10 +418,10 @@ public class CommandHandler implements CommandExecutor {
 					}
 				}
 				if (completed)
-					p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+					p.sendMessage(Msgs.getMessage("SUCCESS_COPY"));
 				return true;
 			} else if (!is.hasItemMeta() || is.getItemMeta() == null) {
-				p.sendMessage(plugin.msgs.get("FAILURE_COPY_UNCOPIABLE"));
+				p.sendMessage(Msgs.getMessage("FAILURE_COPY_UNCOPIABLE"));
 			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 				if (plugin.functions.checkCommandCopyPermission(p, bm.getAuthor())) {
@@ -434,7 +434,7 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}
 					if (completed)
-						p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+						p.sendMessage(Msgs.getMessage("SUCCESS_COPY"));
 				}
 				return true;
 			} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
@@ -448,12 +448,12 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}
 					if (completed)
-						p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+						p.sendMessage(Msgs.getMessage("SUCCESS_COPY"));
 				} else
-					p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
+					p.sendMessage(Msgs.getMessage("FAILURE_PERMISSION_COPY"));
 				return true;
 			} else
-				p.sendMessage(plugin.msgs.get("FAILURE_COPY_UNCOPIABLE"));
+				p.sendMessage(Msgs.getMessage("FAILURE_COPY_UNCOPIABLE"));
 			return true;
 		} else
 			return false;
@@ -462,18 +462,18 @@ public class CommandHandler implements CommandExecutor {
 	public boolean export(Player p, String[] args) {
 		if (CommandPermissions.EXPORT.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+				p.sendMessage(Msgs.getMessage("FAILURE_COMMAND_NEEDBOOK"));
 				return true;
 			}
 			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 			if (plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder()
 					+ "/SavedBooks/", args[1])) {
-				p.sendMessage(plugin.msgs.get("SUCCESS_EXPORT")
+				p.sendMessage(Msgs.getMessage("SUCCESS_EXPORT")
 						.replace("<book.savename>", args[1]));
 			} else {
-				p.sendMessage(plugin.msgs.get("FAILURE_FILE_EXISTANT"));
+				p.sendMessage(Msgs.getMessage("FAILURE_FILE_EXISTANT"));
 				if (p.hasPermission("booksuite.command.delete")) {
-					p.sendMessage(plugin.msgs.get("OVERWRITE_FILE")
+					p.sendMessage(Msgs.getMessage("OVERWRITE_FILE")
 							.replace("<book.savename>", args[1]));
 					overwritable.put(p.getName(), args[1]);
 					syncOverwriteTimer(p);
@@ -488,7 +488,7 @@ public class CommandHandler implements CommandExecutor {
 		if (CommandPermissions.DELETE.checkPermission(p)
 				&& CommandPermissions.EXPORT.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
-				p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+				p.sendMessage(Msgs.getMessage("FAILURE_COMMAND_NEEDBOOK"));
 				return true;
 			} else {
 				if (overwritable.containsKey(p.getName())) {
@@ -499,7 +499,7 @@ public class CommandHandler implements CommandExecutor {
 								.getItemInHand().getItemMeta(),
 								plugin.getDataFolder() + "/SavedBooks/",
 								overwritable.get(p.getName()))) {
-							p.sendMessage(plugin.msgs.get("SUCCESS_EXPORT")
+							p.sendMessage(Msgs.getMessage("SUCCESS_EXPORT")
 									.replace("<book.savename>", overwritable.get(p.getName())));
 						}
 					}
@@ -509,16 +509,16 @@ public class CommandHandler implements CommandExecutor {
 					if (args.length == 2) {
 						if (!plugin.filemanager.delete(plugin.getDataFolder()
 								+ "/SavedBooks/", args[1])) {
-							p.sendMessage(plugin.msgs.get("OVERWRITE_WARN"));
+							p.sendMessage(Msgs.getMessage("OVERWRITE_WARN"));
 						}
 						if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p
 								.getItemInHand().getItemMeta(),
 								plugin.getDataFolder() + "/SavedBooks/",
 								args[1])) {
-							p.sendMessage(plugin.msgs.get("SUCCESS_EXPORT"));
+							p.sendMessage(Msgs.getMessage("SUCCESS_EXPORT"));
 						}
 					} else
-						p.sendMessage(plugin.msgs.get("FAILURE_OVERWRITE"));
+						p.sendMessage(Msgs.getMessage("FAILURE_OVERWRITE"));
 					return true;
 				}
 			}
@@ -529,7 +529,7 @@ public class CommandHandler implements CommandExecutor {
 	public boolean usage(Player p, String[] args) {
 		if (listPermittedCommands(p).length() > 0) {
 			if (args.length == 1) {
-				p.sendMessage(plugin.msgs.get("USAGE"));
+				p.sendMessage(Msgs.getMessage("USAGE"));
 				p.sendMessage(ChatColor.DARK_RED + listPermittedCommands(p));
 			} else {
 				boolean failure = false;
@@ -543,20 +543,20 @@ public class CommandHandler implements CommandExecutor {
 							if (cdp.checkPermission(p)) {
 								switch (cdp) {
 								case EDIT:
-									p.sendMessage(plugin.msgs.get("USAGE_EDIT_ADDPAGE")
-											+ plugin.msgs.get("USAGE_EDIT_ADDPAGE_EXPLANATION"));
-									p.sendMessage(plugin.msgs.get("USAGE_EXAMPLE")
-											+ plugin.msgs.get("USAGE_EDIT_ADDPAGE_EXAMPLE"));
-									p.sendMessage(plugin.msgs.get("USAGE_EDIT_DELPAGE")
-											+ plugin.msgs.get("USAGE_EDIT_DELPAGE_EXPLANATION"));
-									p.sendMessage(plugin.msgs.get("USAGE_EXAMPLE")
-											+ plugin.msgs.get("USAGE_EDIT_DELPAGE_EXAMPLE"));
+									p.sendMessage(Msgs.getMessage("USAGE_EDIT_ADDPAGE")
+											+ Msgs.getMessage("USAGE_EDIT_ADDPAGE_EXPLANATION"));
+									p.sendMessage(Msgs.getMessage("USAGE_EXAMPLE")
+											+ Msgs.getMessage("USAGE_EDIT_ADDPAGE_EXAMPLE"));
+									p.sendMessage(Msgs.getMessage("USAGE_EDIT_DELPAGE")
+											+ Msgs.getMessage("USAGE_EDIT_DELPAGE_EXPLANATION"));
+									p.sendMessage(Msgs.getMessage("USAGE_EXAMPLE")
+											+ Msgs.getMessage("USAGE_EDIT_DELPAGE_EXAMPLE"));
 									break;
 								case AUTHOR:
-									p.sendMessage(plugin.msgs.get("USAGE_AUTHOR")
-											+ plugin.msgs.get("USAGE_AUTHOR_EXPLANATION"));
-									p.sendMessage(plugin.msgs.get("USAGE_EXAMPLE")
-											+ plugin.msgs.get("USAGE_AUTHOR_EXAMPLE"));
+									p.sendMessage(Msgs.getMessage("USAGE_AUTHOR")
+											+ Msgs.getMessage("USAGE_AUTHOR_EXPLANATION"));
+									p.sendMessage(Msgs.getMessage("USAGE_EXAMPLE")
+											+ Msgs.getMessage("USAGE_AUTHOR_EXAMPLE"));
 									break;
 								case TITLE:
 									p.sendMessage(ChatColor.AQUA
@@ -750,7 +750,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public boolean invalidCommand(CommandSender sender) {
-		sender.sendMessage(plugin.msgs.get("VERSION")
+		sender.sendMessage(Msgs.getMessage("VERSION")
 				.replaceAll("<plugin.version>", plugin.version));
 		if (listPermittedCommands(sender).length() > 0) {
 			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use "

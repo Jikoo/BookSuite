@@ -21,7 +21,7 @@ public class ReflectiveModuleInstantiatier {
 				Class<?> aClass = classLoader.loadClass(jv.get("classpath")
 						.valueOf());
 				ModuleManager ob = (ModuleManager) aClass.newInstance();
-				if ("enabled".equals(jv.get("defualt"))){
+				if ("enabled".equals(jv.get("defualt").valueOf())){
 					ml.addModule(ob.getManagedModule());
 				}
 				

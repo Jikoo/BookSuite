@@ -1,4 +1,4 @@
-package com.github.Jikoo.BookSuite.copy;
+package com.github.Jikoo.BookSuite.press;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,18 @@ public class PrintingCompany implements BookSuiteModule {
 
 	private Map<Block, PrintingPress> presses = new HashMap<Block, PrintingPress>();
 	private boolean enabled = true;
+
+	/*
+	 * singleton instance
+	 */
+	private static PrintingCompany instance;
+
+	public static PrintingCompany getInstance() {
+		if (instance == null) {
+			instance = new PrintingCompany();
+		}
+		return instance;
+	}
 
 	/**
 	 * adds a printing press to the set, that can be accessed either by the base
@@ -69,8 +81,10 @@ public class PrintingCompany implements BookSuiteModule {
 
 	/**
 	 * 
-	 * @param p the player that is using the press
-	 * @param press the press to be operated
+	 * @param p
+	 *            the player that is using the press
+	 * @param press
+	 *            the press to be operated
 	 * @return whether to set this event as canceled or not
 	 */
 	private boolean manipulate(Player p, PrintingPress press) {
@@ -117,7 +131,8 @@ public class PrintingCompany implements BookSuiteModule {
 	@Override
 	public boolean isTriggeringCommand(Command c, String[] args,
 			CommandSender sender, String label) {
-		return false; //we should separate copying and printing presses for the same of modularization
+		return false; // we should separate copying and printing presses for the
+						// same of modularization
 	}
 
 	@Override
@@ -127,14 +142,14 @@ public class PrintingCompany implements BookSuiteModule {
 
 	@Override
 	public int disable() {
+		instance = null;
 		this.enabled = false;
 		return 0;
 	}
 
 	@Override
 	public boolean enable() {
-		if (this.isEnabled())
-		{
+		if (this.isEnabled()) {
 			return false;
 		}
 		this.enabled = true;

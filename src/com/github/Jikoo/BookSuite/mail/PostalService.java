@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.Jikoo.BookSuite.Msgs;
 import com.github.Jikoo.BookSuite.module.BookSuiteModule;
 
 public class PostalService implements BookSuiteModule{
@@ -42,6 +43,10 @@ public class PostalService implements BookSuiteModule{
 	// the inventory of the postal service
 	private Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
 	
+	//all players mailboxes
+	private Map<String, MailBox> boxes = new HashMap<String, MailBox>();
+	
+	@SuppressWarnings("unused")
 	private boolean enabled = true;
 
 	/*
@@ -56,6 +61,18 @@ public class PostalService implements BookSuiteModule{
 		return instance;
 	}
 
+	/**
+	 * 
+	 * @param p the name of the player
+	 * @return the mailbox belonging to that player
+	 */
+	public MailBox getMailBox(String p) {
+		if (boxes.get(p) == null) {
+			boxes.put(p, new MailBox(p, 9));
+		}
+		return boxes.get(p);
+	}
+	
 	/**
 	 * creates a new instance of the postal service if there was not one already
 	 * in existence in file.
@@ -155,6 +172,7 @@ public class PostalService implements BookSuiteModule{
 		if (instance != null) {
 			try {
 				getInstance().writeToFile();
+				instance = null;
 			} catch (Exception e) {
 				return 1;
 			}
@@ -169,19 +187,19 @@ public class PostalService implements BookSuiteModule{
 
 	@Override
 	public boolean isTriggeredByEvent(Event e) {
-		
+		BSLogger.info(Msgs.getMessage("MAIL_DEBUG"));
 		if (e instanceof PlayerInteractEvent){
 			PlayerInteractEvent pie = (PlayerInteractEvent)e;
 			if (BookSuite.getInstance().functions.isMailBox(pie.getClickedBlock())) {
 				Player p = pie.getPlayer();
-				p.openInventory(MailBox.getMailBox(p).open(p));
+				p.openInventory(getMailBox(p.getName()).open(p));
 				pie.setCancelled(true);
 				return true;
 			}
 		} else if (e instanceof InventoryCloseEvent){
 			InventoryCloseEvent event = (InventoryCloseEvent)e;
 			if (event.getInventory().getTitle().contains("'s MailBox")) {
-				MailBox.getMailBox(event.getPlayer().getName()).sendMail(
+				getMailBox(event.getPlayer().getName()).sendMail(
 						event.getInventory());
 				return true;
 			}
