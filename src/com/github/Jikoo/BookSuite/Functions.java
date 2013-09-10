@@ -741,7 +741,7 @@ public class Functions {
 	 * 
 	 * @return an instance of the functions file for use in other classes
 	 */
-	protected static Functions getInstance() {
+	public static Functions getInstance() {
 		if (instance == null)
 			instance = new Functions();
 		return instance;

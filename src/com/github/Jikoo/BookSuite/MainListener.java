@@ -84,15 +84,10 @@ public class MainListener implements Listener {
 				return;
 			}
 		}
-		
-		
-		
-		// new 
-		// 
+
+		// new
+		//
 		// old
-		
-		
-		
 
 		Player p = event.getPlayer();
 
@@ -106,8 +101,7 @@ public class MainListener implements Listener {
 			// if clicking a workbench, check to see if it is a press and act
 			// accordingly
 			if (plugin.functions.isPrintingPress(clicked)) {
-				PrintingPress press = new PrintingPress(plugin, p.getName(),
-						clicked);
+				PrintingPress press = new PrintingPress(clicked);
 
 				if (!p.hasPermission("booksuite.denynowarn.press")) {
 					if (is.getType().equals(Material.MAP)) {

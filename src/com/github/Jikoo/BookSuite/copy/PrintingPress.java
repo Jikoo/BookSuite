@@ -21,12 +21,10 @@ public class PrintingPress {
 	Block blockUp;
 	BlockState originalBlock;
 	BlockState changedBlock;
-	String pName;
 
-	public PrintingPress(BookSuite plugin, String pName, Block blockUp) {
+	public PrintingPress(Block blockUp) {
 		this.blockUp = blockUp;
 		originalBlock = blockUp.getState();
-		this.pName = pName;
 	}
 
 	public void operatePress() {
