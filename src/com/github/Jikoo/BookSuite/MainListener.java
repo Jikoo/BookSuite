@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -30,8 +29,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.Jikoo.BookSuite.copy.PrintingPress;
-import com.github.Jikoo.BookSuite.mail.MailBox;
 import com.github.Jikoo.BookSuite.module.BookSuiteModule;
 import com.github.Jikoo.BookSuite.module.ReflectiveModuleInstantiatier;
 
@@ -98,8 +95,8 @@ public class MainListener implements Listener {
 			ItemStack is = p.getItemInHand();
 			Block clicked = event.getClickedBlock();
 
-			if (plugin.functions.canMakePress(clicked,
-					event.getBlockFace(), is, p)) {
+			if (plugin.functions.canMakePress(clicked, event.getBlockFace(),
+					is, p)) {
 				clicked.getRelative(BlockFace.UP).setTypeIdAndData(
 						is.getTypeId(),
 						plugin.functions.getCorrectStairOrientation(p), true);

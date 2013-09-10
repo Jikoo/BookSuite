@@ -41,6 +41,8 @@ public class PostalService implements BookSuiteModule{
 
 	// the inventory of the postal service
 	private Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
+	
+	private boolean enabled = true;
 
 	/*
 	 * Singleton instance
@@ -192,6 +194,19 @@ public class PostalService implements BookSuiteModule{
 			CommandSender sender, String label) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean enable() {
+		if (this.isEnabled())
+		{
+			return false;
+		}
+		else
+		{
+			PostalService.getInstance();
+			return true;
+		}
 	}
 
 }

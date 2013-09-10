@@ -67,6 +67,12 @@ public class PrintingCompany implements BookSuiteModule {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param p the player that is using the press
+	 * @param press the press to be operated
+	 * @return whether to set this event as canceled or not
+	 */
 	private boolean manipulate(Player p, PrintingPress press) {
 		if (!p.hasPermission("booksuite.denynowarn.press")) {
 			ItemStack is = p.getItemInHand();
@@ -111,8 +117,7 @@ public class PrintingCompany implements BookSuiteModule {
 	@Override
 	public boolean isTriggeringCommand(Command c, String[] args,
 			CommandSender sender, String label) {
-		// TODO Auto-generated method stub
-		return false;
+		return false; //we should separate copying and printing presses for the same of modularization
 	}
 
 	@Override
@@ -124,6 +129,16 @@ public class PrintingCompany implements BookSuiteModule {
 	public int disable() {
 		this.enabled = false;
 		return 0;
+	}
+
+	@Override
+	public boolean enable() {
+		if (this.isEnabled())
+		{
+			return false;
+		}
+		this.enabled = true;
+		return true;
 	}
 
 }

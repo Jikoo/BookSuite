@@ -3,5 +3,10 @@
 		"name":"mail",
 		"classpath":"com.github.Jikoo.BookSuite.mail.PostmasterGeneral",
 		"default":"enabled"
+	},
+	{
+		"name":"printingPress",
+		"classpath":"com.github.Jikoo.BookSuite.copy.JohannesGutenberg",
+		"default":"enabled"
 	}
 ]

@@ -45,4 +45,10 @@ public interface BookSuiteModule {
 	 * @return the error status of this method. 0 mean success
 	 */
 	public int disable();
+
+	/**
+	 * 
+	 * @return whether the module was enabled (if it already was, false is returned)
+	 */
+	public boolean enable();
 }
