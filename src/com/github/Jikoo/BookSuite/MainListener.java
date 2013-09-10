@@ -77,7 +77,7 @@ public class MainListener implements Listener {
 		}
 
 		for (BookSuiteModule bsm : modules) {
-			if (bsm.isTriggeredByEvent(event)) {
+			if (bsm.isEnabled() && bsm.isTriggeredByEvent(event)) {
 				event.setCancelled(true);
 			}
 			if (event.isCancelled()) {
@@ -98,50 +98,7 @@ public class MainListener implements Listener {
 			ItemStack is = p.getItemInHand();
 			Block clicked = event.getClickedBlock();
 
-			// if clicking a workbench, check to see if it is a press and act
-			// accordingly
-			if (plugin.functions.isPrintingPress(clicked)) {
-				PrintingPress press = new PrintingPress(clicked);
-
-				if (!p.hasPermission("booksuite.denynowarn.press")) {
-					if (is.getType().equals(Material.MAP)) {
-						if (plugin.functions.canObtainMap(p)) {
-							press.operatePress();
-							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Copied successfully!");
-						}
-						event.setCancelled(true);
-					} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
-						BookMeta bm = (BookMeta) is.getItemMeta();
-
-						if (plugin.functions.checkCopyPermission(p,
-								bm.getAuthor())
-								&& plugin.functions.canObtainBook(p)) {
-							press.operatePress();
-							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN
-									+ "Copied successfully!");
-						}
-						event.setCancelled(true);
-					} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
-						if (p.hasPermission("booksuite.copy.unsigned")) {
-							if (plugin.functions.canObtainBook(p)) {
-								press.operatePress();
-								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN
-										+ "Copied successfully!");
-							}
-						} else {
-							p.sendMessage(ChatColor.DARK_RED
-									+ "You do not have permission to copy unsigned books!");
-						}
-						event.setCancelled(true);
-					} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
-						return;
-					}
-				}
-			} else if (plugin.functions.canMakePress(clicked,
+			if (plugin.functions.canMakePress(clicked,
 					event.getBlockFace(), is, p)) {
 				clicked.getRelative(BlockFace.UP).setTypeIdAndData(
 						is.getTypeId(),

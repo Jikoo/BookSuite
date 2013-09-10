@@ -23,6 +23,6 @@ Defaults:
 		- unsign own books using cauldron
 		- send and receive mail with attachments
 		- use commands addpage, delpage, list, import*, and export
-			*Books imported from URL will be by author player doing the importing. Don't want random users blamed for inappropriate messages.
+			*Books imported from URL will be have the author field set to the name of the player that imports the book. Don't want random users blamed for inappropriate messages.
 	op:
 		- everything

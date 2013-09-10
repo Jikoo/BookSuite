@@ -3,20 +3,25 @@ package com.github.Jikoo.BookSuite.copy;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.Jikoo.BookSuite.Functions;
 import com.github.Jikoo.BookSuite.module.BookSuiteModule;
 
 public class PrintingCompany implements BookSuiteModule {
 
-	Map<Block, PrintingPress> presses = new HashMap<Block, PrintingPress>();
+	private Map<Block, PrintingPress> presses = new HashMap<Block, PrintingPress>();
+	private boolean enabled = true;
 
 	/**
 	 * adds a printing press to the set, that can be accessed either by the base
@@ -56,8 +61,48 @@ public class PrintingCompany implements BookSuiteModule {
 			PlayerInteractEvent pie = (PlayerInteractEvent) e;
 			if (Functions.getInstance().isPrintingPress(pie.getClickedBlock())) {
 				PrintingPress p = getPrintingPress(pie.getClickedBlock());
-				p.operatePress();
+				pie.setCancelled(this.manipulate(pie.getPlayer(), p));
+			}
+		}
+		return false;
+	}
+
+	private boolean manipulate(Player p, PrintingPress press) {
+		if (!p.hasPermission("booksuite.denynowarn.press")) {
+			ItemStack is = p.getItemInHand();
+			if (is.getType().equals(Material.MAP)) {
+				if (Functions.getInstance().canObtainMap(p)) {
+					press.operatePress();
+					Functions.getInstance().copy(p);
+					p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
+				}
 				return true;
+			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
+				BookMeta bm = (BookMeta) is.getItemMeta();
+
+				if (Functions.getInstance().checkCopyPermission(p,
+						bm.getAuthor())
+						&& Functions.getInstance().canObtainBook(p)) {
+					press.operatePress();
+					Functions.getInstance().copy(p);
+					p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
+				}
+				return true;
+			} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
+				if (p.hasPermission("booksuite.copy.unsigned")) {
+					if (Functions.getInstance().canObtainBook(p)) {
+						press.operatePress();
+						Functions.getInstance().copy(p);
+						p.sendMessage(ChatColor.DARK_GREEN
+								+ "Copied successfully!");
+					}
+				} else {
+					p.sendMessage(ChatColor.DARK_RED
+							+ "You do not have permission to copy unsigned books!");
+				}
+				return true;
+			} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
+				return false;
 			}
 		}
 		return false;
@@ -72,13 +117,12 @@ public class PrintingCompany implements BookSuiteModule {
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.enabled;
 	}
 
 	@Override
 	public int disable() {
-		// TODO Auto-generated method stub
+		this.enabled = false;
 		return 0;
 	}
 
