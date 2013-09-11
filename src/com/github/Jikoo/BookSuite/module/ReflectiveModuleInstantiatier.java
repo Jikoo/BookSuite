@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
+import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 import com.github.Jikoo.BookSuite.MainListener;
 import com.github.Jikoo.BookSuite.io.json.JsonValue;
@@ -21,10 +22,19 @@ public class ReflectiveModuleInstantiatier {
 				Class<?> aClass = classLoader.loadClass(jv.get("classpath")
 						.valueOf());
 				ModuleManager ob = (ModuleManager) aClass.newInstance();
-				if ("enabled".equals(jv.get("defualt").valueOf())){
+				if ("enabled".equals(jv.get("default").valueOf())) {
+					BSLogger.info(new StringBuilder("Module: ")
+							.append(jv.get("name").valueOf()).append(" loaded")
+							.toString());
 					ml.addModule(ob.getManagedModule());
+				} else {
+					BSLogger.info(new StringBuilder("Module: ")
+							.append(jv.get("name").valueOf())
+							.append(" defaulted to: \"")
+							.append(jv.get("default").valueOf())
+							.append("\"").toString());
 				}
-				
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

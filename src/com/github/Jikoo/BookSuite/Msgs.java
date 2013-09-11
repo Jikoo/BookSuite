@@ -22,7 +22,7 @@ public class Msgs {
 	private static JsonValue messages;
 
 	private static void parse() throws FileNotFoundException {
-		String path = BookSuite.getInstance().getDataFolder() + "/msgs.json";
+		String path = BookSuite.getInstance().getDataFolder() + "/strings.json";
 		Scanner reader = new Scanner(new File(path));
 		StringBuilder sb = new StringBuilder();
 		while (reader.hasNext()) {

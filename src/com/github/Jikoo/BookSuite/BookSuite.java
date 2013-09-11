@@ -15,13 +15,11 @@ import java.io.File;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.Jikoo.BookSuite.mail.PostalService;
 import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
-import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
 	protected final String version = "3.2.0";
@@ -56,10 +54,9 @@ public class BookSuite extends JavaPlugin {
 		if (new UpdateConfig(this).update()) {
 			BSLogger.warn("Your configuration has been updated, please check it!");
 		}
-		if (new UpdateStrings(this).update()) {
-			BSLogger.info("More customization has been added to strings.yml.");
-		}
-		msgs = new Msgs();
+		//if (new UpdateStrings(this).update()) {
+		//	BSLogger.info("More customization has been added to strings.yml.");
+		//}
 
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();

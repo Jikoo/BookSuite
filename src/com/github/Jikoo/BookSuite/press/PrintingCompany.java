@@ -60,9 +60,9 @@ public class PrintingCompany implements BookSuiteModule {
 			return p;
 		}
 		if (eventBlock.getType().equals(Material.WORKBENCH)) {
-			makePress(eventBlock);
+			makePress(eventBlock.getRelative(BlockFace.UP));
 		} else if (Functions.getInstance().isInvertedStairs(eventBlock)) {
-			makePress(eventBlock.getRelative(BlockFace.DOWN));
+			makePress(eventBlock);
 		}
 		return presses.get(eventBlock);
 	}

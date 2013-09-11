@@ -24,9 +24,9 @@ public class UpdateStrings {
 
 	public boolean update() {
 		YamlConfiguration strings = YamlConfiguration.loadConfiguration(new File(plugin
-				.getDataFolder(), "strings.yml"));
+				.getDataFolder(), "strings.json"));
 		YamlConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin
-				.getResource("strings.yml"));
+				.getResource("strings.json"));
 		Set<String> options = defaultStrings.getKeys(false);
 		Set<String> current = strings.getKeys(false);
 		boolean changed = false;
@@ -49,7 +49,7 @@ public class UpdateStrings {
 
 		if (changed) {
 			try {
-				strings.save(new File(plugin.getDataFolder(), "strings.yml"));
+				strings.save(new File(plugin.getDataFolder(), "strings.json"));
 			} catch (Exception e) {
 				BSLogger.err(e);
 			}
