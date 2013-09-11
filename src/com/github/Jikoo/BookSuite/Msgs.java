@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn
+ *     Ted Meyer - switched whole system from yaml to json
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
