@@ -22,6 +22,8 @@ public class Msgs {
 	private static JsonValue messages;
 
 	private static void parse() throws FileNotFoundException {
+		// If file doesn't exist, create. TODO update/ensure all strings exist
+		BookSuite.getInstance().saveResource("strings.json", false);
 		String path = BookSuite.getInstance().getDataFolder() + "/strings.json";
 		Scanner reader = new Scanner(new File(path));
 		StringBuilder sb = new StringBuilder();
