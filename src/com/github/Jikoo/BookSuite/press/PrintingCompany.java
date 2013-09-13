@@ -67,13 +67,13 @@ public class PrintingCompany implements BookSuiteModule {
 		return presses.get(eventBlock);
 	}
 
-	@Override
 	public boolean isTriggeredByEvent(Event e) {
 		if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent pie = (PlayerInteractEvent) e;
 			if (Functions.getInstance().isPrintingPress(pie.getClickedBlock())) {
 				PrintingPress p = getPrintingPress(pie.getClickedBlock());
 				pie.setCancelled(this.manipulate(pie.getPlayer(), p));
+				return true;
 			}
 		}
 		return false;
@@ -128,26 +128,22 @@ public class PrintingCompany implements BookSuiteModule {
 		return false;
 	}
 
-	@Override
 	public boolean isTriggeringCommand(Command c, String[] args,
 			CommandSender sender, String label) {
 		return false; // we should separate copying and printing presses for the
 						// same of modularization
 	}
 
-	@Override
 	public boolean isEnabled() {
 		return this.enabled;
 	}
 
-	@Override
 	public int disable() {
 		instance = null;
 		this.enabled = false;
 		return 0;
 	}
 
-	@Override
 	public boolean enable() {
 		if (this.isEnabled()) {
 			return false;

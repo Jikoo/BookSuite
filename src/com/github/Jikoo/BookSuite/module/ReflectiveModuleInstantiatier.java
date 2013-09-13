@@ -26,6 +26,7 @@ public class ReflectiveModuleInstantiatier {
 				.getClassLoader();
 		JsonValue modules;
 		try {
+			BookSuite.getInstance().saveResource("modules.json", false);
 			modules = JsonValue.getJsonValue(readFile(BookSuite.getInstance()
 					.getDataFolder() + "/modules.json"));
 			for (JsonValue jv : modules) {
@@ -47,7 +48,7 @@ public class ReflectiveModuleInstantiatier {
 
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			BSLogger.criticalErr(e);
 		}
 
 	}

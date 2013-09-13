@@ -54,9 +54,9 @@ public class BookSuite extends JavaPlugin {
 		if (new UpdateConfig(this).update()) {
 			BSLogger.warn("Your configuration has been updated, please check it!");
 		}
-		//if (new UpdateStrings(this).update()) {
-		//	BSLogger.info("More customization has been added to strings.yml.");
-		//}
+//		if (new UpdateStrings(this).update()) {
+//			BSLogger.info("More customization has been added to strings.yml.");
+//		}
 
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();

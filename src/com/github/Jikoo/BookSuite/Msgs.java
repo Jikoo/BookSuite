@@ -40,13 +40,14 @@ public class Msgs {
 			try {
 				parse();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				BSLogger.severe("Error loading strings.json! Chat messages will not work.");
+				BSLogger.criticalErr(e);
 			}
 		}
 		try {
 			return messages.get(new JsonString(s)).valueOf();
 		} catch (JsonException e) {
-			e.printStackTrace();
+			BSLogger.criticalErr(e);
 			return "";
 		}
 	}

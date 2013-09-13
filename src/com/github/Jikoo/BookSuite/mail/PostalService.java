@@ -167,7 +167,6 @@ public class PostalService implements BookSuiteModule{
 		}
 	}
 
-	@Override
 	public int disable() {
 		if (instance != null) {
 			try {
@@ -180,12 +179,10 @@ public class PostalService implements BookSuiteModule{
 		return 0;
 	}
 	
-	@Override
 	public boolean isEnabled() {
 		return instance!=null;
 	}
 
-	@Override
 	public boolean isTriggeredByEvent(Event e) {
 		BSLogger.info(Msgs.getMessage("MAIL_DEBUG"));
 		if (e instanceof PlayerInteractEvent){
@@ -207,14 +204,12 @@ public class PostalService implements BookSuiteModule{
 		return false;
 	}
 
-	@Override
 	public boolean isTriggeringCommand(Command c, String[] args,
 			CommandSender sender, String label) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public boolean enable() {
 		if (this.isEnabled())
 		{

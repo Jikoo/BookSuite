@@ -143,7 +143,6 @@ public class JsonValue implements Iterable<JsonValue> {
         return "JsonValue"; 
     }
 
-	@Override
 	public Iterator<JsonValue> iterator() {
 		return new LinkedList<JsonValue>().iterator();
 	}

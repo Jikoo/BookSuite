@@ -1,12 +1,12 @@
 [
 	{
-		"name":"mail",
+		"name":"Mail",
 		"classpath":"com.github.Jikoo.BookSuite.mail.PostmasterGeneral",
 		"default":"enabled",
 		"debug":"off"
 	},
 	{
-		"name":"printingPress",
+		"name":"Printing Press",
 		"classpath":"com.github.Jikoo.BookSuite.press.JohannesGutenberg",
 		"default":"enabled",
 		"debug":"off"

@@ -51,18 +51,30 @@ public class BSLogger {
 		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
 			return;
 		}
-		String trace = e.toString();
+		StringBuilder trace = new StringBuilder(e.toString());
 		for (StackTraceElement ste : e.getStackTrace()) {
-			trace += "\n\tat " + ste.toString();
+			trace.append("\n\tat " + ste.toString());
 		}
-		debugWarn("Error report:\n" + trace);
+		if (e.getCause() != null) {
+			trace.append("\nCaused by: " + e.getCause().toString());
+			for (StackTraceElement ste : e.getCause().getStackTrace()) {
+				trace.append("\n\tat " + ste.toString());
+			}
+		}
+		debugWarn("Error report:\n" + trace.toString());
 		debugWarn("End of error report.");
 	}
 
 	public static void criticalErr(Exception e) {
-		String trace = e.toString();
+		StringBuilder trace = new StringBuilder(e.toString());
 		for (StackTraceElement ste : e.getStackTrace()) {
-			trace += "\n\tat " + ste.toString();
+			trace.append("\n\tat " + ste.toString());
+		}
+		if (e.getCause() != null) {
+			trace.append("\nCaused by: " + e.getCause().toString());
+			for (StackTraceElement ste : e.getCause().getStackTrace()) {
+				trace.append("\n\tat " + ste.toString());
+			}
 		}
 		severe("Error report:\n" + trace);
 		severe("End of error report.");
