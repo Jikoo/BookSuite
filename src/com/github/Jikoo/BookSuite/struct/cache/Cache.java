@@ -71,6 +71,6 @@ public class Cache<K, V> implements Iterable<V>{
 
 	@Override
 	public Iterator<V> iterator() {
-		return 
+		return null; 
 	}
 }

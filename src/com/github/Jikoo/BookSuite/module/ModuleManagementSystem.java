@@ -38,14 +38,14 @@ public class ModuleManagementSystem {
 	
 	public void performCancelableAction(Event e)
 	{
-		for (BookSuiteModule bsm : modules) {
-			if (bsm.isEnabled() && bsm.isTriggeredByEvent(event)) {
-				event.setCancelled(true);
-			}
-			if (event.isCancelled()) {
-				return;
-			}
-		}
+		//for (BookSuiteModule bsm : modules) {
+		//	if (bsm.isEnabled() && bsm.isTriggeredByEvent(event)) {
+		//		event.setCancelled(true);
+		//	}
+		//	if (event.isCancelled()) {
+		//		return;
+		//	}
+		//}
 	}
 	
 	
