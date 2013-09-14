@@ -14,9 +14,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import com.github.Jikoo.BookSuite.io.json.JsonException;
-import com.github.Jikoo.BookSuite.io.json.JsonString;
-import com.github.Jikoo.BookSuite.io.json.JsonValue;
+import com.github.Jikoo.BookSuite.struct.json.JsonException;
+import com.github.Jikoo.BookSuite.struct.json.JsonString;
+import com.github.Jikoo.BookSuite.struct.json.JsonValue;
 
 public class Msgs {
 	private static JsonValue messages;

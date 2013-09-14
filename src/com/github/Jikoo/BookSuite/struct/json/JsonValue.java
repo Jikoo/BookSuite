@@ -1,4 +1,4 @@
-package com.github.Jikoo.BookSuite.io.json;
+package com.github.Jikoo.BookSuite.struct.json;
 
 import java.util.Iterator;
 import java.util.LinkedList;

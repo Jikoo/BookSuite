@@ -17,7 +17,7 @@ import java.util.Scanner;
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 import com.github.Jikoo.BookSuite.MainListener;
-import com.github.Jikoo.BookSuite.io.json.JsonValue;
+import com.github.Jikoo.BookSuite.struct.json.JsonValue;
 
 public class ReflectiveModuleInstantiatier {
 

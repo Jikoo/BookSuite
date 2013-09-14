@@ -1,4 +1,4 @@
-package com.github.Jikoo.BookSuite.io.json;
+package com.github.Jikoo.BookSuite.struct.json;
 
 public class JsonBoolean extends JsonValue{
     private boolean b;
