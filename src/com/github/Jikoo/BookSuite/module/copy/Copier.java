@@ -17,11 +17,16 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class Copier {
+import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
+
+public class Copier extends BookSuiteModule{
 	Map<Integer, ? extends ItemStack> inkMap;
 	Map<Integer, ? extends ItemStack> bookMap;
 	Map<Integer, ? extends ItemStack> paperMap;
@@ -211,5 +216,42 @@ public class Copier {
 			quantity += is.getAmount();
 		}
 		return quantity;
+	}
+
+	@Override
+	public boolean isTriggeredByEvent(Event e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isTriggeringCommand(Command c, String[] args,
+			CommandSender sender, String label) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int disable() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean enable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
