@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.copy;
+package com.github.Jikoo.BookSuite.module.copy;
 
 import java.util.ArrayList;
 import java.util.HashMap;

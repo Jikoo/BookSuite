@@ -1,14 +1,26 @@
 [
 	{
 		"name":"Mail",
-		"classpath":"com.github.Jikoo.BookSuite.mail.PostmasterGeneral",
+		"classpath":"com.github.Jikoo.BookSuite.module.mail.PostmasterGeneral",
 		"default":"enabled",
-		"debug":"off"
+		"debug":"off",
+		"dependencies":[]
 	},
 	{
 		"name":"Printing Press",
-		"classpath":"com.github.Jikoo.BookSuite.press.JohannesGutenberg",
+		"classpath":"com.github.Jikoo.BookSuite.module.press.JohannesGutenberg",
 		"default":"enabled",
-		"debug":"off"
+		"debug":"off",
+		"dependencies":
+		[
+			"Copier"
+		]
+	},
+	{
+		"name":"Copier",
+		"classpath":"com.github.Jikoo.BookSuite.module.copy.RudolphHell",
+		"default":"enabled",
+		"debug":"off",
+		"dependencies":[]
 	}
 ]

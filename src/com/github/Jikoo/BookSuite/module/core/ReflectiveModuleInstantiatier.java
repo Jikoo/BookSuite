@@ -16,6 +16,7 @@ import java.util.Scanner;
 
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.Jikoo.BookSuite.struct.json.JsonArray;
 import com.github.Jikoo.BookSuite.struct.json.JsonValue;
 
 public class ReflectiveModuleInstantiatier {
@@ -36,6 +37,10 @@ public class ReflectiveModuleInstantiatier {
 				String name = jv.get("name").valueOf();
 				boolean d = "enabled".equals(jv.get("default").valueOf());
 				BookSuiteModule m = ob.getManagedModule(d);
+				JsonArray dependencies = (JsonArray) jv.get("dependencies");
+				for (JsonValue dep : dependencies) {
+					m.addDependancy(dep.valueOf());
+				}
 				String msg = new StringBuilder("The module").append(name)
 						.append(" was loaded in state: ")
 						.append(d ? "enabled" : "disabled").toString();

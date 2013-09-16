@@ -18,7 +18,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import com.github.Jikoo.BookSuite.Functions;
 import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
 
-public class PrintingCompany implements BookSuiteModule {
+public class PrintingCompany extends BookSuiteModule {
 
 	private Map<Block, PrintingPress> presses = new HashMap<Block, PrintingPress>();
 	private boolean enabled = true;

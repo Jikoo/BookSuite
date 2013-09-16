@@ -38,7 +38,7 @@ import com.github.Jikoo.BookSuite.BookSuite;
 import com.github.Jikoo.BookSuite.Msgs;
 import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
 
-public class PostalService implements BookSuiteModule{
+public class PostalService extends BookSuiteModule{
 
 	// the inventory of the postal service
 	private Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
@@ -206,7 +206,6 @@ public class PostalService implements BookSuiteModule{
 
 	public boolean isTriggeringCommand(Command c, String[] args,
 			CommandSender sender, String label) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

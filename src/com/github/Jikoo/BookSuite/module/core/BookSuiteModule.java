@@ -14,7 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 
-public interface BookSuiteModule {
+public abstract class BookSuiteModule {
 
 	/**
 	 * 
@@ -25,7 +25,7 @@ public interface BookSuiteModule {
 	 *            the event
 	 * @return whether or not this module has handled the event
 	 */
-	public boolean isTriggeredByEvent(Event e);
+	public abstract boolean isTriggeredByEvent(Event e);
 
 	/**
 	 * 
@@ -41,26 +41,55 @@ public interface BookSuiteModule {
 	 * @return whether this module is capable of dealing with this command
 	 *         effectively
 	 */
-	public boolean isTriggeringCommand(Command c, String[] args,
+	public abstract boolean isTriggeringCommand(Command c, String[] args,
 			CommandSender sender, String label);
 
 	/**
 	 * 
 	 * @return whether this pluggin is disabled or not
 	 */
-	public boolean isEnabled();
+	public abstract boolean isEnabled();
 
 	/**
 	 * 
 	 * @return the error status of this method. 0 mean success
 	 */
-	public int disable();
+	public abstract int disable();
 
 	/**
 	 * 
-	 * @return whether the module was enabled (if it already was, false is returned)
+	 * @return whether the module was enabled (if it already was, false is
+	 *         returned)
 	 */
-	public boolean enable();
-	
-	public String getName();
+	public abstract boolean enable();
+
+	public abstract String getName();
+
+	ModuleDependencyChecker mdc;
+
+	/**
+	 * 
+	 * @param mdc
+	 *            the dependency checker that this module will use for itself
+	 */
+	public void addModuleDependencyChecker(ModuleDependencyChecker mdc) {
+		this.mdc = mdc;
+	}
+
+	/**
+	 * 
+	 * @return whether the dependencies have been fulfilled
+	 */
+	public boolean dependenciesFulfilled() {
+		return this.mdc == null || this.mdc.dependenciesFulfilled();
+	}
+
+	/**
+	 * 
+	 * @param moduleName
+	 *            the name of the module to set as the dependency to this one
+	 */
+	public void addDependancy(String moduleName) {
+		mdc.addDependency(moduleName);
+	}
 }
