@@ -11,12 +11,16 @@
 package com.github.Jikoo.BookSuite.mail;
 
 import com.github.Jikoo.BookSuite.module.BookSuiteModule;
-import com.github.Jikoo.BookSuite.module.ModuleManager;
+import com.github.Jikoo.BookSuite.module.DirectModuleManager;
 
-public class PostmasterGeneral implements ModuleManager{
+public class PostmasterGeneral implements DirectModuleManager {
 
-	public BookSuiteModule getManagedModule() {
-		return PostalService.getInstance();
+	public BookSuiteModule getManagedModule(boolean b) {
+		PostalService p = PostalService.getInstance();
+		if (!b) {
+			p.disable();
+		}
+		return p;
 	}
 
 }

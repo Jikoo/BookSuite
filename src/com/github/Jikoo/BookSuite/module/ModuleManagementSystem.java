@@ -10,45 +10,60 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.module;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
 import com.github.Jikoo.BookSuite.struct.cache.Cache;
 
 public class ModuleManagementSystem {
 
-	Cache<String, BookSuiteModule> modules = new Cache<String, BookSuiteModule>(10);
-	
-	public BookSuiteModule getModuleByName(String s)
-	{
+	Cache<String, BookSuiteModule> modules = new Cache<String, BookSuiteModule>(
+			10);
+
+	public BookSuiteModule getModuleByName(String s) {
 		return modules.get(s);
 	}
-	
-	public void disableModule(String s)
-	{
+
+	public void disableModule(String s) {
 		modules.get(s).disable();
 	}
-	
-	public void enableModule(String s)
-	{
+
+	public void enableModule(String s) {
 		modules.get(s).enable();
 	}
 	
-	public void performCancelableAction(Event e)
+	public void addModule(BookSuiteModule m, String s)
 	{
-		//for (BookSuiteModule bsm : modules) {
-		//	if (bsm.isEnabled() && bsm.isTriggeredByEvent(event)) {
-		//		event.setCancelled(true);
-		//	}
-		//	if (event.isCancelled()) {
-		//		return;
-		//	}
-		//}
+		this.modules.insert(s, m);
 	}
-	
-	
-	
-	
+
+	public void performCancelableAction(Event e) throws ClassCastException {
+
+		for (BookSuiteModule bsm : modules) {
+			if (bsm.isEnabled() && bsm.isTriggeredByEvent(e)) {
+				if (e instanceof Cancellable) {
+					((Cancellable) e).setCancelled(true);
+				} else {
+					throw new ClassCastException(
+							"you tried to cancel an uncancelable event");
+				}
+			}
+			if (e instanceof Cancellable) {
+				if (((Cancellable) e).isCancelled()) {
+					return;
+				}
+			} else {
+				throw new ClassCastException(
+						"you tried to cancel an uncancelable event");
+			}
+		}
+	}
+
+	public void performNonCancelableAction(Event e) {
+		for (BookSuiteModule bsm : modules) {
+			if (bsm.isEnabled()) {
+				bsm.isTriggeredByEvent(e);
+			}
+		}
+	}
 }

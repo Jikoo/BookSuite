@@ -16,12 +16,11 @@ import java.util.Scanner;
 
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
-import com.github.Jikoo.BookSuite.MainListener;
 import com.github.Jikoo.BookSuite.struct.json.JsonValue;
 
 public class ReflectiveModuleInstantiatier {
 
-	public static void loadModules(MainListener ml) {
+	public static void loadModules(ModuleManagementSystem ml) {
 		ClassLoader classLoader = ReflectiveModuleInstantiatier.class
 				.getClassLoader();
 		JsonValue modules;
@@ -32,19 +31,17 @@ public class ReflectiveModuleInstantiatier {
 			for (JsonValue jv : modules) {
 				Class<?> aClass = classLoader.loadClass(jv.get("classpath")
 						.valueOf());
-				ModuleManager ob = (ModuleManager) aClass.newInstance();
-				if ("enabled".equals(jv.get("default").valueOf())) {
-					BSLogger.info(new StringBuilder("Module: ")
-							.append(jv.get("name").valueOf()).append(" loaded")
-							.toString());
-					ml.addModule(ob.getManagedModule());
-				} else {
-					BSLogger.info(new StringBuilder("Module: ")
-							.append(jv.get("name").valueOf())
-							.append(" defaulted to: \"")
-							.append(jv.get("default").valueOf())
-							.append("\"").toString());
-				}
+				DirectModuleManager ob = (DirectModuleManager) aClass
+						.newInstance();
+				String name = jv.get("name").valueOf();
+				boolean d = "enabled".equals(jv.get("default").valueOf());
+				BookSuiteModule m = ob.getManagedModule(d);
+				String msg = new StringBuilder("The module").append(name)
+						.append(" was loaded in state: ")
+						.append(d ? "enabled" : "disabled").toString();
+
+				ml.addModule(m, name);
+				BSLogger.info(msg);
 
 			}
 		} catch (Exception e) {

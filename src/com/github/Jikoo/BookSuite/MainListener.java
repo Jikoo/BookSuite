@@ -11,9 +11,6 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -29,10 +26,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.Jikoo.BookSuite.module.BookSuiteModule;
+import com.github.Jikoo.BookSuite.module.ModuleManagementSystem;
 import com.github.Jikoo.BookSuite.module.ReflectiveModuleInstantiatier;
 
-public class MainListener implements Listener {
+public class MainListener extends ModuleManagementSystem implements Listener {
 
 	// singleton instance
 	private static MainListener instance;
@@ -48,18 +45,6 @@ public class MainListener implements Listener {
 	// access to the plugin main class
 	BookSuite plugin = BookSuite.getInstance();
 
-	// list of the modules
-	private List<BookSuiteModule> modules = new LinkedList<BookSuiteModule>();
-
-	/**
-	 * 
-	 * @param m
-	 *            the module that is to be added
-	 */
-	public void addModule(BookSuiteModule m) {
-		this.modules.add(m);
-	}
-
 	/**
 	 * copy book (PrintingPress) or send mail
 	 * 
@@ -73,14 +58,7 @@ public class MainListener implements Listener {
 			return;
 		}
 
-		for (BookSuiteModule bsm : modules) {
-			if (bsm.isEnabled() && bsm.isTriggeredByEvent(event)) {
-				event.setCancelled(true);
-			}
-			if (event.isCancelled()) {
-				return;
-			}
-		}
+		performCancelableAction(event);
 
 		// new
 		//
@@ -153,11 +131,7 @@ public class MainListener implements Listener {
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
-		for (BookSuiteModule bsm : modules) {
-			if (bsm.isTriggeredByEvent(event)) {
-				// meh
-			}
-		}
+		performNonCancelableAction(event);
 	}
 
 	/**

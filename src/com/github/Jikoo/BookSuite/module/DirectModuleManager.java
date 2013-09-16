@@ -10,11 +10,11 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.module;
 
-public interface ModuleManager {
-	
+public interface DirectModuleManager {
+
 	/**
 	 * 
 	 * @return the module that the instance of this class accesses
 	 */
-	public BookSuiteModule getManagedModule();
+	public BookSuiteModule getManagedModule(boolean enabled);
 }
