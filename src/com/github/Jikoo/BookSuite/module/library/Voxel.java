@@ -9,7 +9,7 @@
  *     Adam Gunn - plugin surrounding libraries
  ******************************************************************************/
 
-package com.github.Jikoo.BookSuite.Library;
+package com.github.Jikoo.BookSuite.module.library;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

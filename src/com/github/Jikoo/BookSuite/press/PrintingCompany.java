@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import com.github.Jikoo.BookSuite.Functions;
-import com.github.Jikoo.BookSuite.module.BookSuiteModule;
+import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
 
 public class PrintingCompany implements BookSuiteModule {
 

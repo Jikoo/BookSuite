@@ -1,7 +1,7 @@
 package com.github.Jikoo.BookSuite.press;
 
-import com.github.Jikoo.BookSuite.module.BookSuiteModule;
-import com.github.Jikoo.BookSuite.module.DirectModuleManager;
+import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
+import com.github.Jikoo.BookSuite.module.core.DirectModuleManager;
 
 public class JohannesGutenberg implements DirectModuleManager {
 

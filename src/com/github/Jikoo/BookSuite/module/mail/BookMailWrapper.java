@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn - plugin surrounding libraries
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.mail;
+package com.github.Jikoo.BookSuite.module.mail;
 
 import java.io.Serializable;
 import java.util.List;

@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn - plugin surrounding libraries
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.mail;
+package com.github.Jikoo.BookSuite.module.mail;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -36,7 +36,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 import com.github.Jikoo.BookSuite.Msgs;
-import com.github.Jikoo.BookSuite.module.BookSuiteModule;
+import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
 
 public class PostalService implements BookSuiteModule{
 

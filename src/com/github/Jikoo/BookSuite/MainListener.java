@@ -26,8 +26,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.Jikoo.BookSuite.module.ModuleManagementSystem;
-import com.github.Jikoo.BookSuite.module.ReflectiveModuleInstantiatier;
+import com.github.Jikoo.BookSuite.module.core.ModuleManagementSystem;
+import com.github.Jikoo.BookSuite.module.core.ReflectiveModuleInstantiatier;
 
 public class MainListener extends ModuleManagementSystem implements Listener {
 

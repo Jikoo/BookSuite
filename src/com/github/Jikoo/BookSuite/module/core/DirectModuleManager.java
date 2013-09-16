@@ -8,19 +8,13 @@
  * Contributors:
  *     Adam Gunn - plugin surrounding libraries
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.mail;
+package com.github.Jikoo.BookSuite.module.core;
 
-import com.github.Jikoo.BookSuite.module.BookSuiteModule;
-import com.github.Jikoo.BookSuite.module.DirectModuleManager;
+public interface DirectModuleManager {
 
-public class PostmasterGeneral implements DirectModuleManager {
-
-	public BookSuiteModule getManagedModule(boolean b) {
-		PostalService p = PostalService.getInstance();
-		if (!b) {
-			p.disable();
-		}
-		return p;
-	}
-
+	/**
+	 * 
+	 * @return the module that the instance of this class accesses
+	 */
+	public BookSuiteModule getManagedModule(boolean enabled);
 }

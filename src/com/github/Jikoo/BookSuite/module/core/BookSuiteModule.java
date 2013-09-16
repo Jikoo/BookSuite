@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn - plugin surrounding libraries
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.module;
+package com.github.Jikoo.BookSuite.module.core;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
