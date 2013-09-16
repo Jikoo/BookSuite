@@ -9,7 +9,7 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.press;
+package com.github.Jikoo.BookSuite.module.press;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;

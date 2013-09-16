@@ -1,4 +1,4 @@
-package com.github.Jikoo.BookSuite.press;
+package com.github.Jikoo.BookSuite.module.press;
 
 import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
 import com.github.Jikoo.BookSuite.module.core.DirectModuleManager;

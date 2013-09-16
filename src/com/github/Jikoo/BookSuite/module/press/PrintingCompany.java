@@ -1,4 +1,4 @@
-package com.github.Jikoo.BookSuite.press;
+package com.github.Jikoo.BookSuite.module.press;
 
 import java.util.HashMap;
 import java.util.Map;
