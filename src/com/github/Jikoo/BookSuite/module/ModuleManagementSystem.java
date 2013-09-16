@@ -31,15 +31,15 @@ public class ModuleManagementSystem {
 	public void enableModule(String s) {
 		modules.get(s).enable();
 	}
-	
-	public void addModule(BookSuiteModule m, String s)
-	{
+
+	public void addModule(BookSuiteModule m, String s) {
 		this.modules.insert(s, m);
 	}
 
 	public void performCancelableAction(Event e) throws ClassCastException {
 
 		for (BookSuiteModule bsm : modules) {
+
 			if (bsm.isEnabled() && bsm.isTriggeredByEvent(e)) {
 				if (e instanceof Cancellable) {
 					((Cancellable) e).setCancelled(true);

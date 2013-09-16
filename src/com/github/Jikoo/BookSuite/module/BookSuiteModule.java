@@ -61,4 +61,6 @@ public interface BookSuiteModule {
 	 * @return whether the module was enabled (if it already was, false is returned)
 	 */
 	public boolean enable();
+	
+	public String getName();
 }

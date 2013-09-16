@@ -152,4 +152,9 @@ public class PrintingCompany implements BookSuiteModule {
 		return true;
 	}
 
+	@Override
+	public String getName() {
+		return "Printing Press";
+	}
+
 }

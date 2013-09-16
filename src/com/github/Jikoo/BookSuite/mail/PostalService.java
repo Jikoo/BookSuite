@@ -222,4 +222,9 @@ public class PostalService implements BookSuiteModule{
 		}
 	}
 
+	@Override
+	public String getName() {
+		return "Mail";
+	}
+
 }

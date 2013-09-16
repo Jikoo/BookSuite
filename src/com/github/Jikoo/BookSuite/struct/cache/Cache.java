@@ -18,9 +18,6 @@ public class Cache<K, V> implements Iterable<V> {
 	private ListItem<K, V> newest = new ListItem<K, V>();
 	private ListItem<K, V> oldest = newest;
 
-	private boolean hasChanged = true;
-	private CacheIterator<V> iterator;
-
 	public Cache(int maxSize) {
 		this.maxSize = maxSize;
 	}
@@ -30,13 +27,11 @@ public class Cache<K, V> implements Iterable<V> {
 		kv.key = k;
 		kv.value = v;
 		map.put(k, kv);
-		newest.child = kv;
+		kv.child = newest;
 		newest = kv;
 
 		if (map.size() > this.maxSize) {
-			ListItem<K, V> condemned = this.oldest;
-			this.oldest.child.parent = null;
-			this.map.remove(condemned.key);
+			this.remove(oldest.key);
 		}
 	}
 
@@ -47,6 +42,7 @@ public class Cache<K, V> implements Iterable<V> {
 		below.parent = above;
 		above.child = below;
 		map.remove(k);
+
 	}
 
 	public V get(K k) {
@@ -69,13 +65,22 @@ public class Cache<K, V> implements Iterable<V> {
 		return oldest.value;
 	}
 
+	public int getSize() {
+		return this.map.size();
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Cache size: ").append(
+				this.getSize()).append("\n");
+		for (V v : this) {
+			sb.append(v.toString()).append("\n");
+		}
+		return sb.toString();
+	}
+
 	@Override
 	public Iterator<V> iterator() {
-		if (this.hasChanged) {
-			this.iterator = new CacheIterator<V>(newest);
-			this.hasChanged = false;
-		}
-		return this.iterator;
+		return new CacheIterator<V>(newest);
 	}
 
 	@SuppressWarnings("hiding")

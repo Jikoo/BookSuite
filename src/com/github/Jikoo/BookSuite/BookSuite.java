@@ -40,8 +40,7 @@ public class BookSuite extends JavaPlugin {
 
 	private MainListener listener;
 	private CommandHandler command;
-
-
+	
 	private static BookSuite instance;
 
 	@Override
