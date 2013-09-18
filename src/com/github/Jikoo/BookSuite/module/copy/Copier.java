@@ -26,7 +26,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.Jikoo.BookSuite.module.core.BookSuiteModule;
 
-public class Copier extends BookSuiteModule{
+public class Copier extends BookSuiteModule {
 	Map<Integer, ? extends ItemStack> inkMap;
 	Map<Integer, ? extends ItemStack> bookMap;
 	Map<Integer, ? extends ItemStack> paperMap;
@@ -252,6 +252,11 @@ public class Copier extends BookSuiteModule{
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public static BookSuiteModule getInstance()
+	{
 		return null;
 	}
 }

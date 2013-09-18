@@ -8,8 +8,7 @@ public class RudolphHell implements DirectModuleManager{
 
 	@Override
 	public BookSuiteModule getManagedModule(boolean enabled) {
-		// TODO Auto-generated method stub
-		return null;
+		return Copier.getInstance();
 	}
 	
 }
