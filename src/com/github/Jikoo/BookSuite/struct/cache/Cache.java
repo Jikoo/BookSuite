@@ -85,7 +85,6 @@ public class Cache<K, V> implements Iterable<V> {
 		return sb.toString();
 	}
 
-	@Override
 	public Iterator<V> iterator() {
 		return new CacheIterator<V>(newest);
 	}
@@ -99,19 +98,16 @@ public class Cache<K, V> implements Iterable<V> {
 			this.current = newest;
 		}
 
-		@Override
 		public boolean hasNext() {
 			return current != null && current.child != null;
 		}
 
-		@Override
 		public V next() {
 			V v = current.value;
 			this.remove();
 			return v;
 		}
 
-		@Override
 		public void remove() {
 			this.current = this.current.child;
 		}
