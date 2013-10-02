@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -49,7 +50,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public enum CommandPermissions {
-		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, EXPORT, LIST, DELETE, RELOAD, UPDATE;
+		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, EXPORT, LIST, LOCK, DELETE, RELOAD, UPDATE;
 
 		public boolean checkPermission(CommandSender s) {
 			return (s.hasPermission("booksuite.command." + this.lName()) || !(s instanceof Player));
@@ -116,6 +117,11 @@ public class CommandHandler implements CommandExecutor {
 			 */
 			if (args[0].equals("overwrite")) {
 				if (overwrite(p, args))
+					return true;
+			}
+
+			if (args[0].equals("lock")) {
+				if (lock(p))
 					return true;
 			}
 		} else {
@@ -395,13 +401,10 @@ public class CommandHandler implements CommandExecutor {
 							"maximum-copies-per-operation")) {
 						copies = plugin.getConfig().getInt(
 								"maximum-copies-per-operation");
-						p.sendMessage(ChatColor.DARK_RED
-								+ "The maximum number of books copiable at once is "
-								+ copies + ".");
+						p.sendMessage(plugin.msgs.get("FAILURE_COPY_MAXIMUM").replace("<max>", String.valueOf(copies)));
 					}
 				} catch (NumberFormatException e) {
-					p.sendMessage(ChatColor.DARK_RED + args[1]
-							+ " is not a valid integer. Assuming 1..");
+					p.sendMessage(plugin.msgs.get("FAILURE_COPY_INVALID_NUMBER").replace("<number>", args[1]));
 					copies = 1;
 				}
 			} else
@@ -530,7 +533,7 @@ public class CommandHandler implements CommandExecutor {
 		if (listPermittedCommands(p).length() > 0) {
 			if (args.length == 1) {
 				p.sendMessage(plugin.msgs.get("USAGE"));
-				p.sendMessage(ChatColor.DARK_RED + listPermittedCommands(p));
+				p.sendMessage(plugin.msgs.get("USAGE_TOPICS") + listPermittedCommands(p));
 			} else {
 				boolean failure = false;
 				StringBuilder sb1 = new StringBuilder();
@@ -552,100 +555,11 @@ public class CommandHandler implements CommandExecutor {
 									p.sendMessage(plugin.msgs.get("USAGE_EXAMPLE")
 											+ plugin.msgs.get("USAGE_EDIT_DELPAGE_EXAMPLE"));
 									break;
-								case AUTHOR:
-									p.sendMessage(plugin.msgs.get("USAGE_AUTHOR")
-											+ plugin.msgs.get("USAGE_AUTHOR_EXPLANATION"));
-									p.sendMessage(plugin.msgs.get("USAGE_EXAMPLE")
-											+ plugin.msgs.get("USAGE_AUTHOR_EXAMPLE"));
-									break;
-								case TITLE:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book t(itle) <new title>"
-											+ ChatColor.DARK_GREEN
-											+ " - change title of book in hand");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book t BookSuite Instruction Manual");
-									break;
-								case COPY:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book copy <quantity>"
-											+ ChatColor.DARK_GREEN
-											+ " - Create copies!");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA + "/book copy 20");
-									break;
-								case UNSIGN:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book u(nsign)"
-											+ ChatColor.DARK_GREEN
-											+ " - unsign book in hand.");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA + "/book u");
-									break;
-								case IMPORT:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book <u(rl)|<f(ile)|l(oad)>> <url|filename>"
-											+ ChatColor.DARK_GREEN
-											+ " - import book from file or url");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book u http://dev.bukkit.org/paste/gy7ekjupawivnbxq.txt");
-									break;
-								case EXPORT:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book <e(xport)|s(ave)> <filename>"
-											+ ChatColor.DARK_GREEN
-											+ " - export held book to file");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book s ExampletasticBook");
-									break;
-								case LIST:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book l(ist)"
-											+ ChatColor.DARK_GREEN
-											+ " - list all books");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA + "/book l");
-									break;
-								case DELETE:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book d(elete) <file>"
-											+ ChatColor.DARK_GREEN
-											+ " - delete specified book");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA
-											+ "/book d ExampletasticBook");
-									break;
-								case RELOAD:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book reload"
-											+ ChatColor.DARK_GREEN
-											+ " - reload the plugin");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA + "/book reload");
-									break;
-								case UPDATE:
-									p.sendMessage(ChatColor.AQUA
-											+ "/book update"
-											+ ChatColor.DARK_GREEN
-											+ " - check for updates");
-									p.sendMessage(ChatColor.DARK_GREEN
-											+ "Usage example: "
-											+ ChatColor.AQUA + "/book update");
-									break;
 								default:
-									failure = true;
-									sb1.append(s + ", ");
+									p.sendMessage(plugin.msgs.get("USAGE_" + cdp.toString())
+											+ plugin.msgs.get("USAGE_" + cdp.toString() + "_EXPLANATION"));
+									p.sendMessage(plugin.msgs.get("USAGE_EXAMPLE")
+											+ plugin.msgs.get("USAGE_" + cdp.toString() + "_EXAMPLE"));
 									break;
 								}
 							} else {
@@ -749,15 +663,35 @@ public class CommandHandler implements CommandExecutor {
 		return sb.substring(0, sb.length() - 2);
 	}
 
+	private boolean lock(Player p) {
+		ItemStack is = p.getItemInHand();
+		if (is.getType() != Material.WRITTEN_BOOK || is.getType() != Material.BOOK_AND_QUILL) {
+			p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDEITHER"));
+			return true;
+		}
+		BookMeta bm = (BookMeta) is.getItemMeta();
+		if (!bm.hasAuthor()) {
+			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_NEEDBAQAUTHOR"));
+		}
+		ArrayList<String> lore = bm.hasLore() ? (ArrayList<String>) bm.getLore() : new ArrayList<String>();
+		if (lore.contains(plugin.msgs.get("LOCK"))) {
+			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_ALREADY"));
+		} else {
+			lore.add(plugin.msgs.get("LOCK"));
+			bm.setLore(lore);
+		}
+		return true;
+	}
+
+	private boolean unlock(Player p) {
+		return true;
+	}
+
 	public boolean invalidCommand(CommandSender sender) {
-		sender.sendMessage(plugin.msgs.get("VERSION")
-				.replaceAll("<plugin.version>", plugin.version));
+		sender.sendMessage(plugin.msgs.get("VERSION").replaceAll("<plugin.version>", plugin.version));
 		if (listPermittedCommands(sender).length() > 0) {
-			sender.sendMessage(ChatColor.DARK_GREEN + "For command usage, use "
-					+ ChatColor.AQUA + "/book help <topic(s)>"
-					+ ChatColor.DARK_GREEN + ".");
-			sender.sendMessage(ChatColor.DARK_GREEN + "Possible topics: "
-					+ listPermittedCommands(sender));
+			sender.sendMessage(plugin.msgs.get("USAGE_HELP"));
+			sender.sendMessage(plugin.msgs.get("USAGE_TOPICS") + listPermittedCommands(sender));
 		}
 		return true;
 	}
@@ -828,8 +762,8 @@ public class CommandHandler implements CommandExecutor {
 
 		public void run() {
 			if (temp == -1) {
-				p.sendMessage(ChatColor.DARK_RED
-						+ "Too many books are being imported at this time, please try again later.");
+				p.sendMessage(plugin.msgs.get("FAILURE_IMPORT_TEMP_FULL"));
+				// TODO return supplies
 				return;
 			}
 			BookMeta bm = fm.makeBookMetaFromText(p, "temp" + temp,
@@ -861,6 +795,8 @@ public class CommandHandler implements CommandExecutor {
 			}
 		}
 	}
+
+	// TODO temp clear @10 secs (200L)
 
 	public void syncOverwriteTimer(Player p) {
 		Bukkit.getServer().getScheduler()

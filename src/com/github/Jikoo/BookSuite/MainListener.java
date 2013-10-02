@@ -11,7 +11,6 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -74,7 +73,7 @@ public class MainListener implements Listener {
 						if (plugin.functions.canObtainMap(p)) {
 							press.operatePress();
 							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
+							p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 						}
 						event.setCancelled(true);
 					} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
@@ -84,7 +83,7 @@ public class MainListener implements Listener {
 								&& plugin.functions.canObtainBook(p)) {
 							press.operatePress();
 							plugin.functions.copy(p);
-							p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
+							p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 						}
 						event.setCancelled(true);
 					} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
@@ -92,11 +91,10 @@ public class MainListener implements Listener {
 							if (plugin.functions.canObtainBook(p)) {
 								press.operatePress();
 								plugin.functions.copy(p);
-								p.sendMessage(ChatColor.DARK_GREEN + "Copied successfully!");
+								p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 							}
 						} else {
-							p.sendMessage(ChatColor.DARK_RED
-									+ "You do not have permission to copy unsigned books!");
+							p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
 						}
 						event.setCancelled(true);
 					} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
@@ -121,8 +119,7 @@ public class MainListener implements Listener {
 				if (p.hasPermission("booksuite.block.erase")) {
 					if (clicked.getData() < 1 && !p.getGameMode().equals(GameMode.CREATIVE)
 							&& !p.hasPermission("booksuite.block.erase.free")) {
-						p.sendMessage(ChatColor.DARK_RED
-								+ "You'll need some water to unsign this book.");
+						p.sendMessage(plugin.msgs.get("FAILURE_ERASE_NOWATER"));
 					} else if (plugin.functions.isAuthor(p, bm.getAuthor())) {
 						plugin.functions.unsign(p);
 						if (!p.hasPermission("booksuite.block.erase.free")
@@ -137,12 +134,12 @@ public class MainListener implements Listener {
 						}
 
 					} else {
-						p.sendMessage(ChatColor.DARK_RED + "You can only unsign your own books.");
+						p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE_OTHER"));
 					}
 					event.setCancelled(true);
 
 				} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
-					p.sendMessage(ChatColor.DARK_RED + "You do not have permission to use erasers.");
+					p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE"));
 					event.setCancelled(true);
 				}
 			} else if (plugin.functions.isMailBox(clicked)) {
@@ -187,9 +184,8 @@ public class MainListener implements Listener {
 				}
 			}
 			if (event.isCancelled()) {
-				event.getPlayer().sendMessage(
-						ChatColor.DARK_RED + "You'll need " + obm.getAuthor().replace(" and ", " or ")
-						+ ChatColor.DARK_RED + "'s permission to edit this book!");
+				event.getPlayer().sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS")
+						.replace("<author(s)>", obm.getAuthor().replace(" and ", " or ")));
 				return;
 			}
 		}

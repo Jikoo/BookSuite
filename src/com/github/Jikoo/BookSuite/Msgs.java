@@ -23,7 +23,6 @@ public class Msgs {
 	public Msgs() {
 		String defaultLocation = "plugins" + File.pathSeparatorChar + "BookSuite"
 				+ File.pathSeparatorChar;
-		BookSuite.getInstance().saveResource("strings.yml", false);
 		File f = new File(defaultLocation, "strings.yml");
 		if (f.exists()) {
 			strings = YamlConfiguration.loadConfiguration(f);

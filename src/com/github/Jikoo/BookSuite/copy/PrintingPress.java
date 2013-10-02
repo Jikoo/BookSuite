@@ -13,7 +13,9 @@ package com.github.Jikoo.BookSuite.copy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+
 import com.github.Jikoo.BookSuite.BookSuite;
 
 public class PrintingPress {
@@ -24,7 +26,11 @@ public class PrintingPress {
 	String pName;
 
 	public PrintingPress(BookSuite plugin, String pName, Block blockUp) {
-		this.blockUp = blockUp;
+		if (plugin.functions.isInvertedStairs(blockUp)) {
+			this.blockUp = blockUp;
+		} else {
+			this.blockUp = blockUp.getRelative(BlockFace.UP);
+		}
 		originalBlock = blockUp.getState();
 		this.pName = pName;
 	}

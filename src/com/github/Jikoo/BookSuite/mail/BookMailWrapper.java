@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn - plugin surrounding libraries
+ *     Adam Gunn - plugin surrounding Mail
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.mail;
 

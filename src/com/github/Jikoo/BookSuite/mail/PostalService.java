@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn - plugin surrounding libraries
+ *     Adam Gunn - minor contributions + plugin surrounding Mail
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.mail;
 
@@ -34,7 +34,7 @@ import com.github.Jikoo.BookSuite.BookSuite;
 public class PostalService {
 
 	// the inventory of the postal service
-	private Map<String, List<BookMailWrapper>> inventory = new HashMap<String, List<BookMailWrapper>>();
+	private Map<String, List<BookMailWrapper>> inventory;
 
 	/*
 	 * Singleton instance
@@ -62,11 +62,12 @@ public class PostalService {
 			@SuppressWarnings("unchecked")
 			Map<String, List<BookMailWrapper>> recovered = (Map<String, List<BookMailWrapper>>) input
 					.readObject();
+			this.inventory = new HashMap<String, List<BookMailWrapper>>();
 			this.inventory = recovered;
 			input.close();
 
 		} catch (Exception e) {
-			BSLogger.debugInfo("no previous mail");
+			BSLogger.debugInfo("No mail was saved previously.");
 		}
 	}
 
@@ -141,12 +142,21 @@ public class PostalService {
 	}
 
 	/**
-	 * disables the module of the pluggin: if postal service has been accessed,
+	 * Saves any remaining data and sets inventory to null.
+	 */
+	private void save() {
+		this.writeToFile();
+		this.inventory = null;
+	}
+
+	/**
+	 * disables the module of the plugin: if postal service has been accessed,
 	 * save it to file, otherwise, do nothing
 	 */
 	public static void disable() {
 		if (instance != null) {
-			getInstance().writeToFile();
+			instance.save();
+			instance = null;
 		}
 	}
 }
