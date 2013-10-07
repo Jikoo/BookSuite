@@ -148,6 +148,7 @@ public class Copier {
 		return stacks.size() - (int) Math.ceil(totalAmount(stacks) / 64d) ;
 	}
 
+	@SuppressWarnings("deprecation")
 	public Inventory removeAddMerge(Inventory i, ItemStack is, int quantity) {
 		Material m = is.getType();
 
@@ -192,6 +193,7 @@ public class Copier {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private int totalInk(Map<Integer, ? extends ItemStack> m) {
 		int ink = 0;
 		for (Entry<Integer, ? extends ItemStack> e : inkMap.entrySet()) {

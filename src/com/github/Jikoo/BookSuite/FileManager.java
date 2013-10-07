@@ -123,8 +123,9 @@ public class FileManager {
 	 *            the name of the <code>File</code> to read
 	 * @return the <code>ItemStack</code> created
 	 */
+	@SuppressWarnings("deprecation")
 	public ItemStack makeItemStackFromFile(String directory, String filename) {
-		ItemStack is = new ItemStack(3, 1);
+		ItemStack is = new ItemStack(Material.DIRT, 1);
 		ItemMeta im = is.getItemMeta();
 		try {
 			File itemFile = new File(directory, filename + ".item");
@@ -227,6 +228,7 @@ public class FileManager {
 	 *            the name of the <code>File</code> to write
 	 * @return <code>true</code>, if successful
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean makeFileFromItemStack(ItemStack is, String directory,
 			String filename) {
 		try {

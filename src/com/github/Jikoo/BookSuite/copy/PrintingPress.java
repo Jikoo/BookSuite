@@ -46,6 +46,7 @@ public class PrintingPress {
 	 * @param b
 	 *            the stair block to be transformed
 	 */
+	@SuppressWarnings("deprecation")
 	public void changeStairBlock(Block b) {
 		if (b.getTypeId() == 53)// WOOD_STAIRS
 			b.setTypeIdAndData(126, (byte) 0, false);// WOOD_STEP
@@ -94,6 +95,7 @@ public class PrintingPress {
 			b = block;
 		}
 
+		@SuppressWarnings("deprecation")
 		public void run() {
 			if (b.getType().equals(changedBlock.getType())) {
 				b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock

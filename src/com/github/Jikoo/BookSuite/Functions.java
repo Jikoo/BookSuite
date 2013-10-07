@@ -385,6 +385,7 @@ public class Functions {
 	 *            the block to be tested
 	 * @return whether the block is an inverted stair
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean isInvertedStairs(Block b) {
 		for (int i : ACCEPTABLE)
 			if (i == b.getTypeId())
@@ -398,6 +399,7 @@ public class Functions {
 	 *            the stack of stairs to be tested
 	 * @return whether the item is an acceptable type of stair
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean isCorrectStairType(ItemStack is) {
 		for (int i : ACCEPTABLE)
 			if (i == is.getTypeId())
