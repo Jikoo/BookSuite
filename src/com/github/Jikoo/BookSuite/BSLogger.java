@@ -14,12 +14,11 @@ import org.bukkit.Bukkit;
 
 public class BSLogger {
 	/**
-	 * A small function to replace Logger.info()
+	 * A small function to replace BookSuite.getInstance().getLogger.info()
 	 * <p>
 	 * Supports color in console.
 	 * 
-	 * @param msg
-	 *            the message to send
+	 * @param msg the message to send
 	 */
 	public static void info(String msg) {
 		Bukkit.getConsoleSender().sendMessage("[BookSuite] " + msg);
@@ -51,20 +50,37 @@ public class BSLogger {
 		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
 			return;
 		}
-		String trace = e.toString();
+
+		StringBuilder trace = new StringBuilder(e.toString());
 		for (StackTraceElement ste : e.getStackTrace()) {
-			trace += "\n\tat " + ste.toString();
+			trace.append("\n\tat ").append(ste.toString());
+		}
+		if (e.getCause() != null) {
+			trace.append("\nCaused by: " + e.getCause().toString());
+			for (StackTraceElement ste : e.getCause().getStackTrace()) {
+				trace.append("\n\tat " + ste.toString());
+			}
 		}
 		debugWarn("Error report:\n" + trace);
 		debugWarn("End of error report.");
 	}
 
 	public static void criticalErr(Exception e) {
-		String trace = e.toString();
+		StringBuilder trace = new StringBuilder(e.toString());
 		for (StackTraceElement ste : e.getStackTrace()) {
-			trace += "\n\tat " + ste.toString();
+			trace.append("\n\tat ").append(ste.toString());
+		}
+		if (e.getCause() != null) {
+			trace.append("\nCaused by: " + e.getCause().toString());
+			for (StackTraceElement ste : e.getCause().getStackTrace()) {
+				trace.append("\n\tat " + ste.toString());
+			}
 		}
 		severe("Error report:\n" + trace);
 		severe("End of error report.");
+	}
+
+	public static void fine(String msg) {
+		Bukkit.getLogger().fine("[BookSuite] " + msg);
 	}
 }

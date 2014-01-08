@@ -24,7 +24,7 @@ import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
-	protected final String version = "3.2.0";
+	protected String version;
 
 	public final int currentFile = 14;
 	public boolean hasUpdate;
@@ -48,6 +48,7 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		version = this.getDescription().getVersion();
 
 		instance = this;
 
@@ -73,13 +74,13 @@ public class BookSuite extends JavaPlugin {
 
 		try {
 			if (getConfig().getBoolean("use-inbuilt-permissions")) {
-				BSLogger.info("Enabling inbuilt permissions.");
+				BSLogger.fine("Enabling inbuilt permissions.");
 				perms = new PermissionsListener(this);
 				perms.enable();
 			}
 
 			if (getConfig().getBoolean("enable-metrics")) {
-				BSLogger.info("Enabling metrics.");
+				BSLogger.fine("Enabling metrics.");
 				try {
 					metrics = new Metrics(this);
 					metrics.start();
@@ -95,11 +96,11 @@ public class BookSuite extends JavaPlugin {
 
 			if (getConfig().getBoolean("update-check")) {
 				if (getConfig().getBoolean("login-update-check")) {
-					BSLogger.info("Enabling login update check.");
+					BSLogger.fine("Enabling login update check.");
 					update.enableNotifications();
 				}
 
-				BSLogger.info("Initiating update check.");
+				BSLogger.fine("Initiating update check.");
 
 				update.asyncUpdateCheck(null, false);
 			}

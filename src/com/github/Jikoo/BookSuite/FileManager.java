@@ -27,8 +27,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 /**
  * FileManager handles most generic file-related functions of BookSuite.
  * 
- * @author Jikoo
- * @author tmathmeyer
+ * @author Jikoo, tmathmeyer
  */
 public class FileManager {
 
@@ -123,7 +122,6 @@ public class FileManager {
 	 *            the name of the <code>File</code> to read
 	 * @return the <code>ItemStack</code> created
 	 */
-	@SuppressWarnings("deprecation")
 	public ItemStack makeItemStackFromFile(String directory, String filename) {
 		ItemStack is = new ItemStack(Material.DIRT, 1);
 		ItemMeta im = is.getItemMeta();
@@ -159,7 +157,7 @@ public class FileManager {
 				} else if (handlingEnchants) {
 					String[] enchant = line.split(":");
 					im.addEnchant(
-							Enchantment.getById(Integer.parseInt(enchant[0])),
+							Enchantment.getByName(enchant[0]),
 							Integer.parseInt(enchant[1]), true);
 				} else {
 					lore.add(line);
@@ -228,7 +226,6 @@ public class FileManager {
 	 *            the name of the <code>File</code> to write
 	 * @return <code>true</code>, if successful
 	 */
-	@SuppressWarnings("deprecation")
 	public boolean makeFileFromItemStack(ItemStack is, String directory,
 			String filename) {
 		try {
@@ -260,7 +257,7 @@ public class FileManager {
 				if (im.hasEnchants()) {
 					file.append("<Enchantments>\n");
 					for (Enchantment e : Enchantment.values()) {
-						file.append(e.getId() + ":" + im.getEnchantLevel(e)
+						file.append(e.getName() + ":" + im.getEnchantLevel(e)
 								+ "\n");
 					}
 					file.append("</Enchantments>");
