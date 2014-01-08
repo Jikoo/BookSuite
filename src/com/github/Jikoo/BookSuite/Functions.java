@@ -323,14 +323,9 @@ public class Functions {
 		}
 		ItemStack book = p.getItemInHand();
 		BookMeta bm = (BookMeta) book.getItemMeta();
-		List<String> pages = new ArrayList<String>();
+		List<String> pages = new ArrayList<String>(bm.getPages());
 		try {
-			int page = Integer.parseInt(pageNumber);
-			for (int i = 1; i <= bm.getPageCount(); i++) {
-				if (i != page)
-					pages.add(bm.getPage(i));
-			}
-			bm.setPages(pages);
+			pages.remove(Integer.parseInt(pageNumber) + 1);
 		} catch (NumberFormatException e) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_USAGE") + BookSuite.getInstance().msgs.get("USAGE_EDIT_DELPAGE"));
 			return false;

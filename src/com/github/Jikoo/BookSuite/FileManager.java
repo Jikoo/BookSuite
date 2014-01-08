@@ -12,6 +12,7 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,66 +48,72 @@ public class FileManager {
 	 *            the type of import
 	 * @return the <code>BookMeta</code> created.
 	 */
-	public BookMeta makeBookMetaFromText(Player p, String file,
-			String location, boolean isURL) {
+	public BookMeta makeBookMetaFromText(Player p, String fileData, boolean isURL) {
 		BookMeta text = (BookMeta) new ItemStack(Material.WRITTEN_BOOK, 1)
 				.getItemMeta();
 		boolean isBookText = false;
 		if (!isURL)
 			isBookText = true;
 
-		try {
-			Scanner s;
-			if (file.contains("."))
-				s = new Scanner(new File(location, file));
-			else
-				s = new Scanner(new File(location, file + ".book"));
-			String page = "";
-			while (s.hasNext()) {
-				String line = s.nextLine();
+			
+		String page = "";
+		for (String line : fileData.split("\n")) {
 
-				// pastebin support section
-				if (location.contains("temp")) {
-					line = line.replaceAll("(<li class=\").*(\">)", "")
-							.replace("</li>", "");
-					line = line.replaceAll("(<div class=\").*(\">)", "")
-							.replace("</div>", "");
-					line = line.replace("&lt;", "<").replace("&gt;", ">");
-					line = line.replace("&nbsp", "<n>");
-				}
+			// pastebin support section
+			if (isURL) {
+				line = line.replaceAll("(<li class=\").*(\">)", "")
+						.replace("</li>", "");
+				line = line.replaceAll("(<div class=\").*(\">)", "")
+						.replace("</div>", "");
+				line = line.replace("&lt;", "<").replace("&gt;", ">");
+				line = line.replace("&nbsp", "<n>");
+			}
 
-				if (line.contains("<book>")) {
-					isBookText = true;
-					line = line.replace("<book>", "");
+			if (line.contains("<book>")) {
+				isBookText = true;
+				line = line.replace("<book>", "");
+			}
+			if (isBookText) {
+				if (line.contains("</book>")) {
+					break;
 				}
-				if (isBookText) {
-					if (line.contains("</book>")) {
-						break;
-					}
-					if (line.length() >= 2 && line.substring(0, 2).equals("//")) {
-						// do nothing, this line is a book comment
-					} else if (line.contains("<author>")
-							&& (!isURL || p
-									.hasPermission("booksuite.command.import.other"))) {
-						text.setAuthor(line.replace("<author>", "").replace(
-								"</author>", ""));
-					} else if (line.contains("<title>")) {
-						text.setTitle(line.replace("<title>", "")
-								.replace("</title>", "").replace("<br>", ""));
-					} else if (line.contains("<page>")) {
-						page = "";
-					} else if (line.contains("</page>")) {
-						text.addPage(BookSuite.getInstance().functions.parseBML(page));
-					} else {
-						page += line + "<n>";
-					}
+				if (line.length() >= 2 && line.substring(0, 2).equals("//")) {
+					// do nothing, this line is a book comment
+				} else if (line.contains("<author>")
+						&& (!isURL || p
+								.hasPermission("booksuite.command.import.other"))) {
+					text.setAuthor(line.replace("<author>", "").replace(
+							"</author>", ""));
+				} else if (line.contains("<title>")) {
+					text.setTitle(line.replace("<title>", "")
+							.replace("</title>", "").replace("<br>", ""));
+				} else if (line.contains("<page>")) {
+					page = "";
+				} else if (line.contains("</page>")) {
+					text.addPage(BookSuite.getInstance().functions.parseBML(page));
+				} else {
+					page += line + "<n>";
 				}
 			}
+		}
+		if (!text.hasAuthor())
+			text.setAuthor(p.getName());
+		return text;
+	}
+
+	public String getFileData(String directory, String file) {Scanner s;
+		try {
+			if (file.contains("."))
+				s = new Scanner(new File(directory, file));
+			else
+				s = new Scanner(new File(directory, file + ".book"));
+			StringBuilder sb = new StringBuilder();
+			while (s.hasNextLine()) {
+				sb.append(s.nextLine()).append('\n');
+			}
 			s.close();
-			if (!text.hasAuthor())
-				text.setAuthor(p.getName());
-			return text;
-		} catch (Exception e) {
+			return sb.toString();
+		} catch (FileNotFoundException e) {
 			BSLogger.err(e);
 			return null;
 		}

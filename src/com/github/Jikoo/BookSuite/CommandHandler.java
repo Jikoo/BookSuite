@@ -11,9 +11,6 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -167,9 +164,9 @@ public class CommandHandler implements CommandExecutor {
 					&& CommandPermissions.IMPORT.checkPermission(p)) {
 				ItemStack newbook = new ItemStack(
 						Material.WRITTEN_BOOK, 1);
-				newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(
-						p, args[1], plugin.getDataFolder()
-								+ "/SavedBooks/", true));
+				newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p,
+						plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[1]),
+						false));
 				if (!newbook.hasItemMeta()
 						|| newbook.getItemMeta() == null) {
 					p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
@@ -187,8 +184,7 @@ public class CommandHandler implements CommandExecutor {
 				if (!plugin.functions.canObtainBook(p))
 					return true;
 				else {
-					asyncBookImport(p.getName(), args[1], plugin
-							.getDataFolder().getPath());
+					asyncBookImport(p, args[1]);
 					p.sendMessage(plugin.msgs.get("SUCCESS_IMPORT_INITIATED"));
 				}
 				return true;
@@ -384,8 +380,6 @@ public class CommandHandler implements CommandExecutor {
 			plugin.rules = null;
 		}
 
-		if (new File(plugin.getDataFolder(), "temp").exists())
-			plugin.filemanager.delete(plugin.getDataFolder().getPath(), "temp");
 		sender.sendMessage(ChatColor.AQUA + "BookSuite v"
 				+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
 				+ " reloaded!");
@@ -697,124 +691,71 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void asyncBookImport(String p, String s, String dir) {
-		Bukkit.getServer().getScheduler()
-				.scheduleAsyncDelayedTask(plugin, new getStreamBook(p, s, dir));
-	}
-
-	public class getStreamBook implements Runnable {
-		String p;
-		URL url;
-		String loc;
-
-		getStreamBook(String p, String s, String dir) {
-			this.p = p;
-			loc = dir;
-			try {
-				url = new URL(s);
-			} catch (MalformedURLException e) {}
-		}
-
-		public void run() {
-			File dir = new File(loc + "/temp/");
-			if (!dir.exists())
-				dir.mkdirs();
-			File tempFile;
-			for (int i = 1; i <= 5; i++) {
-				tempFile = new File(dir, "temp" + i + ".book");
-				if (!tempFile.exists()) {
-					try {
-						tempFile.createNewFile();
-						Scanner urlInput = new Scanner(url.openStream());
-						FileWriter tempWriter = new FileWriter(tempFile);
-						while (urlInput.hasNextLine()) {
-							tempWriter.append(urlInput.nextLine() + "\n");
+	public void asyncBookImport(final Player p, final String s) {
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin,
+				new Runnable() {
+					public void run() {
+						BookMeta bm;
+						StringBuilder sb = new StringBuilder();
+						try {
+							URL url = new URL(s);
+							Scanner urlInput = new Scanner(url.openStream());;
+							while (urlInput.hasNextLine()) {
+								sb.append(urlInput.nextLine()).append('\n');
+							}
+							urlInput.close();
+						} catch (Exception e) {
+							bm = (BookMeta) new ItemStack(Material.WRITTEN_BOOK);
 						}
-						urlInput.close();
-						tempWriter.close();
-					} catch (Exception e) {
-						if (tempFile.exists())
-							tempFile.delete();
-						return;
+						bm = plugin.filemanager.makeBookMetaFromText(p, sb.toString(), true);
+						syncBookImport(p, bm);
 					}
-					syncBookImport(p, i);
-					return;
-				} else if (i == 5)
-					syncBookImport(p, -1);
-			}
-		}
+				});
 	}
 
-	public void syncBookImport(String p, int temp) {
-		Bukkit.getServer().getScheduler()
-				.scheduleSyncDelayedTask(plugin, new giveStreamBook(p, temp));
-	}
-
-	public class giveStreamBook implements Runnable {
-		Player p;
-		int temp;
-		FileManager fm = FileManager.getInstance();
-
-		giveStreamBook(String p, int temp) {
-			this.p = plugin.getServer().getPlayer(p);
-			this.temp = temp;
-		}
-
-		public void run() {
-			if (temp == -1) {
-				p.sendMessage(plugin.msgs.get("FAILURE_IMPORT_TEMP_FULL"));
-				// TODO return supplies
-				return;
-			}
-			BookMeta bm = fm.makeBookMetaFromText(p, "temp" + temp,
-					plugin.getDataFolder() + "/temp/", true);
-			fm.delete(plugin.getDataFolder() + "/temp/", "temp" + temp
-					+ ".book");
-			if (bm != null) {
-				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-				is.setItemMeta(bm);
-				if (p.getInventory().firstEmpty() != -1) {
-					p.getInventory().addItem(is);
-				} else {
-					p.getWorld().dropItem(p.getLocation(), is);
-				}
-			} else {
-				p.sendMessage(ChatColor.DARK_RED + "Error reading from URL.");
-				if (p.getInventory().firstEmpty() > 0) {
-					p.getInventory().addItem(
-							new ItemStack(Material.INK_SACK, 1));
-					p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
-				} else {
-					p.sendMessage(ChatColor.DARK_RED
-							+ "Dropped book supplies at your feet.");
-					p.getWorld().dropItem(p.getLocation(),
-							new ItemStack(Material.INK_SACK, 1));
-					p.getWorld().dropItem(p.getLocation(),
-							new ItemStack(Material.BOOK, 1));
-				}
-			}
-		}
+	public void syncBookImport(final Player p, final BookMeta bm) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
+				new Runnable() {
+					public void run() {
+						ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
+						if (bm.hasPages()) {
+							is.setItemMeta(bm);
+							if (p.getInventory().firstEmpty() != -1) {
+								p.getInventory().addItem(is);
+							} else {
+								p.getWorld().dropItem(p.getLocation(), is);
+							}
+						} else {
+							p.sendMessage(ChatColor.DARK_RED + "Error reading from URL.");
+							if (p.getInventory().firstEmpty() > 0) {
+								p.getInventory().addItem(
+										new ItemStack(Material.INK_SACK, 1));
+								p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
+							} else {
+								p.sendMessage(ChatColor.DARK_RED
+										+ "Dropped book supplies at your feet.");
+								p.getWorld().dropItem(p.getLocation(),
+										new ItemStack(Material.INK_SACK, 1));
+								p.getWorld().dropItem(p.getLocation(),
+										new ItemStack(Material.BOOK, 1));
+							}
+						}
+					}
+				});
 	}
 
 	// TODO temp clear @10 secs (200L)
 
-	public void syncOverwriteTimer(Player p) {
-		Bukkit.getServer().getScheduler()
-				.scheduleSyncDelayedTask(plugin, new overwriteTimer(p), 200L);
-	}
-
-	public class overwriteTimer implements Runnable {
-		Player p;
-
-		overwriteTimer(Player p) {
-			this.p = p;
-		}
-
-		public void run() {
-			if (overwritable.containsKey(p.getName())) {
-				overwritable.remove(p.getName());
-				p.sendMessage(ChatColor.DARK_RED + "Overwrite time expired!");
-			}
-		}
+	public void syncOverwriteTimer(final Player p) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
+				new Runnable() {
+					public void run() {
+						if (overwritable.containsKey(p.getName())) {
+							overwritable.remove(p.getName());
+							p.sendMessage(ChatColor.DARK_RED + "Overwrite time expired!");
+						}
+					}
+				},
+				200L);
 	}
 }

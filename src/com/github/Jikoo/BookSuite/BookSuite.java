@@ -11,8 +11,6 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
-import java.io.File;
-
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.Jikoo.BookSuite.mail.PostalService;
@@ -115,9 +113,6 @@ public class BookSuite extends JavaPlugin {
 			BSLogger.err(e);
 		}
 
-		if (new File(getDataFolder(), "temp").exists())
-			filemanager.delete(getDataFolder().getPath(), "temp");
-
 		listener = MainListener.getInstance();
 		getServer().getPluginManager().registerEvents(listener, this);
 		command = CommandHandler.getInstance();
@@ -131,8 +126,6 @@ public class BookSuite extends JavaPlugin {
 	public void onDisable() {
 		PostalService.disable();
 
-		if (new File(getDataFolder(), "temp").exists())
-			filemanager.delete(getDataFolder().getPath(), "temp");
 		try {
 			if (metrics != null) {
 				metrics.disable();
