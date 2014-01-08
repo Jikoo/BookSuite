@@ -33,7 +33,7 @@ import org.bukkit.inventory.meta.BookMeta;
 public class Functions {
 	private static Functions instance = null;
 	private final char SECTION_SIGN = '\u00A7';
-	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135, 136, 156 };
+	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135, 136, 156, 163, 164 };
 
 	/**
 	 * master method for checking if the player can obtain the books

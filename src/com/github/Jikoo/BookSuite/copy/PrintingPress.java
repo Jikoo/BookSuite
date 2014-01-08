@@ -78,6 +78,14 @@ public class PrintingPress {
 		else if (b.getTypeId() == 156)// QUARTZ_STAIRS
 			b.setTypeIdAndData(44, (byte) 7, false);// STEP
 
+		else if (b.getTypeId() == 163)// ACACIA_WOOD_STAIRS
+			b.setTypeIdAndData(126, (byte) 4, false);// WOOD_STEP
+
+		else if (b.getTypeId() == 164)// DARK_OAK_WOOD_STAIRS
+			b.setTypeIdAndData(126, (byte) 5, false);// WOOD_STEP
+
+		else b.setTypeId(44);// STEP
+
 		changedBlock = b.getState();
 	}
 
