@@ -26,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
@@ -121,6 +120,11 @@ public class CommandHandler implements CommandExecutor {
 				if (lock(p))
 					return true;
 			}
+
+			if (args[0].equals("unlock")) {
+				if (unlock(p))
+					return true;
+			}
 		} else {
 			return this.invalidCommand(sender);
 		}
@@ -146,7 +150,7 @@ public class CommandHandler implements CommandExecutor {
 			}
 			return this.invalidCommand(sender);
 		}
-		if (args.length == 2) {
+		if (args.length >= 2) {
 			// command: /book <e(xport)|s(ave)> <filename> - attempt
 			// to save book in hand to file
 			if (args[0].equals("e") || args[0].equals("export")
@@ -158,9 +162,8 @@ public class CommandHandler implements CommandExecutor {
 
 			// command: /book <u(rl)|<f(ile)|l(oad)>> <url|filename>
 			// - attempt to import a book from location
-			if ((args[0].equals("f") || args[0].equals("file")
-					|| args[0].equals("l") || args[0]
-						.equals("load"))
+			if ((args[0].equals("f") || args[0].equals("file") || args[0].equals("l")
+					|| args[0].equals("load") || args[0].equals("import"))
 					&& CommandPermissions.IMPORT.checkPermission(p)) {
 				ItemStack newbook = new ItemStack(
 						Material.WRITTEN_BOOK, 1);
@@ -204,10 +207,6 @@ public class CommandHandler implements CommandExecutor {
 					return true;
 				}
 			}
-			return this.invalidCommand(sender);
-		}
-
-		if (args.length >= 2) {
 
 			// command: /book t(itle) <args> - attempt to change title
 			// with additional args. Include spaces.
@@ -246,19 +245,8 @@ public class CommandHandler implements CommandExecutor {
 			// command: /book a(uthor) <args> - attempt to change author
 			// with additional args. Include spaces.
 			if (args[0].equals("a") || args[0].equals("author")) {
-				if (CommandPermissions.AUTHOR.checkPermission(p)) {
-					String newAuthor = "";
-					for (int i = 1; i < args.length; i++)
-						if (i != (args.length - 1))
-							newAuthor += args[i] + " ";
-						else
-							newAuthor += args[i];
-					if (plugin.functions.setAuthor(p, newAuthor))
-						p.sendMessage(plugin.msgs.get("SUCCESS_AUTHOR"));
-					else
-						p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+				if (author(p, args))
 					return true;
-				}
 			}
 		}
 
@@ -269,6 +257,7 @@ public class CommandHandler implements CommandExecutor {
 		if (CommandPermissions.TITLE.checkPermission(p)) {
 			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
 				p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+				return true;
 			}
 			if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
 					|| p.hasPermission("booksuite.command.title.other")) {
@@ -278,11 +267,35 @@ public class CommandHandler implements CommandExecutor {
 					if (i == (args.length - 1))
 						newTitle += " ";
 				}
-				plugin.functions.setTitle(p, newTitle);
+				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+				bm.setTitle(newTitle);
+				p.getItemInHand().setItemMeta(bm);
 				p.sendMessage(plugin.msgs.get("SUCCESS_TITLE"));
 			} else {
 				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_TITLE_OTHER"));
 			}
+			return true;
+		}
+		return false;
+	}
+
+	public boolean author(Player p, String[] args) {
+		if (CommandPermissions.AUTHOR.checkPermission(p)) {
+			if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+				p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDBOOK"));
+				return true;
+			}
+			String newAuthor = "";
+			for (int i = 1; i < args.length; i++) {
+				if (i != (args.length - 1)) {
+					newAuthor += args[i] + " ";
+				} else {
+					newAuthor += args[i];
+				}
+			}
+			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+			bm.setAuthor(newAuthor);
+			p.getItemInHand().setItemMeta(bm);
 			return true;
 		}
 		return false;
@@ -312,10 +325,17 @@ public class CommandHandler implements CommandExecutor {
 			BSLogger.warn("Your configuration has been updated, please check it!");
 		}
 		if (new UpdateStrings(plugin).update()) {
-			BSLogger.info("More customization has been added to strings.yml.");
+			BSLogger.info("Your strings.yml has been updated, please check it!");
 		}
+
 		plugin.msgs = new Msgs();
-		plugin.alias.enable();
+
+		if (plugin.getConfig().getBoolean("enable-aliases")) {
+			BSLogger.fine("Enabling aliases.");
+			plugin.alias.enable();
+		} else {
+			plugin.alias.disable();
+		}
 
 		if (plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
 			if (plugin.perms != null) {
@@ -334,25 +354,6 @@ public class CommandHandler implements CommandExecutor {
 				plugin.perms.disable();
 				plugin.perms = null;
 			}
-		}
-
-		try {
-			if (plugin.getConfig().getBoolean("enable-metrics")) {
-				if (plugin.metrics == null) {
-					plugin.metrics = new Metrics(plugin);
-					plugin.metrics.start();
-				} else {
-					plugin.metrics.start();
-				}
-			} else {
-				if (plugin.metrics != null) {
-					plugin.metrics.disable();
-					plugin.metrics = null;
-				}
-			}
-		} catch (Exception e) {
-			BSLogger.warn("[BookSuite] Error changing metrics settings.");
-			BSLogger.err(e);
 		}
 
 		if (plugin.getConfig().getBoolean("login-update-check")) {
@@ -380,7 +381,7 @@ public class CommandHandler implements CommandExecutor {
 			plugin.rules = null;
 		}
 
-		sender.sendMessage(ChatColor.AQUA + "BookSuite v"
+		sender.sendMessage(ChatColor.AQUA + "BookSuite v" // adam strings.yml
 				+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
 				+ " reloaded!");
 	}
@@ -391,61 +392,33 @@ public class CommandHandler implements CommandExecutor {
 			if (args.length >= 2) {
 				try {
 					copies = Integer.parseInt(args[1]);
-					if (copies > plugin.getConfig().getInt(
-							"maximum-copies-per-operation")) {
-						copies = plugin.getConfig().getInt(
-								"maximum-copies-per-operation");
-						p.sendMessage(plugin.msgs.get("FAILURE_COPY_MAXIMUM").replace("<max>", String.valueOf(copies)));
-					}
 				} catch (NumberFormatException e) {
 					p.sendMessage(plugin.msgs.get("FAILURE_COPY_INVALID_NUMBER").replace("<number>", args[1]));
 					copies = 1;
 				}
-			} else
+			} else {
 				copies = 1;
-			boolean completed = true;
+			}
+
 			ItemStack is = p.getItemInHand();
 			if (is.getType().equals(Material.MAP)) {
-				for (int i = 0; i < copies; i++) {
-					if (plugin.functions.canObtainMap(p))
-						plugin.functions.copy(p);
-					else {
-						completed = false;
-						break;
-					}
-				}
-				if (completed)
-					p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+				plugin.functions.copy(p, copies);
+				p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 				return true;
 			} else if (!is.hasItemMeta() || is.getItemMeta() == null) {
 				p.sendMessage(plugin.msgs.get("FAILURE_COPY_UNCOPIABLE"));
+				return true;
 			} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 				if (plugin.functions.checkCommandCopyPermission(p, bm.getAuthor())) {
-					for (int i = 0; i < copies; i++) {
-						if (plugin.functions.canObtainBook(p))
-							plugin.functions.copy(p);
-						else {
-							completed = false;
-							break;
-						}
-					}
-					if (completed)
-						p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+					plugin.functions.copy(p, copies);
+					p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 				}
 				return true;
 			} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
 				if (p.hasPermission("booksuite.copy.unsigned")) {
-					for (int i = 0; i < copies; i++) {
-						if (plugin.functions.canObtainBook(p))
-							plugin.functions.copy(p);
-						else {
-							completed = false;
-							break;
-						}
-					}
-					if (completed)
-						p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+					plugin.functions.copy(p, copies);
+					p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 				} else
 					p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
 				return true;
@@ -622,16 +595,14 @@ public class CommandHandler implements CommandExecutor {
 				}
 
 				if (failure) {
-					if (sb1.substring(0, sb1.length() - 2).contains(", "))
-						p.sendMessage(ChatColor.DARK_RED
-								+ "Invalid help topics: "
+					if (sb1.substring(0, sb1.length() - 2).contains(", ")) {
+						p.sendMessage(ChatColor.DARK_RED + "Invalid help topics: "
 								+ sb1.substring(0, sb1.length() - 2));
-					else
-						p.sendMessage(ChatColor.DARK_RED
-								+ "Invalid help topic: "
+					} else {
+						p.sendMessage(ChatColor.DARK_RED + "Invalid help topic: "
 								+ sb1.substring(0, sb1.length() - 2));
-					p.sendMessage(ChatColor.DARK_RED
-							+ "Possible topics are as follows:");
+					}
+					p.sendMessage(ChatColor.DARK_RED + "Possible topics are as follows:");
 					p.sendMessage(ChatColor.DARK_RED + listPermittedCommands(p));
 				}
 			}
@@ -667,17 +638,34 @@ public class CommandHandler implements CommandExecutor {
 		if (!bm.hasAuthor()) {
 			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_NEEDBAQAUTHOR"));
 		}
-		ArrayList<String> lore = bm.hasLore() ? (ArrayList<String>) bm.getLore() : new ArrayList<String>();
+		ArrayList<String> lore = bm.hasLore() ? new ArrayList<String>(bm.getLore()) : new ArrayList<String>();
 		if (lore.contains(plugin.msgs.get("LOCK"))) {
 			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_ALREADY"));
 		} else {
 			lore.add(plugin.msgs.get("LOCK"));
 			bm.setLore(lore);
+			is.setItemMeta(bm);
+			p.sendMessage(plugin.msgs.get("SUCCESS_LOCK"));
 		}
 		return true;
 	}
 
 	private boolean unlock(Player p) {
+		ItemStack is = p.getItemInHand();
+		if (is.getType() != Material.WRITTEN_BOOK || is.getType() != Material.BOOK_AND_QUILL) {
+			p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDEITHER"));
+			return true;
+		}
+		BookMeta bm = (BookMeta) is.getItemMeta();
+		ArrayList<String> lore = bm.hasLore() ? new ArrayList<String>(bm.getLore()) : new ArrayList<String>();
+		if (lore.contains(plugin.msgs.get("LOCK"))) {
+			lore.remove(plugin.msgs.get("LOCK"));
+			bm.setLore(lore);
+			is.setItemMeta(bm);
+			p.sendMessage(plugin.msgs.get("SUCCESS_UNLOCK"));
+		} else {
+			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_ALREADY"));
+		}
 		return true;
 	}
 
@@ -692,70 +680,63 @@ public class CommandHandler implements CommandExecutor {
 
 	@SuppressWarnings("deprecation")
 	public void asyncBookImport(final Player p, final String s) {
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin,
-				new Runnable() {
-					public void run() {
-						BookMeta bm;
-						StringBuilder sb = new StringBuilder();
-						try {
-							URL url = new URL(s);
-							Scanner urlInput = new Scanner(url.openStream());;
-							while (urlInput.hasNextLine()) {
-								sb.append(urlInput.nextLine()).append('\n');
-							}
-							urlInput.close();
-						} catch (Exception e) {
-							bm = (BookMeta) new ItemStack(Material.WRITTEN_BOOK);
-						}
-						bm = plugin.filemanager.makeBookMetaFromText(p, sb.toString(), true);
-						syncBookImport(p, bm);
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				BookMeta bm;
+				StringBuilder sb = new StringBuilder();
+				try {
+					URL url = new URL(s);
+					Scanner urlInput = new Scanner(url.openStream());;
+					while (urlInput.hasNextLine()) {
+						sb.append(urlInput.nextLine()).append('\n');
 					}
-				});
+					urlInput.close();
+				} catch (Exception e) {
+					bm = (BookMeta) new ItemStack(Material.WRITTEN_BOOK);
+				}
+				bm = plugin.filemanager.makeBookMetaFromText(p, sb.toString(), true);
+				syncBookImport(p, bm);
+			}
+		});
 	}
 
 	public void syncBookImport(final Player p, final BookMeta bm) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
-				new Runnable() {
-					public void run() {
-						ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-						if (bm.hasPages()) {
-							is.setItemMeta(bm);
-							if (p.getInventory().firstEmpty() != -1) {
-								p.getInventory().addItem(is);
-							} else {
-								p.getWorld().dropItem(p.getLocation(), is);
-							}
-						} else {
-							p.sendMessage(ChatColor.DARK_RED + "Error reading from URL.");
-							if (p.getInventory().firstEmpty() > 0) {
-								p.getInventory().addItem(
-										new ItemStack(Material.INK_SACK, 1));
-								p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
-							} else {
-								p.sendMessage(ChatColor.DARK_RED
-										+ "Dropped book supplies at your feet.");
-								p.getWorld().dropItem(p.getLocation(),
-										new ItemStack(Material.INK_SACK, 1));
-								p.getWorld().dropItem(p.getLocation(),
-										new ItemStack(Material.BOOK, 1));
-							}
-						}
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
+				if (bm.hasPages()) {
+					is.setItemMeta(bm);
+					if (p.getInventory().firstEmpty() != -1) {
+						p.getInventory().addItem(is);
+					} else {
+						p.getWorld().dropItem(p.getLocation(), is);
 					}
-				});
+				} else {
+					p.sendMessage(ChatColor.DARK_RED + "Error reading from URL.");
+					if (p.getInventory().firstEmpty() > 0) {
+						p.getInventory().addItem(new ItemStack(Material.INK_SACK, 1));
+						p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
+					} else {
+						p.sendMessage(ChatColor.DARK_RED
+								+ "Dropped book supplies at your feet.");
+						p.getWorld().dropItem(p.getLocation(),
+								new ItemStack(Material.INK_SACK, 1));
+						p.getWorld().dropItem(p.getLocation(),
+								new ItemStack(Material.BOOK, 1));
+					}
+				}
+			}
+		});
 	}
 
-	// TODO temp clear @10 secs (200L)
-
 	public void syncOverwriteTimer(final Player p) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
-				new Runnable() {
-					public void run() {
-						if (overwritable.containsKey(p.getName())) {
-							overwritable.remove(p.getName());
-							p.sendMessage(ChatColor.DARK_RED + "Overwrite time expired!");
-						}
-					}
-				},
-				200L);
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+			public void run() {
+				if (overwritable.containsKey(p.getName())) {
+					overwritable.remove(p.getName());
+					p.sendMessage(ChatColor.DARK_RED + "Overwrite time expired!");
+				}
+			}
+		}, 200L);
 	}
 }

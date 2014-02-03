@@ -1,20 +1,7 @@
-press: make crunchy sound?
-
-config file:
-    - configurable cost per book?
-    - support other costs (leather, 3 pages, ink)
-
 standalone editor for the books (with automatic uploading!)
     - Sorta done by independent guy, see project page on BukkitDev
 
 reorganize commands for efficiency
-
-message logger and configurable strings.yml
-
-customize metrics so it disables based on MY config, not the main one
-
-method for ops to check others' mail - useful if players can mail to a collective complaints box, etc.
-The rebellion must be crushed at all costs.
 
 Use adjacent chests for supplies
     - check for LWC
@@ -23,15 +10,11 @@ Book mail
     - no commands - right click air with book
     - recipient in title or first page
     - item attachments
-    
+
 Story reading command
 
 Rulebook (and /rules /? etc. optional override)
 
-Extra importing permissions? (per-book, booksuite.import.<book name>)
-    - mostly for rank benefits explanations
-    - booksuite.import.<rankname> -> /bs l /.Perm/<rankname>.book works
-
-Private per-player books
+Permissions to allow importing of others' private books, e.g. booksuite.import.jikoo.mysavedbook
 
 /bs l gui

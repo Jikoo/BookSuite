@@ -36,8 +36,7 @@ public class UpdateCheck implements Listener {
 
 	public boolean checkForUpdates() {
 		try {
-			URL feed = new URL(
-					"http://dev.bukkit.org/bukkit-plugins/booksuite/files.rss");
+			URL feed = new URL("http://dev.bukkit.org/bukkit-plugins/booksuite/files.rss");
 			Scanner stream = new Scanner(feed.openStream());
 			boolean item = false;
 			while (stream.hasNextLine()) {
@@ -119,10 +118,8 @@ public class UpdateCheck implements Listener {
 	}
 
 	public void delayUpdateCheck(CommandSender sender, boolean warn, Long length) {
-		Bukkit.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(plugin,
-						new startUpdateCheck(sender, warn), length);
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
+				new startUpdateCheck(sender, warn), length);
 	}
 
 	public class startUpdateCheck implements Runnable {
@@ -149,10 +146,8 @@ public class UpdateCheck implements Listener {
 
 	@SuppressWarnings("deprecation")
 	public void asyncUpdateCheck(String pName, boolean inform) {
-		Bukkit.getServer()
-				.getScheduler()
-				.scheduleAsyncDelayedTask(plugin,
-						new doUpdateCheck(pName, inform));
+		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin,
+				new doUpdateCheck(pName, inform));
 	}
 
 	public class doUpdateCheck implements Runnable {
@@ -173,10 +168,8 @@ public class UpdateCheck implements Listener {
 	}
 
 	public void syncUpdateCheck(String pName, boolean hasUpdate, boolean inform) {
-		Bukkit.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(plugin,
-						new informUpdate(pName, hasUpdate, inform));
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
+				new informUpdate(pName, hasUpdate, inform));
 	}
 
 	public class informUpdate implements Runnable {
@@ -197,8 +190,7 @@ public class UpdateCheck implements Listener {
 						Bukkit.getPlayerExact(pName).sendMessage(update);
 					else if (inform)
 						Bukkit.getPlayerExact(pName).sendMessage(
-								ChatColor.DARK_GREEN
-										+ "BookSuite is up to date!");
+								ChatColor.DARK_GREEN + "BookSuite is up to date!");
 				}
 			} else {
 				if (hasUpdate)

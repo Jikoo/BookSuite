@@ -33,20 +33,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class FileManager {
 
 	/**
-	 * Makes a <code>BookMeta</code> from text. Text is read from a plaintext
-	 * <code>File</code> file stored in the directory location. If the file is
-	 * read from a <code>URL</code>, additional regex is applied to prevent
-	 * special characters appearing incorrectly.
+	 * Makes a BookMeta from text. Text is read from a plaintext File file
+	 * stored in the directory location. If the file is read from a URL,
+	 * additional regex is applied to prevent special characters appearing
+	 * incorrectly.
 	 * 
-	 * @param p
-	 *            the <code>Player</code> attempting to obtain a book
-	 * @param file
-	 *            the name of the <code>File</code> to read
-	 * @param location
-	 *            the directory of the <code>File</code>
-	 * @param isURL
-	 *            the type of import
-	 * @return the <code>BookMeta</code> created.
+	 * @param p the Player attempting to obtain a book
+	 * @param file the name of the File to read
+	 * @param location the directory of the File
+	 * @param isURL the type of import
+	 * 
+	 * @return the BookMeta created.
 	 */
 	public BookMeta makeBookMetaFromText(Player p, String fileData, boolean isURL) {
 		BookMeta text = (BookMeta) new ItemStack(Material.WRITTEN_BOOK, 1)
@@ -120,14 +117,13 @@ public class FileManager {
 	}
 
 	/**
-	 * Makes an <code>ItemStack</code> from text. Text is read from a plaintext
-	 * <code>File</code> filename stored in the directory directory.
+	 * Makes an ItemStack from text. Text is read from a plaintext File filename
+	 * stored in the directory directory.
 	 * 
-	 * @param directory
-	 *            the directory of the <code>File</code>
-	 * @param filename
-	 *            the name of the <code>File</code> to read
-	 * @return the <code>ItemStack</code> created
+	 * @param directory the directory of the File
+	 * @param filename the name of the File to read
+	 * 
+	 * @return the ItemStack created
 	 */
 	public ItemStack makeItemStackFromFile(String directory, String filename) {
 		ItemStack is = new ItemStack(Material.DIRT, 1);
@@ -182,16 +178,14 @@ public class FileManager {
 	}
 
 	/**
-	 * Makes a plaintext <code>File</code> filename in directory directory from
-	 * the contents of <code>BookMeta</code> bm.
+	 * Makes a plaintext File filename in directory directory from the contents
+	 * of BookMeta bm.
 	 * 
-	 * @param bm
-	 *            the <code>BookMeta</code>
-	 * @param directory
-	 *            the directory to write to
-	 * @param filename
-	 *            the <code>File</code> to write
-	 * @return <code>true</code>, if successful
+	 * @param bm the BookMeta
+	 * @param directory the directory to write to
+	 * @param filename the File to write
+	 * 
+	 * @return true, if successful
 	 */
 	public boolean makeFileFromBookMeta(BookMeta bm, String directory,
 			String filename) {
@@ -222,16 +216,14 @@ public class FileManager {
 	}
 
 	/**
-	 * Makes a plaintext <code>File</code> filename in directory directory from
-	 * the contents of <code>ItemStack</code> is.
+	 * Makes a plaintext File filename in directory directory from the contents
+	 * of ItemStack is.
 	 * 
-	 * @param is
-	 *            the <code>ItemStack</code>
-	 * @param directory
-	 *            the directory to write to
-	 * @param filename
-	 *            the name of the <code>File</code> to write
-	 * @return <code>true</code>, if successful
+	 * @param is the ItemStack
+	 * @param directory the directory to write to
+	 * @param filename the name of the File to write
+	 * 
+	 * @return true, if successful
 	 */
 	public boolean makeFileFromItemStack(ItemStack is, String directory,
 			String filename) {
@@ -279,82 +271,12 @@ public class FileManager {
 	}
 
 	/**
-	 * Append mail index.
+	 * Deletes specified File
 	 * 
-	 * @param directory
-	 *            the directory
-	 * @param appendText
-	 *            the <code>String</code> to append to the mail index
-	 * @return <code>true</code>, if successful
-	 */
-	public boolean appendMailIndex(String directory, String appendText) {
-		try {
-			File indexLocation = new File(directory);
-			if (!indexLocation.exists())
-				indexLocation.mkdirs();
-			File indexFile = new File(indexLocation, "index.bsm");
-			FileWriter index;
-			if (indexFile.exists()) {
-				index = new FileWriter(indexFile);
-				index.append(appendText + "\n");
-			} else {
-				indexFile.createNewFile();
-				index = new FileWriter(indexFile);
-				index.write(appendText + "\n");
-			}
-			index.close();
-			return true;
-		} catch (Exception e) {
-			BSLogger.err(e);
-			return false;
-		}
-
-	}
-
-	/**
-	 * Removes mail.
+	 * @param directory the directory
+	 * @param filename the File name
 	 * 
-	 * @param directory
-	 *            the directory
-	 * @param mail
-	 *            the name of the mail <code>File</code>
-	 * @return <code>true</code>, if successful
-	 */
-	public boolean removeMail(String directory, String mail) {
-		try {
-			File indexFile = new File(directory, "index.bsm");
-			if (!indexFile.exists())
-				return false;
-			Scanner s = new Scanner(indexFile);
-			String indexContents = "";
-
-			while (s.hasNextLine()) {
-				String line = s.nextLine();
-				if (!line.equals(mail)) {
-					indexContents += line + "\n";
-
-				}
-			}
-			s.close();
-			FileWriter writer = new FileWriter(indexFile);
-			writer.write(indexContents);
-			writer.close();
-			delete(directory, mail + ".book");
-		} catch (Exception e) {
-			BSLogger.err(e);
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Deletes specified <code>File</code>
-	 * 
-	 * @param directory
-	 *            the directory
-	 * @param filename
-	 *            the <code>File</code> name
-	 * @return <code>true</code>, if successful
+	 * @return true if successful
 	 */
 	public boolean delete(String directory, String filename) {
 		File file = new File(directory, filename);
@@ -367,13 +289,13 @@ public class FileManager {
 		instance = null;
 	}
 
-	/** The <code>FileManager</code> instance. */
+	/** The FileManager instance. */
 	private static FileManager instance;
 
 	/**
-	 * Gets the single instance of <code>FileManager</code>.
+	 * Gets the single instance of FileManager.
 	 * 
-	 * @return single instance of <code>FileManager</code>
+	 * @return single instance of FileManager
 	 */
 	protected static FileManager getInstance() {
 		if (instance == null)

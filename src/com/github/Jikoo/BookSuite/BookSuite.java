@@ -14,7 +14,6 @@ package com.github.Jikoo.BookSuite;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.Jikoo.BookSuite.mail.PostalService;
-import com.github.Jikoo.BookSuite.metrics.Metrics;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
 import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
@@ -24,15 +23,14 @@ import com.github.Jikoo.BookSuite.update.UpdateStrings;
 public class BookSuite extends JavaPlugin {
 	protected String version;
 
-	public final int currentFile = 14;
+	public final int currentFile = 13;
 	public boolean hasUpdate;
 	public String updateString;
+	public Msgs msgs;
 
 	protected UpdateCheck update;
 	protected PermissionsListener perms;
 	protected Rules rules;
-	protected Metrics metrics;
-	protected Msgs msgs;
 
 	public Functions functions;
 	public FileManager filemanager;
@@ -64,54 +62,37 @@ public class BookSuite extends JavaPlugin {
 		filemanager = FileManager.getInstance();
 
 		alias = Alias.getInstance();
-		alias.enable();
+		if (getConfig().getBoolean("enable-aliases")) {
+			BSLogger.fine("Enabling aliases.");
+			alias.enable();
+		}
 
 		if (getConfig().getBoolean("update-check")
 				|| getConfig().getBoolean("allow-update-command"))
 			update = new UpdateCheck();
 
-		try {
-			if (getConfig().getBoolean("use-inbuilt-permissions")) {
-				BSLogger.fine("Enabling inbuilt permissions.");
-				perms = new PermissionsListener(this);
-				perms.enable();
-			}
-
-			if (getConfig().getBoolean("enable-metrics")) {
-				BSLogger.fine("Enabling metrics.");
-				try {
-					metrics = new Metrics(this);
-					metrics.start();
-				} catch (Exception e) {
-					BSLogger.warn("Error enabling metrics.");
-					BSLogger.err(e);
-					if (metrics != null) {
-						metrics.disable();
-						metrics = null;
-					}
-				}
-			}
-
-			if (getConfig().getBoolean("update-check")) {
-				if (getConfig().getBoolean("login-update-check")) {
-					BSLogger.fine("Enabling login update check.");
-					update.enableNotifications();
-				}
-
-				BSLogger.fine("Initiating update check.");
-
-				update.asyncUpdateCheck(null, false);
-			}
-
-			if (getConfig().getBoolean("book-rules")) {
-				rules = new Rules();
-				rules.enable();
-			}
-
-		} catch (Exception e) {
-			BSLogger.warn("Error loading configuration.");
-			BSLogger.err(e);
+		if (getConfig().getBoolean("use-inbuilt-permissions")) {
+			BSLogger.fine("Enabling inbuilt permissions.");
+			perms = new PermissionsListener(this);
+			perms.enable();
 		}
+
+		if (getConfig().getBoolean("update-check")) {
+			if (getConfig().getBoolean("login-update-check")) {
+				BSLogger.fine("Enabling login update check.");
+				update.enableNotifications();
+			}
+
+			BSLogger.fine("Initiating update check.");
+
+			update.asyncUpdateCheck(null, false);
+		}
+
+		if (getConfig().getBoolean("book-rules")) {
+			rules = new Rules();
+			rules.enable();
+		}
+
 
 		listener = MainListener.getInstance();
 		getServer().getPluginManager().registerEvents(listener, this);
@@ -125,16 +106,6 @@ public class BookSuite extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		PostalService.disable();
-
-		try {
-			if (metrics != null) {
-				metrics.disable();
-				metrics = null;
-			}
-		} catch (Exception e) {
-			BSLogger.warn("Error disabling metrics.");
-			BSLogger.err(e);
-		}
 
 		if (update != null) {
 			update.disableNotifications();

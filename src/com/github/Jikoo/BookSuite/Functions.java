@@ -14,9 +14,7 @@ package com.github.Jikoo.BookSuite;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -33,7 +31,6 @@ import org.bukkit.inventory.meta.BookMeta;
 public class Functions {
 	private static Functions instance = null;
 	private final char SECTION_SIGN = '\u00A7';
-	private final int[] ACCEPTABLE = { 53, 67, 108, 109, 114, 128, 134, 135, 136, 156, 163, 164 };
 
 	/**
 	 * master method for checking if the player can obtain the books
@@ -86,20 +83,13 @@ public class Functions {
 	 * @return whether p (the player) has enough room to store a book
 	 */
 	private boolean hasStackingRoom(Player p) {
-		if (!p.hasPermission("booksuite.copy.stack"))
-			return false;
-
-		HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(
-				p.getItemInHand().getType());
-		if (allBooks.size() == 1) {
-			return p.getItemInHand().getAmount() < 64;
-		} else {
-			for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
-				if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
-					if (e.getValue().getAmount() < 64) {
-						return true;
-					}
-				}
+		ItemStack[] contents = p.getInventory().getContents();
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i] != null && contents[i].getType() == p.getItemInHand().getType()
+					&& contents[i].hasItemMeta()
+					&& contents[i].getItemMeta().equals(p.getItemInHand().getItemMeta())
+					&& contents[i].getAmount() < contents[i].getType().getMaxStackSize()) {
+				return true;
 			}
 		}
 		return false;
@@ -165,37 +155,8 @@ public class Functions {
 	 *            the player
 	 */
 	@SuppressWarnings("deprecation")
-	public void copy(Player p) {
-		if (p.hasPermission("booksuite.copy.stack")
-				&& !p.getItemInHand().getType().equals(Material.MAP)) {
-			if (p.getItemInHand().getAmount() == 64) {
-				HashMap<Integer, ? extends ItemStack> allBooks = p.getInventory().all(
-						p.getItemInHand().getType());
-				if (allBooks.size() == 1) {
-					newDuplicate(p);
-				} else {
-					boolean copiedSuccessfully = false;
-					for (Entry<Integer, ? extends ItemStack> e : allBooks.entrySet()) {
-						if (e.getValue().getItemMeta().equals(p.getItemInHand().getItemMeta())) {
-							if (e.getValue().getAmount() < 64) {
-								ItemStack book = e.getValue();
-								book.setAmount(e.getValue().getAmount() + 1);
-								p.getInventory().setItem(e.getKey(), book);
-								copiedSuccessfully = true;
-								break;
-							}
-						}
-					}
-					if (!copiedSuccessfully) {
-						newDuplicate(p);
-					}
-				}
-			} else {
-				p.getItemInHand().setAmount(p.getItemInHand().getAmount() + 1);
-			}
-		} else {
-			newDuplicate(p);
-		}
+	public void copy(Player p, int quantity) {
+		newDuplicate(p, quantity);
 		p.updateInventory();
 	}
 
@@ -205,9 +166,19 @@ public class Functions {
 	 * @param p
 	 *            the <code>Player</code> in whose inventory the duplication will be done
 	 */
-	private void newDuplicate(Player p) {
+	private void newDuplicate(Player p, int quantity) {
 		ItemStack duplicate = p.getItemInHand().clone();
-		duplicate.setAmount(1);
+		duplicate.setAmount(duplicate.getMaxStackSize());
+		while (quantity > 0) {
+			if (quantity > duplicate.getMaxStackSize()) {
+				p.getInventory().addItem(duplicate);
+				quantity -= duplicate.getMaxStackSize();
+			} else {
+				duplicate.setAmount(quantity);
+				p.getInventory().addItem(duplicate);
+				quantity = 0;
+			}
+		}
 		p.getInventory().addItem(duplicate);
 	}
 
@@ -229,42 +200,6 @@ public class Functions {
 			unsignMeta.setAuthor(null);
 		unsign.setItemMeta(unsignMeta);
 		unsign.setType(Material.BOOK_AND_QUILL);
-		return true;
-	}
-
-	/**
-	 * 
-	 * @param p
-	 *            the player who triggers the event
-	 * @param newAuthor
-	 *            the name of the author to set as the book's author
-	 * @return whether the change of author was successful
-	 */
-	public boolean setAuthor(Player p, String newAuthor) {
-		ItemStack book = p.getItemInHand();
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
-			return false;
-		BookMeta bookMeta = (BookMeta) book.getItemMeta();
-		bookMeta.setAuthor(newAuthor);
-		book.setItemMeta(bookMeta);
-		return true;
-	}
-
-	/**
-	 * 
-	 * @param p
-	 *            the player who triggers the event
-	 * @param newTitle
-	 *            the new title of the book to be set
-	 * @return whether the setting of the title was completed successfully
-	 */
-	public boolean setTitle(Player p, String newTitle) {
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK))
-			return false;
-		ItemStack book = p.getItemInHand();
-		BookMeta bookMeta = (BookMeta) book.getItemMeta();
-		bookMeta.setTitle(newTitle);
-		book.setItemMeta(bookMeta);
 		return true;
 	}
 
@@ -341,9 +276,9 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p
-	 *            the player who triggered the event and whom is to be tested
-	 *            for this property
+	 * @param p the player who triggered the event and whom is to be tested for
+	 *        this property
+	 * 
 	 * @return whether p (the player) can obtain a map
 	 */
 	public boolean canObtainMap(Player p) {
@@ -376,36 +311,32 @@ public class Functions {
 	/**
 	 * tests if a given block is an inverted stair block
 	 * 
-	 * @param b
-	 *            the block to be tested
+	 * @param b the block to be tested
+	 * 
 	 * @return whether the block is an inverted stair
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean isInvertedStairs(Block b) {
-		for (int i : ACCEPTABLE)
-			if (i == b.getTypeId())
-				return b.getData() > 3;
+		if (b.getType().name().contains("STAIRS")) {
+			return b.getData() > 3;
+		}
 		return false;
 	}
 
 	/**
 	 * 
-	 * @param is
-	 *            the stack of stairs to be tested
+	 * @param is the stack of stairs to be tested
+	 * 
 	 * @return whether the item is an acceptable type of stair
 	 */
-	@SuppressWarnings("deprecation")
 	public boolean isCorrectStairType(ItemStack is) {
-		for (int i : ACCEPTABLE)
-			if (i == is.getTypeId())
-				return true;
-		return false;
+		return is.getType().name().contains("STAIRS");
 	}
 
 	/**
 	 * 
-	 * @param p
-	 *            the player who triggered the event
+	 * @param p the player who triggered the event
+	 * 
 	 * @return the proper orientation byte for the stair
 	 */
 	public byte getCorrectStairOrientation(Player p) {
@@ -422,10 +353,9 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param blockToCheck
-	 *            the block to check
-	 * @return whether this block is a stair or crafting table part of a
-	 *         printing press
+	 * @param blockToCheck the block to check
+	 * 
+	 * @return whether this block is part of a printing press
 	 */
 	public boolean isPrintingPress(Block blockToCheck) {
 		if (!BookSuite.getInstance().getConfig().getBoolean("enable-printing-presses")) {
@@ -529,21 +459,7 @@ public class Functions {
 	}
 
 	/**
-	 * 
-	 * TODO: MAKE THIS WORK
-	 * 
-	 * @param clicked
-	 *            the block that was clicked
-	 * @param clicker
-	 *            the player who clicked the block
-	 * @return whether block that the player clicked is part of a library
-	 */
-	public boolean isLibrary(Block clicked, Player clicker) {
-		return false;
-	}
-
-	/**
-	 * Parses file text.
+	 * Parses Book Markup Language (BML)
 	 * 
 	 * @param text
 	 *            the <code>String</code> to parse
@@ -588,10 +504,8 @@ public class Functions {
 	/**
 	 * Lists book files in directory
 	 * 
-	 * @param directory
-	 *            the directory
-	 * @param p
-	 *            the <code>Player</code> to obtain file list
+	 * @param directory the directory
+	 * @param p the <code>Player</code> to obtain file list
 	 */
 	public void listBookFilesIn(String directory, Player p) {
 		final File file = new File(directory);
@@ -685,12 +599,11 @@ public class Functions {
 	 * Adds an author to a book. Adds/edits fake lore if not a signing event,
 	 * otherwise removes existing faked lore
 	 * 
-	 * @param bm
-	 *            the <code>BookMeta</code> to edit
-	 * @param author
-	 *            name to add as an author
-	 * @param signing
-	 *            true if the book is being converted into a written book
+	 * @param bm the <code>BookMeta</code> to edit
+	 * @param author name to add as an author
+	 * @param signing true if the book is being converted into a written book
+	 * 
+	 * @return the altered BookMeta
 	 */
 	public BookMeta addAuthor(BookMeta bm, String oldAuthors, Player author, boolean signing) {
 		String newAuthors = BookSuite.getInstance().alias.getActiveAlias(author);
@@ -711,14 +624,13 @@ public class Functions {
 					lore = null;
 				}
 			} else if (!isCredited) {
-				lore.set(0,
-						new StringBuilder().append(ChatColor.GRAY).append("by ").append(newAuthors)
-								.toString());
+				lore.set(0, new StringBuilder().append(ChatColor.GRAY).append("by ")
+						.append(newAuthors).toString());
 			}
 		} else {
 			lore = new ArrayList<String>();
-			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ").append(isCredited ? oldAuthors : newAuthors)
-					.toString());
+			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ")
+					.append(isCredited ? oldAuthors : newAuthors).toString());
 			if (bm.hasLore()) {
 				lore.addAll(bm.getLore());
 			}
@@ -733,7 +645,6 @@ public class Functions {
 	}
 
 	/**
-	 * 
 	 * SINGLETON
 	 * 
 	 * @return an instance of the functions file for use in other classes

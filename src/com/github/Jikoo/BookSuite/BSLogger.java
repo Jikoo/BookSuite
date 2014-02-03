@@ -14,7 +14,7 @@ import org.bukkit.Bukkit;
 
 public class BSLogger {
 	/**
-	 * A small function to replace BookSuite.getInstance().getLogger.info()
+	 * A small utility to replace BookSuite.getInstance().getLogger.info()
 	 * <p>
 	 * Supports color in console.
 	 * 

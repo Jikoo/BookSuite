@@ -1,34 +1,14 @@
 # For more details about the configuration, please see
 # http://dev.bukkit.org/bukkit-plugins/booksuite/pages/default-config/
 # 
-# 
-# Because of the way multiple copies are handled, copying is capped to
-# 10 by default. High numbers WILL lead to server lag on usage.
-# Also, how many of the same book do you really need?
-# 
-# This measure is temporary and will be removed in the next build.
-# The only reason a feature so badly coded is included is because
-# this release has been rushed by bugs.
-# 
-maximum-copies-per-operation: 10
 
 ###  ALIASES  ###
-# Aliases are names people are allowed to sign books with
-# and authors whose books they can unsign.
+# If true, players sign books with their display name.
 #
-# Modes:
-# none
-#     - Vanilla book signing behavior
-# default
+# true
 #     - Players sign books as their display name/nick name
 #     - Players can unsign books by their display name or login name
-# multi
-#     - Players sign books as their set alias (defaults to display name)
-#     - Players can unsign books by any of their aliases
-#     - Aliases can be added with /book alias add <alias>
-#     - Aliases can be set (used for signing) with /book alias <alias>
-#     - Aliases are stored in aliases.yml
-alias-mode: default
+enable-aliases: true
 
 ###  PERMISSIONS  ###
 # If you use a permissions plugin, set to false and assign permissions.
@@ -56,11 +36,6 @@ enable-mail: true
 # a copy of the saved rulebook. Set false to slightly
 # improve memory usage and disable rules commands.
 enable-book-rules: true
-
-###  METRICS  ###
-# Please do not disable metrics, being able to see that there are
-# servers using BookSuite encourages me to develop it further.
-enable-metrics: true
 
 ###  UPDATE CHECK  ###
 update-check: true

@@ -72,7 +72,7 @@ public class MainListener implements Listener {
 					if (is.getType().equals(Material.MAP)) {
 						if (plugin.functions.canObtainMap(p)) {
 							press.operatePress();
-							plugin.functions.copy(p);
+							plugin.functions.copy(p, 1);
 							p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 						}
 						event.setCancelled(true);
@@ -82,7 +82,7 @@ public class MainListener implements Listener {
 						if (plugin.functions.checkCopyPermission(p, bm.getAuthor())
 								&& plugin.functions.canObtainBook(p)) {
 							press.operatePress();
-							plugin.functions.copy(p);
+							plugin.functions.copy(p, 1);
 							p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 						}
 						event.setCancelled(true);
@@ -90,7 +90,7 @@ public class MainListener implements Listener {
 						if (p.hasPermission("booksuite.copy.unsigned")) {
 							if (plugin.functions.canObtainBook(p)) {
 								press.operatePress();
-								plugin.functions.copy(p);
+								plugin.functions.copy(p, 1);
 								p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 							}
 						} else {
