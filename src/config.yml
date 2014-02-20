@@ -39,7 +39,6 @@ enable-book-rules: true
 
 ###  UPDATE CHECK  ###
 update-check: true
-allow-update-command: true
 login-update-check: true
 
 ###  DEBUG  ###

@@ -6,8 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     Adam Gunn - ideas and implementation
- *     Ted Meyer - IO assistance and BML (Book Markup Language)
+ *     Adam Gunn
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 

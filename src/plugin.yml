@@ -18,6 +18,7 @@ permissions:
    booksuite.mail.admin: true
    booksuite.block.erase.other: true
    booksuite.alias.admin: true
+   booksuite.color: true
  booksuite.default:
   description: Average Joe's permissions.
   default: false
@@ -29,6 +30,7 @@ permissions:
      booksuite.command.default: true
      booksuite.mail.default: true
      booksuite.block.erase: true
+     booksuite.color: true
 
 
 
@@ -92,16 +94,6 @@ permissions:
     children:
      booksuite.copy.self:
       description: copy own books
-      default: false
-      children:
-       booksuite.denynowarn.press: false
-     booksuite.copy.unsigned:
-      description: copy unsigned books
-      default: false
-      children:
-       booksuite.denynowarn.press: false
-     booksuite.copy.map:
-      description: copy maps
       default: false
       children:
        booksuite.denynowarn.press: false
@@ -260,6 +252,11 @@ permissions:
 commands:
  book:
   default: false
-  description: booksuite universal command
+  description: BookSuite's universal command
   permission: booksuite.command
   aliases: [booksuite, bsuite, bs]
+ bsrules:
+  default: false
+  description: BookSuite's rules function
+  permission: booksuite.command.rules
+  aliases: [rules, booksuiterules]

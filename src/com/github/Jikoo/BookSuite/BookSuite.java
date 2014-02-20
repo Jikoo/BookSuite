@@ -63,28 +63,19 @@ public class BookSuite extends JavaPlugin {
 
 		alias = Alias.getInstance();
 		if (getConfig().getBoolean("enable-aliases")) {
-			BSLogger.fine("Enabling aliases.");
 			alias.enable();
 		}
 
-		if (getConfig().getBoolean("update-check")
-				|| getConfig().getBoolean("allow-update-command"))
-			update = new UpdateCheck();
-
 		if (getConfig().getBoolean("use-inbuilt-permissions")) {
-			BSLogger.fine("Enabling inbuilt permissions.");
 			perms = new PermissionsListener(this);
 			perms.enable();
 		}
 
 		if (getConfig().getBoolean("update-check")) {
+			update = new UpdateCheck();
 			if (getConfig().getBoolean("login-update-check")) {
-				BSLogger.fine("Enabling login update check.");
 				update.enableNotifications();
 			}
-
-			BSLogger.fine("Initiating update check.");
-
 			update.asyncUpdateCheck(null, false);
 		}
 
@@ -93,14 +84,12 @@ public class BookSuite extends JavaPlugin {
 			rules.enable();
 		}
 
-
 		listener = MainListener.getInstance();
 		getServer().getPluginManager().registerEvents(listener, this);
 		command = CommandHandler.getInstance();
 		getCommand("book").setExecutor(command);
 
-		BSLogger.info(new StringBuilder("BookSuite v").append(version)
-				.append(" enabled").toString());
+		BSLogger.info(new StringBuilder("BookSuite v").append(version).append(" enabled").toString());
 	}
 
 	@Override
@@ -137,9 +126,7 @@ public class BookSuite extends JavaPlugin {
 
 		instance = null;
 
-		BSLogger.info(
-				new StringBuilder("BookSuite v").append(version)
-						.append(" disabled").toString());
+		BSLogger.info(new StringBuilder("BookSuite v").append(version).append(" disabled").toString());
 	}
 
 	public static BookSuite getInstance() {

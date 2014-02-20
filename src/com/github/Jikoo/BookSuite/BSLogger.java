@@ -61,8 +61,8 @@ public class BSLogger {
 				trace.append("\n\tat " + ste.toString());
 			}
 		}
-		debugWarn("Error report:\n" + trace);
-		debugWarn("End of error report.");
+		warn("Error report:\n" + trace);
+		warn("End of error report.");
 	}
 
 	public static void criticalErr(Exception e) {
@@ -78,9 +78,5 @@ public class BSLogger {
 		}
 		severe("Error report:\n" + trace);
 		severe("End of error report.");
-	}
-
-	public static void fine(String msg) {
-		Bukkit.getLogger().fine("[BookSuite] " + msg);
 	}
 }

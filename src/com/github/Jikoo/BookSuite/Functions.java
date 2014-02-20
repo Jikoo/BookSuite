@@ -114,8 +114,8 @@ public class Functions {
 	}
 
 	/**
-	 * @param a
-	 *            the author of the book to be copied
+	 * @param a the author of the book to be copied
+	 * 
 	 * @return true if the player has permission to copy
 	 */
 	public boolean checkCopyPermission(Player p, String a) {
@@ -131,8 +131,8 @@ public class Functions {
 	}
 
 	/**
-	 * @param a
-	 *            the author of the book to be copied
+	 * @param a the author of the book to be copied
+	 * 
 	 * @return true if the player has permission to copy
 	 */
 	public boolean checkCommandCopyPermission(Player p, String a) {
@@ -148,11 +148,9 @@ public class Functions {
 	}
 
 	/**
+	 * Copies the book that the player is currently holding
 	 * 
-	 * copies the book that the player is currently holding
-	 * 
-	 * @param p
-	 *            the player
+	 * @param p the player
 	 */
 	@SuppressWarnings("deprecation")
 	public void copy(Player p, int quantity) {
@@ -161,10 +159,11 @@ public class Functions {
 	}
 
 	/**
-	 * Helper method for copying. Adds an <code>ItemStack</code> of size 1 to the specified player's inventory.
+	 * Helper method for copying. Adds an <code>ItemStack</code> of size 1 to
+	 * the specified player's inventory.
 	 * 
-	 * @param p
-	 *            the <code>Player</code> in whose inventory the duplication will be done
+	 * @param p the <code>Player</code> in whose inventory the duplication will
+	 *        be done
 	 */
 	private void newDuplicate(Player p, int quantity) {
 		ItemStack duplicate = p.getItemInHand().clone();
@@ -221,23 +220,18 @@ public class Functions {
 		}
 		ItemStack book = p.getItemInHand();
 		BookMeta bm = (BookMeta) book.getItemMeta();
-		List<String> pages = new ArrayList<String>();
+		List<String> pages = new ArrayList<String>(bm.getPages());
 		try {
-			int page = Integer.parseInt(pageNumber);
-			for (int i = 1; i <= bm.getPageCount(); i++) {
-				if (i == page)
-					pages.add(text);
-				pages.add(bm.getPage(i));
-			}
+			pages.add(Integer.parseInt(pageNumber), text);
 			bm.setPages(pages);
 		} catch (NumberFormatException e) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_USAGE") + BookSuite.getInstance().msgs.get("USAGE_EDIT_ADDPAGE"));
 			return false;
-		} catch (IndexOutOfBoundsException e1) {
+		} catch (IndexOutOfBoundsException e) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_EDIT_INVALIDNUMBER"));
 			return false;
-		} catch (Exception e2) {
-			BSLogger.err(e2);
+		} catch (Exception e) {
+			BSLogger.err(e);
 		}
 		book.setItemMeta(bm);
 		return true;
@@ -282,28 +276,23 @@ public class Functions {
 	 * @return whether p (the player) can obtain a map
 	 */
 	public boolean canObtainMap(Player p) {
-		if (p.hasPermission("booksuite.copy.map")) {
-			Inventory inv = p.getInventory();
-			if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
-				if (inv.firstEmpty() == -1 && p.getItemInHand().getAmount() == 64) {
-					p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
-					return false;
-				} else
-					return true;
-			} else if (inv.contains(new ItemStack(Material.PAPER, 9))) {
-				inv.remove(new ItemStack(Material.PAPER, 9));
-				if (inv.firstEmpty() == -1) {
-					inv.addItem(new ItemStack(Material.PAPER, 9));
-					p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
-					return false;
-				} else
-					return true;
-			} else {
-				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_COPY_MAP"));
+		Inventory inv = p.getInventory();
+		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
+			if (inv.firstEmpty() == -1 && p.getItemInHand().getAmount() == 64) {
+				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
 				return false;
-			}
+			} else
+				return true;
+		} else if (inv.contains(new ItemStack(Material.PAPER, 9))) {
+			inv.remove(new ItemStack(Material.PAPER, 9));
+			if (inv.firstEmpty() == -1) {
+				inv.addItem(new ItemStack(Material.PAPER, 9));
+				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
+				return false;
+			} else
+				return true;
 		} else {
-			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY"));
+			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_COPY_MAP"));
 			return false;
 		}
 	}
@@ -499,6 +488,17 @@ public class Functions {
 		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
 		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
 		return text;
+	}
+
+	/**
+	 * Translate &code colors into ChatColors.
+	 * 
+	 * @param s the String to translate codes in
+	 * 
+	 * @return the translated String
+	 */
+	public String addColor(String s) {
+		return ChatColor.translateAlternateColorCodes('&', s);
 	}
 
 	/**
