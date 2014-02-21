@@ -190,11 +190,10 @@ public class MainListener implements Listener {
 				return;
 			}
 		}
-		if (event.isSigning()
-				|| event.getPlayer().hasPermission("booksuite.alias.sign")) {
+		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.sign.alias")) {
 			bm = plugin.functions.addAuthor(bm, obm.hasAuthor() ? obm.getAuthor() : null,
 					event.getPlayer(), event.isSigning());
-			if (event.getPlayer().hasPermission("booksuite.color") && bm.hasTitle()) {
+			if (event.getPlayer().hasPermission("booksuite.sign.color") && bm.hasTitle()) {
 				bm.setTitle(Functions.getInstance().addColor(bm.getTitle()));
 			}
 		}

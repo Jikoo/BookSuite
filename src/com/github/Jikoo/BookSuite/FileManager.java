@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -45,23 +45,16 @@ public class FileManager {
 	 * 
 	 * @return the BookMeta created.
 	 */
-	public BookMeta makeBookMetaFromText(Player p, String fileData, boolean isURL) {
-		BookMeta text = (BookMeta) new ItemStack(Material.WRITTEN_BOOK, 1)
-				.getItemMeta();
-		boolean isBookText = false;
-		if (!isURL)
-			isBookText = true;
-
-			
+	public BookMeta makeBookMetaFromText(CommandSender s, String fileData, boolean isURL) {
+		BookMeta text = (BookMeta) new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
+		boolean isBookText = !isURL;
 		String page = "";
 		for (String line : fileData.split("\n")) {
 
 			// pastebin support section
 			if (isURL) {
-				line = line.replaceAll("(<li class=\").*(\">)", "")
-						.replace("</li>", "");
-				line = line.replaceAll("(<div class=\").*(\">)", "")
-						.replace("</div>", "");
+				line = line.replaceAll("(<li class=\").*(\">)", "").replace("</li>", "");
+				line = line.replaceAll("(<div class=\").*(\">)", "").replace("</div>", "");
 				line = line.replace("&lt;", "<").replace("&gt;", ">");
 				line = line.replace("&nbsp", "<n>");
 			}
@@ -77,13 +70,10 @@ public class FileManager {
 				if (line.length() >= 2 && line.substring(0, 2).equals("//")) {
 					// do nothing, this line is a book comment
 				} else if (line.contains("<author>")
-						&& (!isURL || p
-								.hasPermission("booksuite.command.import.other"))) {
-					text.setAuthor(line.replace("<author>", "").replace(
-							"</author>", ""));
+						&& (!isURL || s.hasPermission("booksuite.command.import.other"))) {
+					text.setAuthor(line.replace("<author>", "").replace("</author>", ""));
 				} else if (line.contains("<title>")) {
-					text.setTitle(line.replace("<title>", "")
-							.replace("</title>", "").replace("<br>", ""));
+					text.setTitle(line.replace("<title>", "").replace("</title>", "").replace("<br>", ""));
 				} else if (line.contains("<page>")) {
 					page = "";
 				} else if (line.contains("</page>")) {
@@ -94,17 +84,18 @@ public class FileManager {
 			}
 		}
 		if (!text.hasAuthor())
-			text.setAuthor(p.getName());
+			text.setAuthor(s.getName());
 		return text;
 	}
 
-	public String getFileData(String directory, String file) {Scanner s;
+	public String getFileData(String directory, String file) {
+		if (!file.contains(".")) {
+			file += ".book";
+		}
+		Scanner s = null;
+		StringBuilder sb = new StringBuilder();
 		try {
-			if (file.contains("."))
-				s = new Scanner(new File(directory, file));
-			else
-				s = new Scanner(new File(directory, file + ".book"));
-			StringBuilder sb = new StringBuilder();
+			s = new Scanner(new File(directory, file));
 			while (s.hasNextLine()) {
 				sb.append(s.nextLine()).append('\n');
 			}
@@ -113,6 +104,10 @@ public class FileManager {
 		} catch (FileNotFoundException e) {
 			BSLogger.err(e);
 			return null;
+		} finally {
+			if (s != null) {
+				s.close();
+			}
 		}
 	}
 

@@ -23,6 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -39,11 +40,16 @@ public class Functions {
 	 *            the player attempting to obtain the book
 	 * @return whether the player can obtain the book
 	 */
-	public boolean canObtainBook(Player p) {
+	public boolean canObtainBook(CommandSender s) {
+		if (!(s instanceof Player)) {
+			return true;
+		}
+
+		Player p = (Player) s;
 		Inventory inv = p.getInventory();
 
 		if (p.hasPermission("booksuite.book.free") || p.getGameMode().equals(GameMode.CREATIVE)) {
-			if (!hasRoom(p)) {
+			if (inv.firstEmpty() == -1) {
 				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
 				return false;
 			}
@@ -53,7 +59,7 @@ public class Functions {
 		if (supplies == null) {
 			inv.removeItem(new ItemStack(Material.INK_SACK, 1));
 			inv.removeItem(new ItemStack(Material.BOOK, 1));
-			if (!hasRoom(p)) {
+			if (inv.firstEmpty() == -1) {
 				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
 				inv.addItem(new ItemStack(Material.INK_SACK, 1));
 				inv.addItem(new ItemStack(Material.BOOK, 1));
@@ -62,36 +68,6 @@ public class Functions {
 			return true;
 		}
 		p.sendMessage(supplies);
-		return false;
-	}
-
-	/**
-	 * 
-	 * @param p
-	 *            the player
-	 * @return whether p (the player) has enough room to store a book
-	 */
-	public boolean hasRoom(Player p) {
-		return p.getInventory().firstEmpty() != -1 || hasStackingRoom(p);
-	}
-
-	/**
-	 * HELPER FUNCTION for hasRoom
-	 * 
-	 * @param p
-	 *            the player
-	 * @return whether p (the player) has enough room to store a book
-	 */
-	private boolean hasStackingRoom(Player p) {
-		ItemStack[] contents = p.getInventory().getContents();
-		for (int i = 0; i < contents.length; i++) {
-			if (contents[i] != null && contents[i].getType() == p.getItemInHand().getType()
-					&& contents[i].hasItemMeta()
-					&& contents[i].getItemMeta().equals(p.getItemInHand().getItemMeta())
-					&& contents[i].getAmount() < contents[i].getType().getMaxStackSize()) {
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -154,18 +130,6 @@ public class Functions {
 	 */
 	@SuppressWarnings("deprecation")
 	public void copy(Player p, int quantity) {
-		newDuplicate(p, quantity);
-		p.updateInventory();
-	}
-
-	/**
-	 * Helper method for copying. Adds an <code>ItemStack</code> of size 1 to
-	 * the specified player's inventory.
-	 * 
-	 * @param p the <code>Player</code> in whose inventory the duplication will
-	 *        be done
-	 */
-	private void newDuplicate(Player p, int quantity) {
 		ItemStack duplicate = p.getItemInHand().clone();
 		duplicate.setAmount(duplicate.getMaxStackSize());
 		while (quantity > 0) {
@@ -179,6 +143,7 @@ public class Functions {
 			}
 		}
 		p.getInventory().addItem(duplicate);
+		p.updateInventory();
 	}
 
 	/**

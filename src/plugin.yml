@@ -17,8 +17,7 @@ permissions:
    booksuite.command.admin: true
    booksuite.mail.admin: true
    booksuite.block.erase.other: true
-   booksuite.alias.admin: true
-   booksuite.color: true
+   booksuite.sign: true
  booksuite.default:
   description: Average Joe's permissions.
   default: false
@@ -30,7 +29,7 @@ permissions:
      booksuite.command.default: true
      booksuite.mail.default: true
      booksuite.block.erase: true
-     booksuite.color: true
+     booksuite.sign: true
 
 
 
@@ -144,23 +143,18 @@ permissions:
      booksuite.command.list:
       description: list all .book files in /SavedBooks/
       default: false
-      children:
-       booksuite.command: true
      booksuite.command.import:
       description: make a book from file
       default: false
-      children:
-       booksuite.command: true
      booksuite.command.export:
       description: make a file from book
       default: false
-      children:
-       booksuite.command: true
      booksuite.command.edit:
       description: allow usage of addpage and delpage for book and quill editing
       default: false
-      children:
-       booksuite.command: true
+     booksuite.command.give:
+      description: allow usage of give <player> to import for others
+      default: false
    booksuite.command.import.other:
     description: import a book with an author other than themself
     default: false
@@ -173,8 +167,6 @@ permissions:
      booksuite.command.unsign:
       description: unsign books by self
       default: false
-      children:
-       booksuite.command: true
    booksuite.command.copy.other:
     description: copy books by anyone
     default: false
@@ -182,13 +174,9 @@ permissions:
      booksuite.command.copy:
       description: copy books by self
       default: false
-      children:
-       booksuite.command: true
    booksuite.command.author:
     description: change author
     default: false
-    children:
-     booksuite.command: true
    booksuite.command.title.other:
     description: re-title books by anyone
     default: false
@@ -196,33 +184,24 @@ permissions:
      booksuite.command.title:
       description: re-title books by self
       default: false
-      children:
-       booksuite.command: true
    booksuite.command.delete:
     description: Delete a book from /SavedBooks/
     default: false
-    children:
-     booksuite.command: true
    booksuite.command.reload:
     description: reload the plugin
     default: false
-    children:
-     booksuite.command: true
    booksuite.command.update:
     description: check for updates
     default: false
-    children:
-     booksuite.command: true
 
 
 
- booksuite.alias.admin:
-  description: all non-command alias functions
+ booksuite.sign:
+  description: all functions available on book signing
   default: false
   children:
-   booksuite.alias.sign:
-    description: set book and quill author to player alias, require perm to edit. /book u to unlock
-    default: false
+   booksuite.sign.color: true
+   booksuite.sign.alias: true
 
 
 
@@ -251,9 +230,8 @@ permissions:
 
 commands:
  book:
-  default: false
+  default: true
   description: BookSuite's universal command
-  permission: booksuite.command
   aliases: [booksuite, bsuite, bs]
  bsrules:
   default: false

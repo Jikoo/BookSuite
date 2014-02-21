@@ -45,7 +45,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public enum CommandPermissions {
-		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, EXPORT, LIST, LOCK, DELETE, RELOAD, UPDATE;
+		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, GIVE, EXPORT, LIST, LOCK, DELETE, RELOAD, UPDATE;
 
 		public boolean checkPermission(CommandSender s) {
 			return (s.hasPermission("booksuite.command." + this.lName()) || !(s instanceof Player));
@@ -60,8 +60,7 @@ public class CommandHandler implements CommandExecutor {
 		}
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length >= 1) {
 			args[0] = args[0].toLowerCase();
 
@@ -426,8 +425,7 @@ public class CommandHandler implements CommandExecutor {
 	public void importLocal(Player p, String[] args) {
 		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
 		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p,
-				plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/",
-				args[1]), false));
+				plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[1]), false));
 		if (!newbook.hasItemMeta() || newbook.getItemMeta() == null) {
 			p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
 			return;
@@ -443,6 +441,30 @@ public class CommandHandler implements CommandExecutor {
 			asyncBookImport(p, args[1]);
 			p.sendMessage(plugin.msgs.get("SUCCESS_IMPORT_INITIATED"));
 		}
+	}
+
+	public void give(CommandSender s, String[] args) {
+		Player recipient = Bukkit.getPlayer(args[1]);
+		if (recipient == null) {
+			s.sendMessage(plugin.msgs.get("FAILURE_PLAYER"));
+			return;
+		}
+		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
+		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(s,
+				plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[2]), false));
+		if (!newbook.hasItemMeta() || newbook.getItemMeta() == null) {
+			s.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
+			return;
+		}
+		if (!plugin.functions.canObtainBook(s)) {
+			return;
+		}
+		recipient.getInventory().addItem(newbook);
+		s.sendMessage(plugin.msgs.get("SUCCESS_GIVE").replace("<book.savename>", args[2])
+				.replace("<player>", args[1]));
+		recipient.sendMessage(plugin.msgs.get("SUCCESS_GIVE_RECIEVE")
+				.replace("<book.savename>", args[2]).replace("<sender>", s.getName())
+				.replace("<book.title>", ((BookMeta) newbook.getItemMeta()).getTitle()));
 	}
 
 	public void usage(Player p, String[] args) {
