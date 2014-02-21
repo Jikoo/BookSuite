@@ -97,7 +97,7 @@ public class Functions {
 	public boolean checkCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.copy.self") && a.equals(p.getName()))
+		if (p.hasPermission("booksuite.copy.self") && isAuthor(p, a))
 			return true;
 		else if (p.hasPermission("booksuite.copy.self"))
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY_OTHER"));
@@ -114,13 +114,14 @@ public class Functions {
 	public boolean checkCommandCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.command.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.command.copy") && (a.equals(null) || a.equals(p.getName())))
+		if (p.hasPermission("booksuite.command.copy") && isAuthor(p, a))
 			return true;
-		else if (p.hasPermission("booksuite.command.copy")) {
+		if (p.hasPermission("booksuite.command.copy")) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY_OTHER"));
 			return false;
-		} else
-			return false;
+		}
+		p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY"));
+		return false;
 	}
 
 	/**
@@ -369,10 +370,10 @@ public class Functions {
 	 *         book (note: permissions are factored in later)
 	 */
 	public boolean canErase(Block clicked, ItemStack itemInHand) {
-		if (!itemInHand.getType().equals(Material.WRITTEN_BOOK)) {
+		if (itemInHand.getType() != Material.WRITTEN_BOOK) {
 			return false;
 		}
-		if (!clicked.getType().equals(Material.CAULDRON)) {
+		if (clicked.getType() != Material.CAULDRON) {
 			return false;
 		}
 		if (!itemInHand.hasItemMeta()) {

@@ -72,11 +72,17 @@ public class CommandHandler implements CommandExecutor {
 				plugin.update.delayUpdateCheck(sender, true, 0L);
 				return true;
 			}
+			if (args.length >= 3 && (args[0].equals("g") || args[0].equals("give"))
+					&& CommandPermissions.GIVE.checkPermission(sender)) {
+				give(sender, args);
+				return true;
+			}
 		}
 
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(plugin.msgs.get("VERSION")
 					.replace("<plugin.version>", plugin.version));
+			sender.sendMessage(plugin.msgs.get("HELP_CONSOLE_GIVE"));
 			sender.sendMessage(plugin.msgs.get("HELP_CONSOLE_RELOAD"));
 			sender.sendMessage(plugin.msgs.get("HELP_CONSOLE_UPDATE"));
 			return true;
@@ -352,20 +358,12 @@ public class CommandHandler implements CommandExecutor {
 			p.sendMessage(plugin.msgs.get("FAILURE_COPY_UNCOPIABLE"));
 			return;
 		}
-		if (is.getType().equals(Material.WRITTEN_BOOK)) {
+		if (is.getType().equals(Material.WRITTEN_BOOK) || is.getType().equals(Material.BOOK_AND_QUILL)) {
 			BookMeta bm = (BookMeta) is.getItemMeta();
 			if (plugin.functions.checkCommandCopyPermission(p, bm.getAuthor())) {
 				plugin.functions.copy(p, copies);
 				p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 			}
-			return;
-		}
-		if (is.getType().equals(Material.BOOK_AND_QUILL)) {
-			if (p.hasPermission("booksuite.copy.unsigned")) {
-				plugin.functions.copy(p, copies);
-				p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
-			} else
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
 			return;
 		}
 		p.sendMessage(plugin.msgs.get("FAILURE_COPY_UNCOPIABLE"));

@@ -31,7 +31,7 @@ public class PrintingPress {
 		} else {
 			this.blockUp = blockUp.getRelative(BlockFace.UP);
 		}
-		originalBlock = blockUp.getState();
+		originalBlock = this.blockUp.getState();
 		this.pName = pName;
 	}
 

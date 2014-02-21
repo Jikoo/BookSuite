@@ -57,98 +57,101 @@ public class MainListener implements Listener {
 		Player p = event.getPlayer();
 
 		// right click action
-		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+			return;
+		}
 
-			// get information about the click
-			ItemStack is = p.getItemInHand();
-			Block clicked = event.getClickedBlock();
+		// get information about the click
+		ItemStack is = p.getItemInHand();
+		Block clicked = event.getClickedBlock();
 
-			// if clicking a workbench, check to see if it is a press and act
-			// accordingly
-			if (plugin.functions.isPrintingPress(clicked)) {
-				PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
+		// if clicking a workbench, check to see if it is a press and act
+		// accordingly
+		if (plugin.functions.isPrintingPress(clicked)) {
+			PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
 
-				if (!p.hasPermission("booksuite.denynowarn.press")) {
-					if (is.getType().equals(Material.MAP)) {
-						if (plugin.functions.canObtainMap(p)) {
-							press.operatePress();
-							plugin.functions.copy(p, 1);
-							p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
-						}
-						event.setCancelled(true);
-					} else if (is.getType().equals(Material.WRITTEN_BOOK)) {
-						BookMeta bm = (BookMeta) is.getItemMeta();
+			if (p.hasPermission("booksuite.denynowarn.press")) {
+				return;
+			}
 
-						if (plugin.functions.checkCopyPermission(p, bm.getAuthor())
-								&& plugin.functions.canObtainBook(p)) {
-							press.operatePress();
-							plugin.functions.copy(p, 1);
-							p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
-						}
-						event.setCancelled(true);
-					} else if (is.getType().equals(Material.BOOK_AND_QUILL)) {
-						if (p.hasPermission("booksuite.copy.unsigned")) {
-							if (plugin.functions.canObtainBook(p)) {
-								press.operatePress();
-								plugin.functions.copy(p, 1);
-								p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
-							}
-						} else {
-							p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
-						}
-						event.setCancelled(true);
-					} else if (!(is.hasItemMeta() || is.getItemMeta() != null)) {
-						return;
-					}
-				}
-			} else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
-				clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
-						plugin.functions.getCorrectStairOrientation(p), true);
-				if (p.getGameMode() != GameMode.CREATIVE) {
-					if (is.getAmount() == 1) {
-						p.setItemInHand(null);
-					} else {
-						is.setAmount(is.getAmount() - 1);
-					}
-				}
+			if (!p.hasPermission("booksuite.copy.self")) {
+				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
 				event.setCancelled(true);
-				p.updateInventory();
-			} else if (plugin.functions.canErase(clicked, is)) {
+				return;
+			}
+
+			if (is.getType() == Material.MAP && plugin.functions.canObtainMap(p)) {
+				press.operatePress();
+				plugin.functions.copy(p, 1);
+				p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+				event.setCancelled(true);
+				return;
+			}
+
+			if (is.getType().equals(Material.WRITTEN_BOOK) || is.getType().equals(Material.BOOK_AND_QUILL)) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 
-				if (p.hasPermission("booksuite.block.erase")) {
-					Cauldron cauldron = (Cauldron) clicked.getState();
-					if (!(p.getGameMode() == GameMode.CREATIVE || !cauldron.isEmpty()
-							|| p.hasPermission("booksuite.block.erase.free"))) {
-						p.sendMessage(plugin.msgs.get("FAILURE_ERASE_NOWATER"));
-					} else if (plugin.functions.isAuthor(p, bm.getAuthor())) {
-						plugin.functions.unsign(p);
-						if (p.hasPermission("booksuite.block.erase.free")
-								|| p.getGameMode() == GameMode.CREATIVE) {
-							clicked.setData((byte) (clicked.getData() - 1));
-						}
-					} else if (p.hasPermission("booksuite.block.erase.other")) {
-						plugin.functions.unsign(p);
-						if (!p.hasPermission("booksuite.block.erase.free")
-								&& !p.getGameMode().equals(GameMode.CREATIVE)) {
-							clicked.setData((byte) (clicked.getData() - 1));
-						}
-
-					} else {
-						p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE_OTHER"));
-					}
-					event.setCancelled(true);
-
-				} else if (!p.hasPermission("booksuite.denynowarn.erase")) {
-					p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE"));
-					event.setCancelled(true);
+				if (plugin.functions.checkCopyPermission(p, bm.getAuthor())
+						&& plugin.functions.canObtainBook(p)) {
+					press.operatePress();
+					plugin.functions.copy(p, 1);
+					p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
 				}
-			} else if (plugin.functions.isMailBox(clicked)) {
-				p.openInventory(MailBox.getMailBox(p).open(p));
 				event.setCancelled(true);
-			} /*else if (plugin.functions.isLibrary(clicked, p)){
-				
-			}*/
+				return;
+			}
+		} else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
+			clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
+					plugin.functions.getCorrectStairOrientation(p), true);
+			if (p.getGameMode() != GameMode.CREATIVE) {
+				if (is.getAmount() == 1) {
+					p.setItemInHand(null);
+				} else {
+					is.setAmount(is.getAmount() - 1);
+				}
+			}
+			event.setCancelled(true);
+			p.updateInventory();
+			return;
+		}
+
+		// ERASER
+		if (plugin.functions.canErase(clicked, is)) {
+			BookMeta bm = (BookMeta) is.getItemMeta();
+
+			if (p.hasPermission("booksuite.denynowarn.erase")) {
+				return;
+			}
+			if (!p.hasPermission("booksuite.block.erase")) {
+				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE"));
+				event.setCancelled(true);
+				return;
+			}
+
+			Cauldron cauldron = (Cauldron) clicked.getState().getData();
+			if (p.getGameMode() != GameMode.CREATIVE && cauldron.isEmpty()
+					&& !p.hasPermission("booksuite.block.erase.free")) {
+				p.sendMessage(plugin.msgs.get("FAILURE_ERASE_NOWATER"));
+			} else if (plugin.functions.isAuthor(p, bm.getAuthor())
+					|| p.hasPermission("booksuite.block.erase.other")) {
+				plugin.functions.unsign(p);
+				if (!p.hasPermission("booksuite.block.erase.free")
+						|| p.getGameMode() != GameMode.CREATIVE) {
+					clicked.setData((byte) (clicked.getData() - 1));
+					// future ref in case Bukkit makes a non-deprecated setter for water:
+					// Integer.parseInt(cauldron.toString().replace("/3 FULL", "").replace("FULL", "3").replace("EMPTY").replace(" CAULDRON"));
+				}
+			} else {
+				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE_OTHER"));
+			}
+			event.setCancelled(true);
+			return;
+		}
+
+		// MAIL
+		if (plugin.functions.isMailBox(clicked)) {
+			p.openInventory(MailBox.getMailBox(p).open(p));
+			event.setCancelled(true);
 		}
 	}
 
