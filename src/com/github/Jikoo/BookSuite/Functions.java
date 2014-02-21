@@ -315,13 +315,13 @@ public class Functions {
 		if (!BookSuite.getInstance().getConfig().getBoolean("enable-printing-presses")) {
 			return false;
 		}
-		if (blockToCheck.getType().equals(Material.WORKBENCH)) {
+		if (blockToCheck.getType() == Material.WORKBENCH) {
 			if (isInvertedStairs(blockToCheck.getRelative(BlockFace.UP))) {
 				return true;
 			}
 		}
 		if (isInvertedStairs(blockToCheck)) {
-			if (blockToCheck.getRelative(BlockFace.DOWN).getType().equals(Material.WORKBENCH)) {
+			if (blockToCheck.getRelative(BlockFace.DOWN).getType() == Material.WORKBENCH) {
 				return true;
 			}
 		}
@@ -342,10 +342,10 @@ public class Functions {
 	 *         creating a printing press
 	 */
 	public boolean canMakePress(Block clicked, BlockFace clickedFace, ItemStack itemInHand, Player p) {
-		if (!clickedFace.equals(BlockFace.UP)) {
+		if (clickedFace != BlockFace.UP) {
 			return false;
 		}
-		if (!clicked.getType().equals(Material.WORKBENCH)) {
+		if (clicked.getType() != Material.WORKBENCH) {
 			return false;
 		}
 		if (!p.hasPermission("booksuite.copy.createpress")) {
@@ -401,7 +401,7 @@ public class Functions {
 		Sign sign = null;
 		if (clicked.getState() instanceof Sign) {
 			sign = (Sign) clicked.getState();
-		} else if (clicked.getType().equals(Material.CHEST)) {
+		} else if (clicked.getType() == Material.CHEST) {
 			BlockState up = clicked.getRelative(BlockFace.UP).getState();
 			if (up instanceof Sign) {
 				sign = (Sign) up;

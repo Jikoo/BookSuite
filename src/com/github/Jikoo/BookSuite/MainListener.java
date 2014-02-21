@@ -56,7 +56,8 @@ public class MainListener implements Listener {
 
 		Player p = event.getPlayer();
 
-		// right click action
+		// We only care about right clicks for now.
+		// TODO prevent opening books by others
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
 		}
@@ -65,8 +66,7 @@ public class MainListener implements Listener {
 		ItemStack is = p.getItemInHand();
 		Block clicked = event.getClickedBlock();
 
-		// if clicking a workbench, check to see if it is a press and act
-		// accordingly
+		// PRESS OPERATION
 		if (plugin.functions.isPrintingPress(clicked)) {
 			PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
 
@@ -88,7 +88,7 @@ public class MainListener implements Listener {
 				return;
 			}
 
-			if (is.getType().equals(Material.WRITTEN_BOOK) || is.getType().equals(Material.BOOK_AND_QUILL)) {
+			if (is.getType() == Material.WRITTEN_BOOK || is.getType() == Material.BOOK_AND_QUILL) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 
 				if (plugin.functions.checkCopyPermission(p, bm.getAuthor())
@@ -100,7 +100,11 @@ public class MainListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-		} else if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
+			return;
+		}
+
+		// PRESS EASY CREATION
+		if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
 			clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
 					plugin.functions.getCorrectStairOrientation(p), true);
 			if (p.getGameMode() != GameMode.CREATIVE) {
@@ -179,7 +183,7 @@ public class MainListener implements Listener {
 		BookMeta bm = event.getNewBookMeta();
 
 		// TODO this sucks for the editor, all work lost. Check on open, not on finish
-		if (!event.getPlayer().hasPermission("booksuite.edit.other") && obm.hasAuthor()
+		if (!event.getPlayer().hasPermission("booksuite.sign.other") && obm.hasAuthor()
 				&& obm.getAuthor() != null) {
 			event.setCancelled(true);
 			for (String author : plugin.functions.parseAuthors(obm.getAuthor())) {

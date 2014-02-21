@@ -330,9 +330,7 @@ public class CommandHandler implements CommandExecutor {
 			plugin.rules = null;
 		}
 
-		sender.sendMessage(ChatColor.AQUA + "BookSuite v" // adam strings.yml
-				+ ChatColor.DARK_PURPLE + plugin.version + ChatColor.AQUA
-				+ " reloaded!");
+		sender.sendMessage(plugin.msgs.get("SUCCESS_RELOAD").replace("<plugin.version>", plugin.version));
 	}
 
 	public void copyItem(Player p, String[] args) {
