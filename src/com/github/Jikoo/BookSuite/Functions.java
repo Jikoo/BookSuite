@@ -142,7 +142,6 @@ public class Functions {
 				quantity = 0;
 			}
 		}
-		p.getInventory().addItem(duplicate);
 		p.updateInventory();
 	}
 
@@ -432,7 +431,7 @@ public class Functions {
 		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", SECTION_SIGN + "2");
 		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", SECTION_SIGN + "3");
 		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", SECTION_SIGN + "4");
-		text = text.replaceAll("(<|\\[)(purple|magenta)(>|\\])", SECTION_SIGN + "5");
+		text = text.replaceAll("(<|\\[)((dark_?)?purple|magenta)(>|\\])", SECTION_SIGN + "5");
 		text = text.replaceAll("(<|\\[)gold(>|\\])", SECTION_SIGN + "6");
 		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", SECTION_SIGN + "7");
 		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", SECTION_SIGN + "8");
@@ -440,7 +439,7 @@ public class Functions {
 		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", SECTION_SIGN + "a");
 		text = text.replaceAll("(<|\\[)aqua(>|\\])", SECTION_SIGN + "b");
 		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", SECTION_SIGN + "c");
-		text = text.replaceAll("(<|\\[)pink(>|\\])", SECTION_SIGN + "d");
+		text = text.replaceAll("(<|\\[)(light_?purple|pink)(>|\\])", SECTION_SIGN + "d");
 		text = text.replaceAll("(<|\\[)yellow(>|\\])", SECTION_SIGN + "e");
 		text = text.replaceAll("(<|\\[)white(>|\\])", SECTION_SIGN + "f");
 
