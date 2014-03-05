@@ -182,9 +182,13 @@ public class FileManager {
 
 		try {
 			File bookLocation = new File(directory);
-			if (!bookLocation.exists())
+			if (!bookLocation.exists()) {
 				bookLocation.mkdirs();
-			File bookFile = new File(bookLocation, filename + ".book");
+			}
+			if (!filename.contains(".")) {
+				filename += ".book";
+			}
+			File bookFile = new File(bookLocation, filename);
 			if (!bookFile.exists()) {
 				bookFile.createNewFile();
 			} else {
@@ -194,8 +198,9 @@ public class FileManager {
 			file.write("<book>\n");
 			file.append("<author>" + bm.getAuthor() + "</author>\n");
 			file.append("<title>" + bm.getTitle() + "</title>\n");
-			for (int i = 1; i <= bm.getPageCount(); i++)
+			for (int i = 1; i <= bm.getPageCount(); i++) {
 				file.append("<page>\n" + bm.getPage(i) + "\n</page>\n");
+			}
 			file.append("</book>");
 			file.close();
 			return true;
