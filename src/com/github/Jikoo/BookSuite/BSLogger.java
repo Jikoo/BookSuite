@@ -51,22 +51,16 @@ public class BSLogger {
 			return;
 		}
 
-		StringBuilder trace = new StringBuilder(e.toString());
-		for (StackTraceElement ste : e.getStackTrace()) {
-			trace.append("\n\tat ").append(ste.toString());
-		}
-		if (e.getCause() != null) {
-			trace.append("\nCaused by: " + e.getCause().toString());
-			for (StackTraceElement ste : e.getCause().getStackTrace()) {
-				trace.append("\n\tat " + ste.toString());
-			}
-		}
-		warn("Error report:\n" + trace);
-		warn("End of error report.");
+		warn(assemble(e));
 	}
 
 	public static void criticalErr(Exception e) {
-		StringBuilder trace = new StringBuilder(e.toString());
+		severe(assemble(e));
+	}
+
+	private static String assemble(Exception e) {
+		StringBuilder trace = new StringBuilder("Error report:\n");
+		trace.append(e.toString());
 		for (StackTraceElement ste : e.getStackTrace()) {
 			trace.append("\n\tat ").append(ste.toString());
 		}
@@ -76,7 +70,7 @@ public class BSLogger {
 				trace.append("\n\tat " + ste.toString());
 			}
 		}
-		severe("Error report:\n" + trace);
-		severe("End of error report.");
+		trace.append("\nEnd of error report.");
+		return trace.toString();
 	}
 }

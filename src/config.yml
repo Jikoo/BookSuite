@@ -1,11 +1,11 @@
 # For more details about the configuration, please see
 # http://dev.bukkit.org/bukkit-plugins/booksuite/pages/default-config/
 # 
+# Please note: Mail is in an experimental state and may be subject to
+# change. For this reason, it is disabled by default.
 
 ###  ALIASES  ###
-# If true, players sign books with their display name.
-#
-# true
+# If true:
 #     - Players sign books as their display name/nick name
 #     - Players can unsign books by their display name or login name
 enable-aliases: true
@@ -19,8 +19,7 @@ use-inbuilt-permissions: true
 allow-private-saving: true
 
 ###  PRINTING PRESS  ###
-# Set to false if you do not want to
-# allow anyone to use printing presses.
+# Set to false to globally disable the use of printing presses.
 enable-printing-presses: true
 
 ###  ERASER  ###
@@ -29,18 +28,29 @@ enable-erasers: true
 
 ###  MAIL  ###
 # You know the drill.
-enable-mail: true
+# 
+# Please note: Mail is in an experimental state and may be subject to
+# change. For this reason, it is disabled by default.
+enable-mail: false
 
 ###  RULES  ###
-# If true, /rules, /book rules, and /? will give player
+# If true, /rules and /book rules will give player
 # a copy of the saved rulebook. Set false to slightly
 # improve memory usage and disable rules commands.
 enable-book-rules: true
 
 ###  UPDATE CHECK  ###
+# update-check:
+#   If true:
+#     - /book update can be used to check for updates.
+#     - updater will run when the plugin is enabled.
+# login-update-check:
+#   If true, will check for updates when a player who can use "/book update" logs in.
+#   update-check: false disabled this option.
 update-check: true
 login-update-check: true
 
 ###  DEBUG  ###
-# This option will print out a trace of non-gamebreaking errors.
+# This option will print out more information when non-gamebreaking errors occur.
+# If you see odd messages from BookSuite in your logs, please enable this and report the results.
 debug-mode: false

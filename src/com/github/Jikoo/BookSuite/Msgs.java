@@ -14,10 +14,6 @@ import java.io.File;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
-/**
- * @author Jikoo
- * 
- */
 public class Msgs {
 	private static YamlConfiguration strings;
 	public Msgs() {

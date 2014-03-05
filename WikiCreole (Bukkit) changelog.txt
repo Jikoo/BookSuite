@@ -1,19 +1,20 @@
 ;3.2.0
-:added mail at last!
+:added mail at last! (N.B. experimental; disabled by default)
 :added /book give <player> <savename> - This one's for you, gamermomoe :D
 : - can be run as console
 : - cost of book imported is applied to the sender
 :added color support for book titles/authors on signing and in commands
 :added strings.yml for customization/localization
 : - If you make one for another language, I'll link it and credit you.
-:added aliases TODO finish commands
-: - multi-author support
-: - lock 
+:added aliases
+: - credits all players who edit an unsigned book
+: - sign with display name
 :added private saves (and relevant config + permissions) TODO perms + commands
 :added debug mode and cleaned up message logging
 :fixed making a press using the inbuilt function consuming stairs when in creative
 :fixed inbuilt permissions sometimes causing an error on reload
-:removed book stacking - 1.8 feature
+:removed l as an alias for list - now only /book ls or /book list will work.
+:removed forcible book stacking - 1.8 feature
 :removed permissions for copying individual types of items - they're (almost) all copiable in vanilla
 :removed metrics
 :fixed mass copying - N.B. copy command does not consume resources.

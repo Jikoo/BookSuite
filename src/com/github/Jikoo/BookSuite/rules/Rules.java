@@ -28,7 +28,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
 
-public class Rules implements CommandExecutor, Listener {
+public class Rules implements CommandExecutor, Listener { // TODO Rules
 
 	BookSuite plugin = BookSuite.getInstance();
 
@@ -99,7 +99,7 @@ public class Rules implements CommandExecutor, Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		// TODO check if user has received up-to-date rules
+		// check if user has received up-to-date rules
 		// if no, give book synchronously
 	}
 
@@ -108,7 +108,7 @@ public class Rules implements CommandExecutor, Listener {
 			File f = new File(ruleContainer, currentName);
 			if (f.exists()) {
 				File target = new File(ruleContainer, newName);
-				if (target.exists())// TODO refine for swaps - temp files?
+				if (target.exists())// refine for swaps - temp files?
 					target.delete();
 				f.renameTo(target);
 			}

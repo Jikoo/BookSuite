@@ -36,8 +36,8 @@ public class Functions {
 	/**
 	 * master method for checking if the player can obtain the books
 	 * 
-	 * @param p
-	 *            the player attempting to obtain the book
+	 * @param p the player attempting to obtain the book
+	 * 
 	 * @return whether the player can obtain the book
 	 */
 	public boolean canObtainBook(CommandSender s) {
@@ -74,8 +74,8 @@ public class Functions {
 	/**
 	 * checks if the player has the supplies needed
 	 * 
-	 * @param inv
-	 *            the inventory of the player
+	 * @param inv the inventory of the player
+	 * 
 	 * @return whether the player has the supplies needed to copy the book
 	 */
 	public String checkBookSupplies(Inventory inv) {
@@ -147,9 +147,10 @@ public class Functions {
 	}
 
 	/**
+	 * Unsigns a book in the specified player's hand.
 	 * 
-	 * @param p
-	 *            the player who triggers the unsign event
+	 * @param p the player who triggers the unsign event
+	 * 
 	 * @return whether the unsigning was successful
 	 */
 	public boolean unsign(Player p) {
@@ -160,23 +161,53 @@ public class Functions {
 		}
 		BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
 		unsignMeta.setTitle(null);
-		if (unsign.getType().equals(Material.BOOK_AND_QUILL))
-			unsignMeta.setAuthor(null);
-		unsign.setItemMeta(unsignMeta);
+		unsign.setItemMeta(unsignAuthors(unsignMeta, unsign.getType() == Material.BOOK_AND_QUILL));
 		unsign.setType(Material.BOOK_AND_QUILL);
 		return true;
 	}
 
 	/**
+	 * Helper method for unsigning books. If book was signed, uses lore to make
+	 * owner visible. Otherwise, removes author and lore.
 	 * 
-	 * @param p
-	 *            the player who triggers the event
-	 * @param pageNumber
-	 *            the place the page is to be inserted
-	 * @param text
-	 *            the text that goes on the page
-	 * @return whether the user was successful in their attempt at
-	 *         inserting a page
+	 * @param bm the bookmeta
+	 * @param firstunsign true if the book was a Written Book prior to this unsign
+	 * 
+	 * @return the modified BookMeta
+	 */
+	private BookMeta unsignAuthors(BookMeta bm, boolean firstunsign) {
+		ArrayList<String> lore = bm.hasLore() ?
+				new ArrayList<String>(bm.getLore()) : new ArrayList<String>();
+		if (firstunsign && bm.hasAuthor()) {
+			String fakeAuth = new StringBuilder().append(ChatColor.GRAY).append("by ")
+					.append(bm.getAuthor()).toString();
+			if (!lore.isEmpty() && lore.get(0).startsWith(ChatColor.GRAY + "by ")) {
+				// Shouldn't occur (hopefully) but fix anyway
+				lore.set(0, fakeAuth);
+			} else {
+				lore.add(0, fakeAuth);
+			}
+		} else {
+			bm.setAuthor(null);
+		}
+		if (!firstunsign && !lore.isEmpty() && lore.get(0).startsWith(ChatColor.GRAY + "by ")) {
+			lore.remove(0);
+		}
+		if (lore.isEmpty()) {
+			bm.setLore(null);
+		} else {
+			bm.setLore(lore);
+		}
+		return bm;
+	}
+
+	/**
+	 * 
+	 * @param p the player who triggers the event
+	 * @param pageNumber the place the page is to be inserted
+	 * @param text the text that goes on the page
+	 * 
+	 * @return whether the user was successful in their attempt at inserting a page
 	 */
 	public boolean insertPageAt(Player p, String pageNumber, String text) {
 		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)) {
@@ -204,10 +235,9 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p
-	 *            the player who triggers the event
-	 * @param pageNumber
-	 *            the page to be deleted
+	 * @param p the player who triggers the event
+	 * @param pageNumber the page to be deleted
+	 * 
 	 * @return whether the player was successful in deleting the page
 	 */
 	public boolean deletePageAt(Player p, String pageNumber) {
@@ -235,8 +265,7 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param p the player who triggered the event and whom is to be tested for
-	 *        this property
+	 * @param p the player who triggered the event
 	 * 
 	 * @return whether p (the player) can obtain a map
 	 */
@@ -330,16 +359,12 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param clicked
-	 *            the clicked block
-	 * @param clickedFace
-	 *            the face of the block that was clicked
-	 * @param itemInHand
-	 *            the item in the hand of the player
-	 * @param p
-	 *            the player who clicked
-	 * @return whether the player is allowed and has met the criteria for
-	 *         creating a printing press
+	 * @param clicked the clicked block
+	 * @param clickedFace the face of the block that was clicked
+	 * @param itemInHand the item in the hand of the player
+	 * @param p the player who clicked
+	 * 
+	 * @return whether the player meets the criteria for creating a printing press
 	 */
 	public boolean canMakePress(Block clicked, BlockFace clickedFace, ItemStack itemInHand, Player p) {
 		if (clickedFace != BlockFace.UP) {
@@ -362,15 +387,15 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param clicked
-	 *            the block that was clicked
-	 * @param itemInHand
-	 *            the item the user was holding when the event was triggered
+	 * @param clicked the block that was clicked
+	 * @param itemInHand the item the user was holding when the event was triggered
+	 * 
 	 * @return whether the user who triggered the event is able to erase this
 	 *         book (note: permissions are factored in later)
 	 */
 	public boolean canErase(Block clicked, ItemStack itemInHand) {
-		if (itemInHand.getType() != Material.WRITTEN_BOOK) {
+		if (itemInHand.getType() != Material.WRITTEN_BOOK
+				&& itemInHand.getType() != Material.BOOK_AND_QUILL) {
 			return false;
 		}
 		if (clicked.getType() != Material.CAULDRON) {
@@ -390,8 +415,8 @@ public class Functions {
 
 	/**
 	 * 
-	 * @param clicked
-	 *            the block that was clicked
+	 * @param clicked the block that was clicked
+	 * 
 	 * @return whether the block is a sign or chest that is part of a mailbox
 	 */
 	public boolean isMailBox(Block clicked) {
@@ -415,8 +440,8 @@ public class Functions {
 	/**
 	 * Parses Book Markup Language (BML)
 	 * 
-	 * @param text
-	 *            the <code>String</code> to parse
+	 * @param text the <code>String</code> to parse
+	 * 
 	 * @return the <code>String</code> after parsing
 	 */
 	public String parseBML(String text) {
@@ -488,20 +513,20 @@ public class Functions {
 			}
 		});
 		File[] privateBooks = null;
-		if (BookSuite.getInstance().getConfig()
-				.getBoolean("allow-private-saving")) {
+		if (BookSuite.getInstance().getConfig().getBoolean("allow-private-saving")) {
 			File privateFile = new File(file, p.getName());
 			if (privateFile.exists()) {
 				privateBooks = privateFile.listFiles();
 			}
 		}
-		if (publicBooks == null && privateBooks == null) {
+		if ((publicBooks == null || publicBooks.length == 0)
+				&& (privateBooks == null || privateBooks.length == 0)) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_LIST_NOBOOKS"));
 			return;
 		}
 		String bookList = new String();
 		if (publicBooks != null && publicBooks.length != 0) {
-			p.sendMessage(BookSuite.getInstance().msgs.get("SUCCESS_LIST_PRIVATE"));
+			p.sendMessage(BookSuite.getInstance().msgs.get("SUCCESS_LIST_PUBLIC"));
 			for (File bookFile : publicBooks) {
 				bookList += bookFile.getName().replace(".book", "") + ", ";
 				// Maximum allowed characters in a server-to-client chat message
@@ -517,8 +542,7 @@ public class Functions {
 					bookList = new String();
 				}
 			}
-			p.sendMessage(ChatColor.DARK_GREEN
-					+ bookList.substring(0, bookList.length() - 3));
+			p.sendMessage(ChatColor.DARK_GREEN + bookList.substring(0, bookList.length() - 2));
 		}
 		if (privateBooks != null && privateBooks.length != 0) {
 			bookList = new String();
@@ -532,6 +556,7 @@ public class Functions {
 					bookList = new String();
 				}
 			}
+			p.sendMessage(ChatColor.DARK_GREEN + bookList.substring(0, bookList.length() - 2));
 		}
 	}
 
@@ -571,17 +596,17 @@ public class Functions {
 	 * @return the altered BookMeta
 	 */
 	public BookMeta addAuthor(BookMeta bm, String oldAuthors, Player author, boolean signing) {
-		String newAuthors = BookSuite.getInstance().alias.getActiveAlias(author);
+		String newAuthor = BookSuite.getInstance().alias.getActiveAlias(author);
 		boolean isCredited = false;
 		if (oldAuthors != null) {
 			isCredited = this.isAuthor(author, oldAuthors);
 			if (!isCredited) {
-				newAuthors = this.getAuthors(this.parseAuthors(oldAuthors), newAuthors);
+				newAuthor = this.getAuthors(this.parseAuthors(oldAuthors), newAuthor);
 			}
 		}
-		bm.setAuthor(isCredited ? oldAuthors : newAuthors);
+		bm.setAuthor(isCredited ? oldAuthors : newAuthor);
 
-		ArrayList<String> lore = bm.hasLore() ? (ArrayList<String>) bm.getLore() : null;
+		ArrayList<String> lore = bm.hasLore() ? new ArrayList<String>(bm.getLore()) : null;
 		if (bm.hasLore() && lore.get(0).equals(ChatColor.GRAY + "by " + oldAuthors)) {
 			if (signing) {
 				lore.remove(0);
@@ -590,12 +615,12 @@ public class Functions {
 				}
 			} else if (!isCredited) {
 				lore.set(0, new StringBuilder().append(ChatColor.GRAY).append("by ")
-						.append(newAuthors).toString());
+						.append(newAuthor).toString());
 			}
 		} else {
 			lore = new ArrayList<String>();
 			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ")
-					.append(isCredited ? oldAuthors : newAuthors).toString());
+					.append(isCredited ? oldAuthors : newAuthor).toString());
 			if (bm.hasLore()) {
 				lore.addAll(bm.getLore());
 			}

@@ -95,22 +95,22 @@ public class CommandHandler implements CommandExecutor {
 			return invalidCommand(sender);
 		}
 
-		// command: /book <usage|help> - prints out usage and help based
-		// on additional args
+		// command: /book <usage|help>
+		// prints out usage and help based on additional args
 		if (args[0].equals("usage") || args[0].equals("help")) {
 			usage(p, args);
 			return true;
 		}
 
-		// command: /book copy (quantity) - attempts to make specified
-		// quantity of copies, default 1.
+		// command: /book copy (quantity)
+		// attempts to make specified quantity of copies, default 1.
 		if (args[0].equals("copy") && CommandPermissions.COPY.checkPermission(p)) {
 			copyItem(p, args);
 			return true;
 		}
 
 		/*
-		 * command: /book overwrite (book) - if a save was attempted,
+		 * command: /book overwrite (savename) - if a save was attempted,
 		 * will save over file with book in hand. If no save was
 		 * attempted, will save and overwrite any book by the specified
 		 * name. Usage instead of /book save is discouraged for obvious
@@ -135,9 +135,10 @@ public class CommandHandler implements CommandExecutor {
 		if (args.length == 1) {
 			// command: /book <l(ist)|ls> - list all files in
 			// /SavedBooks/
-			if ((args[0].equals("l") || args[0].equals("list") || args[0].equals("ls"))
+			if ((args[0].equals("list") || args[0].equals("ls"))
 					&& CommandPermissions.LIST.checkPermission(p)) {
 				plugin.functions.listBookFilesIn(plugin.getDataFolder() + "/SavedBooks/", p);
+				// TODO list private other
 				return true;
 			}
 

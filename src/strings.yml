@@ -4,6 +4,8 @@
 # 
 # Please note: Variables such as <player> and <book.savename>
 # are not available for all messages!
+# 
+# BML can be used for colors in all messages.
 FAILURE_COMMAND_NEEDBAQ: "<darkred>You must be holding a book and quill to use this command!"
 FAILURE_COMMAND_NEEDBOOK: "<darkred>You must be holding a written book to use this command!"
 FAILURE_COMMAND_NEEDEITHER: "<darkred>You must be holding a book to use this command!"
@@ -24,7 +26,7 @@ FAILURE_LOCK_NEEDBAQAUTHOR: "<darkred>This book and quill does not have an autho
 FAILURE_OVERWRITE: "<darkred>What are you trying to overwrite? Use the save function."
 FAILURE_PERMISSION_COPY: "<darkred>You do not have permission to copy that!"
 FAILURE_PERMISSION_COPY_OTHER: "<darkred>You do not have permission to copy others' books."
-FAILURE_PERMISSION_ALIAS: "<darkred>You'll need <author(s)>'s permission to edit this book!"
+FAILURE_PERMISSION_ALIAS: "<darkred>You're not allowed to edit others' books!"
 FAILURE_PERMISSION_ERASE: "<darkred>You do not have permission to use erasers."
 FAILURE_PERMISSION_ERASE_OTHER: "<darkred>You do not have permission to unsign others' books!"
 FAILURE_PERMISSION_TITLE_OTHER: "<darkred>You do not have permission to rename others' books!"

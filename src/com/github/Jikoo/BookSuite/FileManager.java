@@ -25,11 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-/**
- * FileManager handles most generic file-related functions of BookSuite.
- * 
- * @author Jikoo, tmathmeyer
- */
 public class FileManager {
 
 	/**

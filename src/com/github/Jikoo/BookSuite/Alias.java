@@ -64,7 +64,7 @@ public class Alias {
 	public ArrayList<String> getAliases(Player p) {
 		ArrayList<String> aliases = new ArrayList<String>();
 		aliases.add(p.getName());
-		if (enabled) {
+		if (enabled && p.getDisplayName() != null) {
 			aliases.add(p.getDisplayName());
 		}
 		return aliases;

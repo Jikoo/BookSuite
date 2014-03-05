@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     Adam Gunn - ideas and implementation
- *     Ted Meyer - IO assistance and BML (Book Markup Language) plus code cleanliness =P
+ *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
@@ -56,13 +56,26 @@ public class MainListener implements Listener {
 
 		Player p = event.getPlayer();
 
-		// We only care about right clicks for now.
-		// TODO prevent opening books by others
+		// prevent unsigned books by those who cannot edit
+		// Note: Edit window is not like ordinary inventory views - almost
+		// entirely client side. Check closing methods.
+		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+			if (p.getItemInHand() != null && p.getItemInHand().getType() == Material.BOOK_AND_QUILL
+					&& p.getItemInHand().hasItemMeta()) {
+				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+				if (bm.hasAuthor() && !plugin.functions.isAuthor(p, bm.getAuthor())) {
+					p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS"));
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		// If it isn't a right click, we don't care about it.
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
 		}
 
-		// get information about the click
+		// Convenient variables, woo.
 		ItemStack is = p.getItemInHand();
 		Block clicked = event.getClickedBlock();
 
@@ -140,10 +153,10 @@ public class MainListener implements Listener {
 					|| p.hasPermission("booksuite.block.erase.other")) {
 				plugin.functions.unsign(p);
 				if (!p.hasPermission("booksuite.block.erase.free")
-						|| p.getGameMode() != GameMode.CREATIVE) {
+						&& p.getGameMode() != GameMode.CREATIVE) {
 					clicked.setData((byte) (clicked.getData() - 1));
 					// future ref in case Bukkit makes a non-deprecated setter for water:
-					// Integer.parseInt(cauldron.toString().replace("/3 FULL", "").replace("FULL", "3").replace("EMPTY").replace(" CAULDRON"));
+					// Integer.parseInt(cauldron.toString().replace("/3 FULL", "").replace("FULL", "3").replace("EMPTY", "0").replace(" CAULDRON"));
 				}
 			} else {
 				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE_OTHER"));
@@ -156,6 +169,17 @@ public class MainListener implements Listener {
 		if (plugin.functions.isMailBox(clicked)) {
 			p.openInventory(MailBox.getMailBox(p).open(p));
 			event.setCancelled(true);
+			return;
+		}
+
+
+		// TODO close book, not just warn
+		if (p.getItemInHand() != null && p.getItemInHand().getType() == Material.BOOK_AND_QUILL
+				&& p.getItemInHand().hasItemMeta()) {
+			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+			if (bm.hasAuthor() && !plugin.functions.isAuthor(p, bm.getAuthor())) {
+				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS"));
+			}
 		}
 	}
 
@@ -182,20 +206,12 @@ public class MainListener implements Listener {
 		BookMeta obm = event.getPreviousBookMeta();
 		BookMeta bm = event.getNewBookMeta();
 
-		// TODO this sucks for the editor, all work lost. Check on open, not on finish
 		if (!event.getPlayer().hasPermission("booksuite.sign.other") && obm.hasAuthor()
-				&& obm.getAuthor() != null) {
+				&& obm.getAuthor() != null
+				&& !plugin.functions.isAuthor(event.getPlayer(), obm.getAuthor())) {
 			event.setCancelled(true);
-			for (String author : plugin.functions.parseAuthors(obm.getAuthor())) {
-				if (plugin.alias.getAliases(event.getPlayer()).contains(author)) {
-					event.setCancelled(false);
-				}
-			}
-			if (event.isCancelled()) {
-				event.getPlayer().sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS")
-						.replace("<author(s)>", obm.getAuthor().replace(" and ", " or ")));
-				return;
-			}
+			event.getPlayer().sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS"));
+			return;
 		}
 		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.sign.alias")) {
 			bm = plugin.functions.addAuthor(bm, obm.hasAuthor() ? obm.getAuthor() : null,
