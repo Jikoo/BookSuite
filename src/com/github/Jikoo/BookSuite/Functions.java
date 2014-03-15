@@ -155,13 +155,13 @@ public class Functions {
 	 */
 	public boolean unsign(Player p) {
 		ItemStack unsign = p.getItemInHand();
-		if (!unsign.getType().equals(Material.WRITTEN_BOOK)
-				&& !unsign.getType().equals(Material.BOOK_AND_QUILL)) {
+		if (unsign.getType() != Material.WRITTEN_BOOK
+				&& unsign.getType() != Material.BOOK_AND_QUILL) {
 			return false;
 		}
 		BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
 		unsignMeta.setTitle(null);
-		unsign.setItemMeta(unsignAuthors(unsignMeta, unsign.getType() == Material.BOOK_AND_QUILL));
+		unsign.setItemMeta(unsignAuthors(unsignMeta, unsign.getType() == Material.WRITTEN_BOOK));
 		unsign.setType(Material.BOOK_AND_QUILL);
 		return true;
 	}
@@ -275,19 +275,25 @@ public class Functions {
 			if (inv.firstEmpty() == -1 && p.getItemInHand().getAmount() == 64) {
 				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
 				return false;
-			} else
+			} else {
 				return true;
-		} else if (inv.contains(new ItemStack(Material.PAPER, 9))) {
-			inv.remove(new ItemStack(Material.PAPER, 9));
-			if (inv.firstEmpty() == -1) {
-				inv.addItem(new ItemStack(Material.PAPER, 9));
-				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
+			}
+		}
+		for (int i = 0; i < 9; i++) {
+			if (inv.contains(Material.PAPER)) {
+				inv.removeItem(new ItemStack(Material.PAPER));
+			} else {
+				inv.addItem(new ItemStack(Material.PAPER, i));
+				p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_COPY_MAP"));
 				return false;
-			} else
-				return true;
-		} else {
-			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_COPY_MAP"));
+			}
+		}
+		if (inv.firstEmpty() == -1) {
+			inv.addItem(new ItemStack(Material.PAPER, 9));
+			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_SPACE"));
 			return false;
+		} else {
+			return true;
 		}
 	}
 
@@ -501,7 +507,6 @@ public class Functions {
 		final File file = new File(directory);
 		if (!file.exists()) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_LIST_NOBOOKS"));
-			file.mkdirs();
 			return;
 		}
 		File[] publicBooks = file.listFiles(new FilenameFilter() {
@@ -524,16 +529,15 @@ public class Functions {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_LIST_NOBOOKS"));
 			return;
 		}
-		String bookList = new String();
+		String bookList = new String(); // TODO fix
 		if (publicBooks != null && publicBooks.length != 0) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("SUCCESS_LIST_PUBLIC"));
 			for (File bookFile : publicBooks) {
 				bookList += bookFile.getName().replace(".book", "") + ", ";
-				// Maximum allowed characters in a server-to-client chat message
-				// is 32767.
+				// Maximum allowed characters in a server-to-client chat message is 32767.
 				// In the event that people actively try to mess things up or
 				// there are an obscene amount of books, we'll cut it off.
-				//
+				// 
 				// Maximum book name from in-game save is 92 characters.
 				// Server admins will just have to not be stupid.
 				if (bookList.length() > 32500) {
@@ -561,6 +565,9 @@ public class Functions {
 	}
 
 	public boolean isAuthor(Player p, String author) {
+		if (author == null) {
+			return true;
+		}
 		ArrayList<String> aliases = BookSuite.getInstance().alias.getAliases(p);
 		for (String s : parseAuthors(author)) {
 			if (aliases.contains(s)) {
