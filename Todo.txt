@@ -1,20 +1,3 @@
-standalone editor for the books (with automatic uploading!)
-    - Sorta done by independent guy, see project page on BukkitDev
-
-reorganize commands for efficiency
-
-Use adjacent chests for supplies
-    - check for LWC
-    
-Book mail
-    - no commands - right click air with book
-    - recipient in title or first page
-    - item attachments
-
-Story reading command
-
-Rulebook (and /rules /? etc. optional override)
-
-Permissions to allow importing of others' private books, e.g. booksuite.import.jikoo.mysavedbook
+Private books
 
 /bs l gui
