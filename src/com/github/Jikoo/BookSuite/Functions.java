@@ -31,7 +31,6 @@ import org.bukkit.inventory.meta.BookMeta;
 
 public class Functions {
 	private static Functions instance = null;
-	private final char SECTION_SIGN = '\u00A7';
 
 	/**
 	 * master method for checking if the player can obtain the books
@@ -97,7 +96,7 @@ public class Functions {
 	public boolean checkCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.copy.self") && isAuthor(p, a))
+		if (p.hasPermission("booksuite.copy.self") && (p.getName().equals(a) || p.getDisplayName().equals(a)))
 			return true;
 		else if (p.hasPermission("booksuite.copy.self"))
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY_OTHER"));
@@ -114,7 +113,7 @@ public class Functions {
 	public boolean checkCommandCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.command.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.command.copy") && isAuthor(p, a))
+		if (p.hasPermission("booksuite.command.copy") && (p.getName().equals(a) || p.getDisplayName().equals(a)))
 			return true;
 		if (p.hasPermission("booksuite.command.copy")) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY_OTHER"));
@@ -161,44 +160,9 @@ public class Functions {
 		}
 		BookMeta unsignMeta = (BookMeta) unsign.getItemMeta();
 		unsignMeta.setTitle(null);
-		unsign.setItemMeta(unsignAuthors(unsignMeta, unsign.getType() == Material.WRITTEN_BOOK));
+		unsign.setItemMeta(unsignMeta);
 		unsign.setType(Material.BOOK_AND_QUILL);
 		return true;
-	}
-
-	/**
-	 * Helper method for unsigning books. If book was signed, uses lore to make
-	 * owner visible. Otherwise, removes author and lore.
-	 * 
-	 * @param bm the bookmeta
-	 * @param firstunsign true if the book was a Written Book prior to this unsign
-	 * 
-	 * @return the modified BookMeta
-	 */
-	private BookMeta unsignAuthors(BookMeta bm, boolean firstunsign) {
-		ArrayList<String> lore = bm.hasLore() ?
-				new ArrayList<String>(bm.getLore()) : new ArrayList<String>();
-		if (firstunsign && bm.hasAuthor()) {
-			String fakeAuth = new StringBuilder().append(ChatColor.GRAY).append("by ")
-					.append(bm.getAuthor()).toString();
-			if (!lore.isEmpty() && lore.get(0).startsWith(ChatColor.GRAY + "by ")) {
-				// Shouldn't occur (hopefully) but fix anyway
-				lore.set(0, fakeAuth);
-			} else {
-				lore.add(0, fakeAuth);
-			}
-		} else {
-			bm.setAuthor(null);
-		}
-		if (!firstunsign && !lore.isEmpty() && lore.get(0).startsWith(ChatColor.GRAY + "by ")) {
-			lore.remove(0);
-		}
-		if (lore.isEmpty()) {
-			bm.setLore(null);
-		} else {
-			bm.setLore(lore);
-		}
-		return bm;
 	}
 
 	/**
@@ -250,14 +214,15 @@ public class Functions {
 		List<String> pages = new ArrayList<String>(bm.getPages());
 		try {
 			pages.remove(Integer.parseInt(pageNumber) + 1);
+			bm.setPages(pages);
 		} catch (NumberFormatException e) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_USAGE") + BookSuite.getInstance().msgs.get("USAGE_EDIT_DELPAGE"));
 			return false;
-		} catch (IndexOutOfBoundsException e1) {
+		} catch (IndexOutOfBoundsException e) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_EDIT_INVALIDNUMBER"));
 			return false;
-		} catch (Exception e2) {
-			BSLogger.err(e2);
+		} catch (Exception e) {
+			BSLogger.err(e);
 		}
 		book.setItemMeta(bm);
 		return true;
@@ -451,38 +416,42 @@ public class Functions {
 	 * @return the <code>String</code> after parsing
 	 */
 	public String parseBML(String text) {
-		text = text.replaceAll("(<|\\[)i(talic(s)?)?(>|\\])", SECTION_SIGN + "o");
-		text = text.replaceAll("(<|\\[)b(old)?(>|\\])", SECTION_SIGN + "l");
-		text = text.replaceAll("(<|\\[)u(nderline)?(>|\\])", SECTION_SIGN + "n");
-		text = text.replaceAll("(<|\\[)(s(trike)?|del)(>|\\])", SECTION_SIGN + "m");
-		text = text.replaceAll("(<|\\[)(m(agic)?|obf(uscate(d)?)?)(>|\\])", SECTION_SIGN + "k");
+		if (text == null) {
+			return null;
+		}
+		text = text.replaceAll("(<|\\[)[Ii]([Tt][Aa][Ll][Ii][Cc][Ss]?)?(>|\\])", ChatColor.ITALIC.toString());
+		text = text.replaceAll("(<|\\[)[Bb]([Oo][Ll][Dd])?(>|\\])", ChatColor.BOLD.toString());
+		text = text.replaceAll("(<|\\[)[Uu]([Nn][Dd][Ee][Rr][Ll][Ii][Nn][Ee][Dd]?)?(>|\\])", ChatColor.UNDERLINE.toString());
+		text = text.replaceAll("(<|\\[)([Ss]([Tt][Rr][Ii][Kk][Ee]([Tt][Hh][Rr][Oo][Uu][Gg][Hh])?)?|[Dd][Ee][Ll])(>|\\])", ChatColor.STRIKETHROUGH.toString());
+		text = text.replaceAll("(<|\\[)([Mm]([Aa][Gg][Ii][Cc])?|[Oo][Bb][Ff]([Uu][Ss][Cc][Aa][Tt][Ee][Dd]?)?)(>|\\])", ChatColor.MAGIC.toString());
 
-		text = text.replaceAll("(<|\\[)color=", "<");
-		text = text.replaceAll("(<|\\[)black(>|\\])", SECTION_SIGN + "0");
-		text = text.replaceAll("(<|\\[)dark_?blue(>|\\])", SECTION_SIGN + "1");
-		text = text.replaceAll("(<|\\[)dark_?green(>|\\])", SECTION_SIGN + "2");
-		text = text.replaceAll("(<|\\[)dark_?aqua(>|\\])", SECTION_SIGN + "3");
-		text = text.replaceAll("(<|\\[)dark_?red(>|\\])", SECTION_SIGN + "4");
-		text = text.replaceAll("(<|\\[)((dark_?)?purple|magenta)(>|\\])", SECTION_SIGN + "5");
-		text = text.replaceAll("(<|\\[)gold(>|\\])", SECTION_SIGN + "6");
-		text = text.replaceAll("(<|\\[)gr[ea]y(>|\\])", SECTION_SIGN + "7");
-		text = text.replaceAll("(<|\\[)dark_?gr[ea]y(>|\\])", SECTION_SIGN + "8");
-		text = text.replaceAll("(<|\\[)(indigo|(light_?)?blue)(>|\\])", SECTION_SIGN + "9");
-		text = text.replaceAll("(<|\\[)(light_?|bright_?)?green(>|\\])", SECTION_SIGN + "a");
-		text = text.replaceAll("(<|\\[)aqua(>|\\])", SECTION_SIGN + "b");
-		text = text.replaceAll("(<|\\[)(light_?)?red(>|\\])", SECTION_SIGN + "c");
-		text = text.replaceAll("(<|\\[)(light_?purple|pink)(>|\\])", SECTION_SIGN + "d");
-		text = text.replaceAll("(<|\\[)yellow(>|\\])", SECTION_SIGN + "e");
-		text = text.replaceAll("(<|\\[)white(>|\\])", SECTION_SIGN + "f");
+		text = text.replaceAll("(<|\\[)[Cc][Oo][Ll][Oo][Rr]=", "<");
+		text = text.replaceAll("(<|\\[)[Bb][Ll][Aa][Cc][Kk](>|\\])", ChatColor.BLACK.toString());
+		text = text.replaceAll("(<|\\[)[Dd][Aa][Rr][Kk]_?[Bb][Ll][Uu][Ee](>|\\])", ChatColor.DARK_BLUE.toString());
+		text = text.replaceAll("(<|\\[)[Dd][Aa][Rr][Kk]_?[Gg][Rr][Ee][Ee][Nn](>|\\])", ChatColor.DARK_GREEN.toString());
+		text = text.replaceAll("(<|\\[)[Dd][Aa][Rr][Kk]_?[Aa][Qq][Uu][Aa](>|\\])", ChatColor.DARK_AQUA.toString());
+		text = text.replaceAll("(<|\\[)[Dd][Aa][Rr][Kk]_?[Rr][Ee][Dd](>|\\])", ChatColor.DARK_RED.toString());
+		text = text.replaceAll("(<|\\[)([Dd][Aa][Rr][Kk]_?)?[Pp][Uu][Rr][Pp][Ll][Ee](>|\\])", ChatColor.DARK_PURPLE.toString());
+		text = text.replaceAll("(<|\\[)([Dd][Aa][Rr][Kk]_?)?[Gg][Oo][Ll][Dd](>|\\])", ChatColor.GOLD.toString());
+		text = text.replaceAll("(<|\\[)[Gg][Rr][AEae][Yy](>|\\])", ChatColor.GRAY.toString());
+		text = text.replaceAll("(<|\\[)[Dd][Aa][Rr][Kk]_?[Gg][Rr][AEae][Yy](>|\\])", ChatColor.DARK_GRAY.toString());
+		text = text.replaceAll("(<|\\[)([Ii][Nn][Dd][Ii][Gg][Oo]|(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Bb][Ll][Uu][Ee])(>|\\])", ChatColor.BLUE.toString());
+		text = text.replaceAll("(<|\\[)(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Gg][Rr][Ee][Ee][Nn](>|\\])", ChatColor.GREEN.toString());
+		text = text.replaceAll("(<|\\[)[Aa][Qq][Uu][Aa](>|\\])", ChatColor.AQUA.toString());
+		text = text.replaceAll("(<|\\[)(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Rr][Ee][Dd](>|\\])", ChatColor.RED.toString());
+		text = text.replaceAll("(<|\\[)(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Pp][Uu][Rr][Pp][Ll][Ee]|[Pp][Ii][Nn][Kk]|[Mm][Aa][Gg][Ee][Nn][Tt][Aa])(>|\\])", ChatColor.LIGHT_PURPLE.toString());
+		text = text.replaceAll("(<|\\[)[Yy][Ee][Ll][Ll][Oo][Ww](>|\\])", ChatColor.YELLOW.toString());
+		text = text.replaceAll("(<|\\[)[Ww][Hh][Ii][Tt][Ee](>|\\])", ChatColor.WHITE.toString());
 
-		text = text.replaceAll("&([a-fk-orA-FK-OR0-9])", SECTION_SIGN + "$1");
+		text = ChatColor.translateAlternateColorCodes('&', text);
 
-		text = text.replaceAll("(<|\\[)/(i(talic(s)?)?|b(old)?|u(nderline)?|s(trike)?"
-				+ "|del|format|m(agic)?|obf(uscate(d)?)?)(>|\\])", SECTION_SIGN + "r");
-		text = text.replaceAll("(<|\\[)/color(>|\\])", SECTION_SIGN + "0");
-		text = text.replaceAll("(<|\\[)hr(>|\\])", "\n-------------------\n");
-		text = text.replaceAll("(<|\\[)(n|br)(>|\\])", "\n");
-		text = text.replaceAll("(" + SECTION_SIGN + "r)+", SECTION_SIGN + "r");
+		text = text.replaceAll("(<|\\[)/([Ii]([Tt][Aa][Ll][Ii][Cc][Ss]?)?|[Bb]([Oo][Ll][Dd])?|[Uu]([Nn][Dd][Ee][Rr][Ll][Ii][Nn][Ee][Dd]?)?"
+				+ "|[Ss]([Tt][Rr][Ii][Kk][Ee]([Tt][Hh][Rr][Oo][Uu][Gg][Hh])?)?|[Dd][Ee][Ll]|[Ff][Oo][Rr][Mm][Aa][Tt]"
+				+ "|[Mm]([Aa][Gg][Ii][Cc])?|[Oo][Bb][Ff]([Uu][Ss][Cc][Aa][Tt][Ee][Dd]?)?)(>|\\])", ChatColor.RESET.toString());
+		text = text.replaceAll("(<|\\[)/[Cc][Oo][Ll][Oo][Rr](>|\\])", ChatColor.WHITE.toString());
+		text = text.replaceAll("(<|\\[)[Hh][Rr](>|\\])", "\n-------------------\n");
+		text = text.replaceAll("(<|\\[)([Nn]|[Bb][Rr])(>|\\])", "\n");
+		text = text.replaceAll("(" + ChatColor.RESET + ")+", ChatColor.RESET.toString());
 		return text;
 	}
 
@@ -565,76 +534,7 @@ public class Functions {
 	}
 
 	public boolean isAuthor(Player p, String author) {
-		if (author == null) {
-			return true;
-		}
-		ArrayList<String> aliases = BookSuite.getInstance().alias.getAliases(p);
-		for (String s : parseAuthors(author)) {
-			if (aliases.contains(s)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public String[] parseAuthors(String authors) {
-		return authors.replaceAll(",? and", ", ").split("(" + ChatColor.GRAY + ")?,\\s+");
-	}
-
-	public String getAuthors(String[] old, String author) {
-		StringBuilder sb = new StringBuilder();
-		if (old != null) {
-			for (int i = 0; i < old.length; i++) {
-				sb.append(old[i]).append(ChatColor.GRAY).append(", ");
-			}
-			sb.deleteCharAt(sb.lastIndexOf(",")).append("and ");
-		}
-		return sb.append(author).toString();
-	}
-
-	/**
-	 * Adds an author to a book. Adds/edits fake lore if not a signing event,
-	 * otherwise removes existing faked lore
-	 * 
-	 * @param bm the <code>BookMeta</code> to edit
-	 * @param author name to add as an author
-	 * @param signing true if the book is being converted into a written book
-	 * 
-	 * @return the altered BookMeta
-	 */
-	public BookMeta addAuthor(BookMeta bm, String oldAuthors, Player author, boolean signing) {
-		String newAuthor = BookSuite.getInstance().alias.getActiveAlias(author);
-		boolean isCredited = false;
-		if (oldAuthors != null) {
-			isCredited = this.isAuthor(author, oldAuthors);
-			if (!isCredited) {
-				newAuthor = this.getAuthors(this.parseAuthors(oldAuthors), newAuthor);
-			}
-		}
-		bm.setAuthor(isCredited ? oldAuthors : newAuthor);
-
-		ArrayList<String> lore = bm.hasLore() ? new ArrayList<String>(bm.getLore()) : null;
-		if (bm.hasLore() && lore.get(0).equals(ChatColor.GRAY + "by " + oldAuthors)) {
-			if (signing) {
-				lore.remove(0);
-				if (lore.isEmpty()) {
-					lore = null;
-				}
-			} else if (!isCredited) {
-				lore.set(0, new StringBuilder().append(ChatColor.GRAY).append("by ")
-						.append(newAuthor).toString());
-			}
-		} else {
-			lore = new ArrayList<String>();
-			lore.add(new StringBuilder().append(ChatColor.GRAY).append("by ")
-					.append(isCredited ? oldAuthors : newAuthor).toString());
-			if (bm.hasLore()) {
-				lore.addAll(bm.getLore());
-			}
-		}
-		bm.setLore(lore);
-
-		return bm;
+		return p.getName().equals(author) || BookSuite.getInstance().getConfig().getBoolean("enable-aliases") && author.contains(p.getDisplayName());
 	}
 
 	protected void disable() {

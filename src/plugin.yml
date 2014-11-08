@@ -1,7 +1,7 @@
 name: BookSuite
 
 main: com.github.Jikoo.BookSuite.BookSuite
-version: 3.2.0
+version: 4.0.0
 author: Adam Gunn (PlanarWarp/Jikoo)
 authors: [Ted Meyer (tmathmeyer)]
 description: A large collection of book-related functions.
@@ -15,7 +15,6 @@ permissions:
    booksuite.free: true
    booksuite.copy.admin: true
    booksuite.command.admin: true
-   booksuite.mail.admin: true
    booksuite.block.erase.other: true
    booksuite.sign: true
  booksuite.default:
@@ -31,211 +30,127 @@ permissions:
      booksuite.block.erase: true
      booksuite.sign: true
 
-
-
  booksuite.free:
   description: No cost associated with anything!
   default: false
   children:
    booksuite.book.free:
-    description: copy and create books for free
+    description: Copy and create books for free
     default: false
    booksuite.block.erase.free:
-    description: don't use water from cauldron when erasing a book
+    description: Don't use water from cauldron when erasing a book
     default: false
-
-
-
- booksuite.mail.admin:
-  description: all mail
-  default: false
-  children:
-   booksuite.mail.send.other:
-    description: Mail packages as anyone
-    default: false
-    children:
-     booksuite.mail.send: true
-   booksuite.mail.global:
-    description: TODO Mail every player with a mailbox and every online player with perms - no item attachments.
-    default: false
-   booksuite.mail.attach.self:
-    description: mail self items - Enable with caution, can be used as a personal enderchest with no space limit.
-    default: false
-    children:
-     booksuite.mail.attach: true
-   booksuite.mail.default:
-    description: default mail
-    children:
-     booksuite.mail.send:
-      description: Send mail with a right click!
-      default: false
-     booksuite.mail.attach:
-      description: send items with mail!
-      default: false
-     booksuite.mail.receive:
-      description: can check/receive non-global (personal) mail
-      default: false
-
-
 
  booksuite.copy.admin:
-  description: copy everything copiable
+  description: Copy everything copiable
   default: false
   children:
    booksuite.copy.other:
-    description: copy all books
+    description: Copy all books
     default: false
     children:
      booksuite.copy.self: true
    booksuite.copy.default:
-    description: default copy functions
+    description: Default copy functions
     default: false
     children:
      booksuite.copy.self:
-      description: copy own books
+      description: Copy own books
       default: false
       children:
        booksuite.denynowarn.press: false
 
-
-
- booksuite.rules.admin:
-  description: all rule-related commands and permissions
-  default: false
-  children:
-   booksuite.rules.edit:
-    description: permission for all rule-changing commands
-    default: false
-    children:
-     booksuite.rules.add:
-      description: permission to add new rulebooks
-      default: false
-     booksuite.rules.delete:
-      description: permission to delete saved rulebooks
-      default: false
-     booksuite.rules.swap:
-      description: permission to change the order of 2 rulebooks
-      default: false
-   booksuite.rules.default:
-    description: default rule-related permissions
-    default: false
-    children:
-     booksuite.rules.get:
-      description: permission to obtain a rulebook with /rules or /?
-      default: false
-     booksuite.rules.list:
-      description: permission to use /rules list to list all saved rulebooks
-      default: false
-     booksuite.rules.login:
-      description: ability to obtain a rulebook with /rules or /?
-      default: false
-
-
-
  booksuite.command.admin:
-  description: all commands
+  description: All commands
   default: false
   children:
    booksuite.command.default:
-    description: standard commands
+    description: Standard commands
     default: false
     children:
      booksuite.command.list:
-      description: list all .book files in /SavedBooks/
+      description: List all .book files in /SavedBooks/
       default: false
      booksuite.command.import:
-      description: make a book from file
+      description: Make a book from file
       default: false
      booksuite.command.export:
-      description: make a file from book
+      description: Make a file from book
       default: false
      booksuite.command.edit:
-      description: allow usage of addpage and delpage for book and quill editing
+      description: Allow usage of addpage and delpage for book and quill editing
       default: false
      booksuite.command.give:
-      description: allow usage of give <player> to import for others
+      description: Allow usage of /book give <player> <book> to import for others
       default: false
    booksuite.command.import.other:
-    description: import a book with an author other than themself
+    description: Import a book with an author other than self
     default: false
     children:
      booksuite.command.import: true
    booksuite.command.unsign.other:
-    description: unsign books by anyone
+    description: Unsign books by anyone
     default: false
     children:
      booksuite.command.unsign:
-      description: unsign books by self
+      description: Unsign books by self
       default: false
    booksuite.command.copy.other:
-    description: copy books by anyone
+    description: Copy books by anyone
     default: false
     children:
      booksuite.command.copy:
-      description: copy books by self
+      description: Copy books by self
       default: false
    booksuite.command.author:
-    description: change author
+    description: Change author
     default: false
    booksuite.command.title.other:
-    description: re-title books by anyone
+    description: Re-title books by anyone
     default: false
     children:
      booksuite.command.title:
-      description: re-title books by self
+      description: Re-title books by self
       default: false
    booksuite.command.delete:
     description: Delete a book from /SavedBooks/
     default: false
    booksuite.command.reload:
-    description: reload the plugin
+    description: Reload the plugin
     default: false
    booksuite.command.update:
-    description: check for updates
+    description: Check for updates
     default: false
 
-
-
  booksuite.sign:
-  description: all functions available on book signing
+  description: All functions available on book signing
   default: false
   children:
    booksuite.sign.color: true
    booksuite.sign.alias: true
    booksuite.sign.other: true
 
-
-
  booksuite.block.erase.other:
-  description: erase others' books
+  description: Erase others' books
   default: false
   children:
    booksuite.block.erase:
-    description: erase own books
+    description: Erase own books
     default: false
 
-
-
  booksuite.denynowarn:
-  description: vanilla behavior on attempted usage of "eraser" and "press"
+  description: Vanilla behavior on attempted usage of "eraser" and "press"
   default: false
   children:
    booksuite.denynowarn.press:
     description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
     default: false
    booksuite.denynowarn.erase:
-    description: right click cauldron with book does not notify if lacking unsign perms
+    description: Right click cauldron with book does not notify if lacking unsign perms
     default: false
-
-
 
 commands:
  book:
   default: true
   description: BookSuite's universal command
   aliases: [booksuite, bsuite, bs]
- bsrules:
-  default: false
-  description: BookSuite's rules function
-  permission: booksuite.command.rules
-  aliases: [rules, booksuiterules]

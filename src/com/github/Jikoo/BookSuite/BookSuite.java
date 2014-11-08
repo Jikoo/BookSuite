@@ -13,9 +13,7 @@ package com.github.Jikoo.BookSuite;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.Jikoo.BookSuite.mail.PostalService;
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
-import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
@@ -30,11 +28,9 @@ public class BookSuite extends JavaPlugin {
 
 	protected UpdateCheck update;
 	protected PermissionsListener perms;
-	protected Rules rules;
 
 	public Functions functions;
 	public FileManager filemanager;
-	public Alias alias;
 
 	private MainListener listener;
 	private CommandHandler command;
@@ -61,11 +57,6 @@ public class BookSuite extends JavaPlugin {
 		functions = Functions.getInstance();
 		filemanager = FileManager.getInstance();
 
-		alias = Alias.getInstance();
-		if (getConfig().getBoolean("enable-aliases")) {
-			alias.enable();
-		}
-
 		if (getConfig().getBoolean("use-inbuilt-permissions")) {
 			perms = new PermissionsListener(this);
 			perms.enable();
@@ -79,11 +70,6 @@ public class BookSuite extends JavaPlugin {
 			update.asyncUpdateCheck(null, false);
 		}
 
-		if (getConfig().getBoolean("book-rules")) {
-			rules = new Rules();
-			rules.enable();
-		}
-
 		listener = MainListener.getInstance();
 		getServer().getPluginManager().registerEvents(listener, this);
 		command = CommandHandler.getInstance();
@@ -94,7 +80,6 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		PostalService.disable();
 
 		if (update != null) {
 			update.disableNotifications();
@@ -105,15 +90,7 @@ public class BookSuite extends JavaPlugin {
 			perms.disable();
 		perms = null;
 
-		alias.disable();
-		alias = null;
-
 		command = null;
-
-		if (rules != null) {
-			rules.disable();
-			rules = null;
-		}
 
 		functions.disable();
 		functions = null;

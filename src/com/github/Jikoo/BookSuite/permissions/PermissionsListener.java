@@ -13,6 +13,7 @@ package com.github.Jikoo.BookSuite.permissions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,18 +32,18 @@ public class PermissionsListener implements Listener {
 	Permissions permissions;
 	boolean enabled = false;
 	BookSuite plugin;
-	Map<String, Integer> tasks;
+	Map<UUID, Integer> tasks;
 
 	public PermissionsListener(BookSuite plugin) {
 		this.plugin = plugin;
-		tasks = new HashMap<String, Integer>();
+		tasks = new HashMap<UUID, Integer>();
 	}
 
 	@EventHandler
 	public void onLogin(PlayerJoinEvent event) {
 		int taskID = syncImplementPermissions(event.getPlayer());
 		if (taskID != -1) {
-			tasks.put(event.getPlayer().getName(), taskID);
+			tasks.put(event.getPlayer().getUniqueId(), taskID);
 		}
 	}
 
@@ -60,7 +61,7 @@ public class PermissionsListener implements Listener {
 				if (command.length == 1) {
 					int taskID = syncOpPermissionsCheck(event.getPlayer(), event.getPlayer().isOp());
 					if (taskID != -1) {
-						tasks.put(event.getPlayer().getName(), taskID);
+						tasks.put(event.getPlayer().getUniqueId(), taskID);
 					}
 					return;
 				}
@@ -69,7 +70,7 @@ public class PermissionsListener implements Listener {
 					if (p != null) {
 						int taskID = syncOpPermissionsCheck(p, p.isOp());
 						if (taskID != -1) {
-							tasks.put(p.getName(), taskID);
+							tasks.put(p.getUniqueId(), taskID);
 						}
 					}
 				}
@@ -88,7 +89,7 @@ public class PermissionsListener implements Listener {
 					if (p != null) {
 						int taskID = syncOpPermissionsCheck(p, p.isOp());
 						if (taskID != -1) {
-							tasks.put(p.getName(), taskID);
+							tasks.put(p.getUniqueId(), taskID);
 						}
 					}
 				}
@@ -98,12 +99,12 @@ public class PermissionsListener implements Listener {
 
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
-		permissions.removePermissions(event.getPlayer().getName());
+		permissions.removePermissions(event.getPlayer().getUniqueId());
 	}
 
 	@EventHandler
 	public void onKick(PlayerKickEvent event) {
-		permissions.removePermissions(event.getPlayer().getName());
+		permissions.removePermissions(event.getPlayer().getUniqueId());
 	}
 
 	public boolean isEnabled() {
@@ -153,10 +154,10 @@ public class PermissionsListener implements Listener {
 
 		public void run() {
 			if (p.isOp()) {
-				permissions.removePermissions(p.getName());
+				permissions.removePermissions(p.getUniqueId());
 				permissions.addOpPermissions(p);
 			} else {
-				permissions.removePermissions(p.getName());
+				permissions.removePermissions(p.getUniqueId());
 				permissions.addDefaultPermissions(p);
 			}
 			tasks.remove(p.getName());
@@ -180,7 +181,7 @@ public class PermissionsListener implements Listener {
 		public void run() {
 			if (wasOp) {
 				if (!p.isOp()) {
-					permissions.removePermissions(p.getName());
+					permissions.removePermissions(p.getUniqueId());
 					permissions.addDefaultPermissions(p);
 				}
 			} else {
@@ -188,23 +189,17 @@ public class PermissionsListener implements Listener {
 					permissions.addOpPermissions(p);
 				}
 			}
-			tasks.remove(p.getName());
+			tasks.remove(p.getUniqueId());
 		}
 	}
 
 	public int syncOpPermissionsCheck(Player p, boolean wasOp) {
-		return Bukkit.getServer().getScheduler()
-				.scheduleSyncDelayedTask(plugin,
-						new opPermissionsCheck(p, wasOp));
+		return Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new opPermissionsCheck(p, wasOp));
 	}
 
 	public void stopAllPendingTasks() {
-		for (String s : tasks.keySet()) {
-			try {
-				Bukkit.getScheduler().cancelTask(tasks.remove(s));
-			} catch (NullPointerException e) {
-				// Mapping for s is null; do nothing.
-			}
+		for (UUID uuid : tasks.keySet()) {
+			Bukkit.getScheduler().cancelTask(tasks.remove(uuid));
 		}
 	}
 }

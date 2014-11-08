@@ -20,15 +20,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.material.Cauldron;
+import org.bukkit.scoreboard.Team;
 
 import com.github.Jikoo.BookSuite.copy.PrintingPress;
-import com.github.Jikoo.BookSuite.mail.MailBox;
 
 public class MainListener implements Listener {
 
@@ -56,20 +55,6 @@ public class MainListener implements Listener {
 
 		Player p = event.getPlayer();
 
-		// prevent unsigned books by those who cannot edit
-		// Note: Edit window is not like ordinary inventory views - almost
-		// entirely client side. Check closing methods.
-		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-			if (p.getItemInHand() != null && p.getItemInHand().getType() == Material.BOOK_AND_QUILL
-					&& p.getItemInHand().hasItemMeta()) {
-				BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-				if (bm.hasAuthor() && !plugin.functions.isAuthor(p, bm.getAuthor())) {
-					p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS"));
-					event.setCancelled(true);
-				}
-			}
-		}
-
 		// If it isn't a right click, we don't care about it.
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
@@ -81,7 +66,7 @@ public class MainListener implements Listener {
 
 		// PRESS OPERATION
 		if (plugin.functions.isPrintingPress(clicked)) {
-			PrintingPress press = new PrintingPress(plugin, p.getName(), clicked);
+			PrintingPress press = new PrintingPress(clicked);
 
 			if (p.hasPermission("booksuite.denynowarn.press")) {
 				return;
@@ -118,8 +103,7 @@ public class MainListener implements Listener {
 
 		// PRESS EASY CREATION
 		if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
-			clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(),
-					plugin.functions.getCorrectStairOrientation(p), true);
+			clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(), plugin.functions.getCorrectStairOrientation(p), true);
 			if (p.getGameMode() != GameMode.CREATIVE) {
 				if (is.getAmount() == 1) {
 					p.setItemInHand(null);
@@ -146,17 +130,13 @@ public class MainListener implements Listener {
 			}
 
 			Cauldron cauldron = (Cauldron) clicked.getState().getData();
-			if (p.getGameMode() != GameMode.CREATIVE && cauldron.isEmpty()
-					&& !p.hasPermission("booksuite.block.erase.free")) {
+			if (p.getGameMode() != GameMode.CREATIVE && cauldron.isEmpty() && !p.hasPermission("booksuite.block.erase.free")) {
 				p.sendMessage(plugin.msgs.get("FAILURE_ERASE_NOWATER"));
-			} else if (plugin.functions.isAuthor(p, bm.getAuthor())
+			} else if (p.getName().equals(bm.getAuthor()) || p.getDisplayName().equals(bm.getAuthor())
 					|| p.hasPermission("booksuite.block.erase.other")) {
 				plugin.functions.unsign(p);
-				if (!p.hasPermission("booksuite.block.erase.free")
-						&& p.getGameMode() != GameMode.CREATIVE) {
+				if (!p.hasPermission("booksuite.block.erase.free") && p.getGameMode() != GameMode.CREATIVE) {
 					clicked.setData((byte) (clicked.getData() - 1));
-					// future ref in case Bukkit makes a non-deprecated setter for water:
-					// Integer.parseInt(cauldron.toString().replace("/3 FULL", "").replace("FULL", "3").replace("EMPTY", "0").replace(" CAULDRON"));
 				}
 			} else {
 				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE_OTHER"));
@@ -164,62 +144,27 @@ public class MainListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-
-		// MAIL
-		if (plugin.functions.isMailBox(clicked)) {
-			p.openInventory(MailBox.getMailBox(p).open(p));
-			event.setCancelled(true);
-			return;
-		}
-
-
-		// TODO close book, not just warn
-		if (p.getItemInHand() != null && p.getItemInHand().getType() == Material.BOOK_AND_QUILL
-				&& p.getItemInHand().hasItemMeta()) {
-			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-			if (bm.hasAuthor() && !plugin.functions.isAuthor(p, bm.getAuthor())) {
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS"));
-			}
-		}
 	}
 
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent event) {
-		if (event.getInventory().getTitle().contains("'s MailBox")) {
-			MailBox.getMailBox(event.getPlayer().getName()).sendMail(event.getInventory());
-		}
-	}
-
-	/**
-	 * When a player closes a book, this event is fired. BookSuite introduces
-	 * several literary protection features - all players who work on a book are
-	 * credited in order of edit.
-	 * 
-	 * @param event the PlayerBookEditEvent
-	 */
 	@EventHandler
 	public void onBookEdit(PlayerEditBookEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
+		Player player = event.getPlayer();
 
-		BookMeta obm = event.getPreviousBookMeta();
 		BookMeta bm = event.getNewBookMeta();
 
-		if (!event.getPlayer().hasPermission("booksuite.sign.other") && obm.hasAuthor()
-				&& obm.getAuthor() != null
-				&& !plugin.functions.isAuthor(event.getPlayer(), obm.getAuthor())) {
-			event.setCancelled(true);
-			event.getPlayer().sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ALIAS"));
-			return;
-		}
-		if (event.isSigning() || event.getPlayer().hasPermission("booksuite.sign.alias")) {
-			bm = plugin.functions.addAuthor(bm, obm.hasAuthor() ? obm.getAuthor() : null,
-					event.getPlayer(), event.isSigning());
+		if (event.isSigning() && plugin.getConfig().getBoolean("enable-aliases") && player.hasPermission("booksuite.sign.alias")) {
+			Team team = event.getPlayer().getScoreboard().getPlayerTeam(player);
+			StringBuilder name = new StringBuilder();
+			name.append(team != null ? team.getPrefix() : "").append(player.getDisplayName()).append(team != null ? team.getSuffix() : "");
+			bm.setAuthor(name.toString());
 			if (event.getPlayer().hasPermission("booksuite.sign.color") && bm.hasTitle()) {
 				bm.setTitle(Functions.getInstance().addColor(bm.getTitle()));
 			}
 		}
+
 		event.setNewBookMeta(bm);
 	}
 

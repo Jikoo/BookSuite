@@ -1,3 +1,9 @@
+;4.0.0
+:Rewrote the majority of the plugin to not be terrible
+:Removed mail - Cool idea, too messy and inconvenient in practice.
+:Stripped out a bunch of future plans, other book plugins handle them much better.
+:Added color support to /book title and /book author (Why was this not a thing ages ago?)
+:BML parsing now ignores case, mix as you please!
 ;3.2.0
 :added mail at last! (N.B. experimental; disabled by default)
 :added /book give <player> <savename> - This one's for you, gamermomoe :D

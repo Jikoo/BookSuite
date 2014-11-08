@@ -15,6 +15,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -24,9 +26,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
-import com.github.Jikoo.BookSuite.rules.Rules;
 import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
@@ -122,16 +124,6 @@ public class CommandHandler implements CommandExecutor {
 			return true;
 		}
 
-//		if (args[0].equals("lock")) {
-//			lock(p);
-//			return true;
-//		}
-//
-//		if (args[0].equals("unlock")) {
-//			unlock(p);
-//			return true;
-//		}
-
 		if (args.length == 1) {
 			// command: /book <l(ist)|ls> - list all files in
 			// /SavedBooks/
@@ -201,7 +193,7 @@ public class CommandHandler implements CommandExecutor {
 		// command: /book addpage <number> (optional text) - add a
 		// page to a book and quill
 		if (args[0].equals("addpage") && CommandPermissions.EDIT.checkPermission(p)) {
-			if (plugin.functions.insertPageAt(p, args[1], mergeFrom(args, 2)))
+			if (plugin.functions.insertPageAt(p, args[1], StringUtils.join(args, ' ', 2, args.length - 1)))
 				p.sendMessage(plugin.msgs.get("SUCCESS_EDIT_ADDPAGE"));
 			return true;
 		}
@@ -235,7 +227,7 @@ public class CommandHandler implements CommandExecutor {
 		if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
 				|| p.hasPermission("booksuite.command.title.other")) {
 			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-			bm.setTitle(plugin.functions.addColor(mergeFrom(args, 1)));
+			bm.setTitle(plugin.functions.addColor(StringUtils.join(args, ' ', 1, args.length - 1)));
 			p.getItemInHand().setItemMeta(bm);
 			p.sendMessage(plugin.msgs.get("SUCCESS_TITLE"));
 		} else {
@@ -249,7 +241,7 @@ public class CommandHandler implements CommandExecutor {
 			return;
 		}
 		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-		bm.setAuthor(plugin.functions.addColor(mergeFrom(args, 1)));
+		bm.setAuthor(plugin.functions.addColor(StringUtils.join(args, ' ', 1, args.length - 1)));
 		p.getItemInHand().setItemMeta(bm);
 		return;
 	}
@@ -281,12 +273,6 @@ public class CommandHandler implements CommandExecutor {
 
 		plugin.msgs = new Msgs();
 
-		if (plugin.getConfig().getBoolean("enable-aliases")) {
-			plugin.alias.enable();
-		} else {
-			plugin.alias.disable();
-		}
-
 		if (plugin.getConfig().getBoolean("use-inbuilt-permissions")) {
 			if (plugin.perms != null) {
 				if (!plugin.perms.isEnabled()) {
@@ -316,19 +302,6 @@ public class CommandHandler implements CommandExecutor {
 				plugin.update.disableNotifications();
 				plugin.update = null;
 			}
-		}
-
-		plugin.alias.enable();
-
-		if (plugin.getConfig().getBoolean("book-rules")) {
-			if (plugin.rules == null) {
-				plugin.rules = new Rules();
-				plugin.rules.enable();
-			} else
-				plugin.rules.load();
-		} else if (plugin.rules != null) {
-			plugin.rules.disable();
-			plugin.rules = null;
 		}
 
 		sender.sendMessage(plugin.msgs.get("SUCCESS_RELOAD").replace("<plugin.version>", plugin.version));
@@ -549,54 +522,6 @@ public class CommandHandler implements CommandExecutor {
 		return sb.substring(0, sb.length() - 2);
 	}
 
-//	private void lock(Player p) {
-//		ItemStack is = p.getItemInHand();
-//		if (is.getType() != Material.WRITTEN_BOOK || is.getType() != Material.BOOK_AND_QUILL) {
-//			p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDEITHER"));
-//			return;
-//		}
-//		BookMeta bm = (BookMeta) is.getItemMeta();
-//		if (!bm.hasAuthor()) {
-//			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_NEEDBAQAUTHOR"));
-//			return;
-//		}
-//		ArrayList<String> lore = bm.hasLore() ? new ArrayList<String>(bm.getLore()) : new ArrayList<String>();
-//		if (lore.contains(plugin.msgs.get("LOCK"))) {
-//			p.sendMessage(plugin.msgs.get("FAILURE_LOCK_ALREADY"));
-//			return;
-//		}
-//		lore.add(plugin.msgs.get("LOCK"));
-//		bm.setLore(lore);
-//		is.setItemMeta(bm);
-//		p.sendMessage(plugin.msgs.get("SUCCESS_LOCK"));
-//	}
-//
-//	private void unlock(Player p) {
-//		ItemStack is = p.getItemInHand();
-//		if (is.getType() != Material.WRITTEN_BOOK || is.getType() != Material.BOOK_AND_QUILL) {
-//			p.sendMessage(plugin.msgs.get("FAILURE_COMMAND_NEEDEITHER"));
-//			return;
-//		}
-//		BookMeta bm = (BookMeta) is.getItemMeta();
-//		ArrayList<String> lore = bm.hasLore() ? new ArrayList<String>(bm.getLore()) : new ArrayList<String>();
-//		if (lore.contains(plugin.msgs.get("LOCK"))) {
-//			lore.remove(plugin.msgs.get("LOCK"));
-//			bm.setLore(lore);
-//			is.setItemMeta(bm);
-//			p.sendMessage(plugin.msgs.get("SUCCESS_UNLOCK"));
-//			return;
-//		}
-//		p.sendMessage(plugin.msgs.get("FAILURE_LOCK_ALREADY"));
-//	}
-
-	private String mergeFrom(String[] args, int first) {
-		StringBuilder sb = new StringBuilder();
-		for (; first < args.length; first++) {
-			sb.append(args[first]).append(' ');
-		}
-		return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : sb.toString();
-	}
-
 	public boolean invalidCommand(CommandSender sender) {
 		if (listPermittedCommands(sender).length() > 0) {
 			sender.sendMessage(plugin.msgs.get("VERSION").replaceAll("<plugin.version>", plugin.version));
@@ -608,9 +533,8 @@ public class CommandHandler implements CommandExecutor {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void asyncBookImport(final Player p, final String s) {
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+		new BukkitRunnable() {
 			public void run() {
 				BookMeta bm;
 				StringBuilder sb = new StringBuilder();
@@ -627,11 +551,11 @@ public class CommandHandler implements CommandExecutor {
 				bm = plugin.filemanager.makeBookMetaFromText(p, sb.toString(), true);
 				syncBookImport(p, bm);
 			}
-		});
+		}.runTaskAsynchronously(BookSuite.getInstance());
 	}
 
 	public void syncBookImport(final Player p, final BookMeta bm) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+		new BukkitRunnable() {
 			public void run() {
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				if (bm.hasPages()) {
@@ -656,7 +580,7 @@ public class CommandHandler implements CommandExecutor {
 					}
 				}
 			}
-		});
+		}.runTask(BookSuite.getInstance());
 	}
 
 	public void syncOverwriteTimer(final Player p) {

@@ -4,14 +4,8 @@
 # Please note: Mail is in an experimental state and may be subject to
 # change. For this reason, it is disabled by default.
 
-###  ALIASES  ###
-# If true:
-#     - Players sign books as their display name/nick name
-#     - Players can unsign books by their display name or login name
-enable-aliases: true
-
 ###  PERMISSIONS  ###
-# If you use a permissions plugin, set to false and assign permissions.
+# If you use a permissions plugin and don't want ops to have all permissions, set to false and assign permissions.
 use-inbuilt-permissions: true
 
 ###  SAVING  ###
@@ -26,18 +20,16 @@ enable-printing-presses: true
 # Same deal as presses.
 enable-erasers: true
 
-###  MAIL  ###
-# You know the drill.
+###  ALIASES  ###
+# Aliases are used when signing and manipulating books.
 # 
-# Please note: Mail is in an experimental state and may be subject to
-# change. For this reason, it is disabled by default.
-enable-mail: false
-
-###  RULES  ###
-# If true, /rules and /book rules will give player
-# a copy of the saved rulebook. Set false to slightly
-# improve memory usage and disable rules commands.
-enable-book-rules: true
+# This allows players to sign books as <team prefix><display name><team suffix>.
+# 
+# N.B. To support prefix and suffix changes, when checking if the player is an author, containing the display name is enough.
+# This means the user "Minecraft" will be able to unsign books by "123Minecraft123"
+# 
+# N.B. This does not support Vault or any other such plugin, only Bukkit's teams.
+enable-aliases: true
 
 ###  UPDATE CHECK  ###
 # update-check:
@@ -46,7 +38,7 @@ enable-book-rules: true
 #     - updater will run when the plugin is enabled.
 # login-update-check:
 #   If true, will check for updates when a player who can use "/book update" logs in.
-#   update-check: false disabled this option.
+#   update-check: false disables this option.
 update-check: true
 login-update-check: true
 

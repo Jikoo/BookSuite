@@ -11,10 +11,11 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite.copy;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.Jikoo.BookSuite.BookSuite;
 
@@ -23,92 +24,78 @@ public class PrintingPress {
 	Block blockUp;
 	BlockState originalBlock;
 	BlockState changedBlock;
-	String pName;
 
-	public PrintingPress(BookSuite plugin, String pName, Block blockUp) {
-		if (plugin.functions.isInvertedStairs(blockUp)) {
-			this.blockUp = blockUp;
+	public PrintingPress(Block block) {
+		if (BookSuite.getInstance().functions.isInvertedStairs(block)) {
+			this.blockUp = block;
 		} else {
-			this.blockUp = blockUp.getRelative(BlockFace.UP);
+			this.blockUp = block.getRelative(BlockFace.UP);
 		}
-		originalBlock = this.blockUp.getState();
-		this.pName = pName;
 	}
 
 	public void operatePress() {
-		changeStairBlock(blockUp);
+		originalBlock = blockUp.getState();
+		changedBlock = changeStairBlock(blockUp);
 		revertBlockPause(blockUp);
 	}
 
 	/**
 	 * turns the stair block into a slab for graphical effect
 	 * 
-	 * @param b
-	 *            the stair block to be transformed
+	 * @param b the stair block to be transformed
 	 */
 	@SuppressWarnings("deprecation") // No alternative to this yet.
-	public void changeStairBlock(Block b) {
-		if (b.getTypeId() == 53)// WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 0, false);// WOOD_STEP
+	private BlockState changeStairBlock(Block b) {
+		if (b.getType() == Material.SANDSTONE_STAIRS) {
+			b.setType(Material.STEP);
+			b.setData((byte) 1);
+		} else if (b.getType() == Material.COBBLESTONE_STAIRS) {
+			b.setType(Material.STEP);
+			b.setData((byte) 3);
+		} else if (b.getType() == Material.BRICK_STAIRS) {
+			b.setType(Material.STEP);
+			b.setData((byte) 4);
+		} else if (b.getType() == Material.SMOOTH_STAIRS) {
+			b.setType(Material.STEP);
+			b.setData((byte) 5);
+		} else if (b.getType() == Material.NETHER_BRICK_STAIRS) {
+			b.setType(Material.STEP);
+			b.setData((byte) 6);
+		} else if (b.getType() == Material.QUARTZ_STAIRS) {
+			b.setType(Material.STEP);
+			b.setData((byte) 7);
+		} else if (b.getType() == Material.WOOD_STAIRS) {
+			b.setType(Material.WOOD_STEP);
+			b.setData((byte) 0);
+		} else if (b.getType() == Material.SPRUCE_WOOD_STAIRS) {
+			b.setType(Material.WOOD_STEP);
+			b.setData((byte) 1);
+		} else if (b.getType() == Material.BIRCH_WOOD_STAIRS) {
+			b.setType(Material.WOOD_STEP);
+			b.setData((byte) 2);
+		} else if (b.getType() == Material.JUNGLE_WOOD_STAIRS) {
+			b.setType(Material.WOOD_STEP);
+			b.setData((byte) 3);
+		} else if (b.getType() == Material.ACACIA_STAIRS) {
+			b.setType(Material.WOOD_STEP);
+			b.setData((byte) 4);
+		} else if (b.getType() == Material.DARK_OAK_STAIRS) {
+			b.setType(Material.WOOD_STEP);
+			b.setData((byte) 5);
+		} else b.setType(Material.STEP);
 
-		else if (b.getTypeId() == 67)// COBBLESTONE_STAIRS
-			b.setTypeIdAndData(44, (byte) 3, false);// STEP
-
-		else if (b.getTypeId() == 108)// BRICK_STAIRS
-			b.setTypeIdAndData(44, (byte) 4, false);// STEP
-
-		else if (b.getTypeId() == 109)// SMOOTH_STAIRS
-			b.setTypeIdAndData(44, (byte) 5, false);// STEP
-
-		else if (b.getTypeId() == 114)// NETHER_BRICK_STAIRS
-			b.setTypeIdAndData(44, (byte) 6, false);// STEP
-
-		else if (b.getTypeId() == 128)// SANDSTONE_STAIRS
-			b.setTypeIdAndData(44, (byte) 1, false);// STEP
-
-		else if (b.getTypeId() == 134)// SPRUCE_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 1, false);// WOOD_STEP
-
-		else if (b.getTypeId() == 135)// BIRCH_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 2, false);// WOOD_STEP
-
-		else if (b.getTypeId() == 136)// JUNGLE_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 3, false);// WOOD_STEP
-
-		else if (b.getTypeId() == 156)// QUARTZ_STAIRS
-			b.setTypeIdAndData(44, (byte) 7, false);// STEP
-
-		else if (b.getTypeId() == 163)// ACACIA_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 4, false);// WOOD_STEP
-
-		else if (b.getTypeId() == 164)// DARK_OAK_WOOD_STAIRS
-			b.setTypeIdAndData(126, (byte) 5, false);// WOOD_STEP
-
-		else b.setTypeId(44);// STEP
-
-		changedBlock = b.getState();
+		return b.getState();
 	}
 
-	public void revertBlockPause(Block b) {
-		Bukkit.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(BookSuite.getInstance(),
-						new revertBlock(b), 20L);
-	}
-
-	public class revertBlock implements Runnable {
-		Block b;
-
-		revertBlock(Block block) {
-			b = block;
-		}
-
-		@SuppressWarnings("deprecation")
-		public void run() {
-			if (b.getType().equals(changedBlock.getType())) {
-				b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock
-						.getData().getData(), false);
+	private void revertBlockPause(final Block b) {
+		new BukkitRunnable() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				if (b.getType() == changedBlock.getType()) {
+					b.setTypeIdAndData(originalBlock.getTypeId(), originalBlock.getData().getData(), false);
+				}
 			}
-		}
+		}.runTaskLater(BookSuite.getInstance(), 20L);
 	}
 }

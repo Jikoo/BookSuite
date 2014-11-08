@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.Jikoo.BookSuite.BSLogger;
 import com.github.Jikoo.BookSuite.BookSuite;
@@ -117,88 +119,41 @@ public class UpdateCheck implements Listener {
 		}
 	}
 
-	public void delayUpdateCheck(CommandSender sender, boolean warn, Long length) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
-				new startUpdateCheck(sender, warn), length);
-	}
-
-	public class startUpdateCheck implements Runnable {
-		CommandSender sender;
-		boolean warn;
-
-		startUpdateCheck(CommandSender sender, boolean warn) {
-			this.sender = sender;
-			this.warn = warn;
-		}
-
-		public void run() {
-			if (plugin.hasUpdate) {
-				sender.sendMessage(plugin.updateString);
-			} else {
-				if (sender instanceof Player) {
-					asyncUpdateCheck(sender.getName(), false);
+	public void delayUpdateCheck(final CommandSender sender, final boolean warn, final Long length) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (plugin.hasUpdate) {
+					sender.sendMessage(plugin.updateString);
 				} else {
-					asyncUpdateCheck(null, false);
+					asyncUpdateCheck(sender instanceof Player ? ((Player) sender).getUniqueId() : null, false);
 				}
 			}
-		}
+		}.runTaskLater(BookSuite.getInstance(), length);
 	}
 
-	@SuppressWarnings("deprecation")
-	public void asyncUpdateCheck(String pName, boolean inform) {
-		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(plugin,
-				new doUpdateCheck(pName, inform));
+	public void asyncUpdateCheck(final UUID uuid, final boolean inform) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (checkForUpdates())
+					syncUpdateCheck(uuid, true, inform);
+				else
+					syncUpdateCheck(uuid, false, inform);
+			}
+		}.runTaskAsynchronously(BookSuite.getInstance());
 	}
 
-	public class doUpdateCheck implements Runnable {
-		String pName;
-		boolean inform;
-
-		doUpdateCheck(String pName, boolean inform) {
-			this.pName = pName;
-			this.inform = inform;
-		}
-
-		public void run() {
-			if (checkForUpdates())
-				syncUpdateCheck(pName, true, inform);
-			else
-				syncUpdateCheck(pName, false, inform);
-		}
-	}
-
-	public void syncUpdateCheck(String pName, boolean hasUpdate, boolean inform) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
-				new informUpdate(pName, hasUpdate, inform));
-	}
-
-	public class informUpdate implements Runnable {
-		String pName;
-		boolean hasUpdate;
-		boolean inform;
-
-		informUpdate(String pName, boolean hasUpdate, boolean inform) {
-			this.pName = pName;
-			this.hasUpdate = hasUpdate;
-			this.inform = inform;
-		}
-
-		public void run() {
-			if (pName != null) {
-				if (Bukkit.getPlayerExact(pName) != null) {
-					if (hasUpdate)
-						Bukkit.getPlayerExact(pName).sendMessage(update);
-					else if (inform)
-						Bukkit.getPlayerExact(pName).sendMessage(
-								ChatColor.DARK_GREEN + "BookSuite is up to date!");
-				}
-			} else {
-				if (hasUpdate)
+	public void syncUpdateCheck(final UUID uuid, final boolean hasUpdate, final boolean inform) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (uuid != null && Bukkit.getOfflinePlayer(uuid).isOnline() && hasUpdate) {
+					Bukkit.getPlayer(uuid).sendMessage(update);
+				} else if (uuid == null && hasUpdate) {
 					plugin.getServer().getConsoleSender().sendMessage(update);
-				else if (inform)
-					plugin.getServer().getConsoleSender().sendMessage(
-							ChatColor.DARK_GREEN + "BookSuite is up to date!");
+				}
 			}
-		}
+		}.runTask(BookSuite.getInstance());
 	}
 }

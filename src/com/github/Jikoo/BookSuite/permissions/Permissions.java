@@ -12,6 +12,7 @@ package com.github.Jikoo.BookSuite.permissions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,38 +21,34 @@ import org.bukkit.permissions.PermissionAttachment;
 public class Permissions {
 
 	boolean enabled = false;
-	Map<Object, PermissionAttachment> attachments =
-			new HashMap<Object, PermissionAttachment>();
+	Map<UUID, PermissionAttachment> attachments = new HashMap<UUID, PermissionAttachment>();
 
 	public void addDefaultPermissions(Player p) {
-		if (!attachments.containsKey(p.getName())) {
-			attachments.put(p.getName(),
+		if (!attachments.containsKey(p.getUniqueId())) {
+			attachments.put(p.getUniqueId(),
 					p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
 		}
-		attachments.get(p.getName()).setPermission("booksuite.default", true);
+		attachments.get(p.getUniqueId()).setPermission("booksuite.default", true);
 	}
 
 	public void addOpPermissions(Player p) {
-		if (!attachments.containsKey(p.getName())) {
-			attachments.put(p.getName(),
+		if (!attachments.containsKey(p.getUniqueId())) {
+			attachments.put(p.getUniqueId(),
 					p.addAttachment(Bukkit.getPluginManager().getPlugin("BookSuite")));
 		}
-		attachments.get(p.getName()).setPermission("booksuite.admin", true);
+		attachments.get(p.getUniqueId()).setPermission("booksuite.admin", true);
 	}
 
-	public void removePermissions(Object pName) {
-		try {
-			attachments.remove(pName).remove();
-		} catch (NullPointerException e) {
-			// Player did not have registered permissions and cannot be removed;
-			// do nothing.
+	public void removePermissions(UUID pUUID) {
+		if (attachments.containsKey(pUUID)) {
+			attachments.remove(pUUID).remove();
 		}
 	}
 
 	public void removeAllPermissions() {
-		Object[] names = this.attachments.keySet().toArray();
-		for (int i = 0; i < names.length; i++) {
-			this.removePermissions(names[i]);
+		UUID[] uuids = attachments.keySet().toArray(new UUID[0]);
+		for (int i = 0; i < uuids.length; i++) {
+			removePermissions(uuids[i]);
 		}
 	}
 }
