@@ -132,8 +132,7 @@ public class MainListener implements Listener {
 			Cauldron cauldron = (Cauldron) clicked.getState().getData();
 			if (p.getGameMode() != GameMode.CREATIVE && cauldron.isEmpty() && !p.hasPermission("booksuite.block.erase.free")) {
 				p.sendMessage(plugin.msgs.get("FAILURE_ERASE_NOWATER"));
-			} else if (p.getName().equals(bm.getAuthor()) || p.getDisplayName().equals(bm.getAuthor())
-					|| p.hasPermission("booksuite.block.erase.other")) {
+			} else if (plugin.functions.isAuthor(p, bm.getAuthor()) || p.hasPermission("booksuite.block.erase.other")) {
 				plugin.functions.unsign(p);
 				if (!p.hasPermission("booksuite.block.erase.free") && p.getGameMode() != GameMode.CREATIVE) {
 					clicked.setData((byte) (clicked.getData() - 1));
@@ -170,5 +169,6 @@ public class MainListener implements Listener {
 
 	public void disable() {
 		HandlerList.unregisterAll(this);
+		instance = null;
 	}
 }

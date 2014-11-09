@@ -23,8 +23,7 @@ public class Msgs {
 		if (f.exists()) {
 			strings = YamlConfiguration.loadConfiguration(f);
 		} else {
-			strings = YamlConfiguration.loadConfiguration(BookSuite.getInstance().getResource(
-					"strings.yml"));
+			strings = YamlConfiguration.loadConfiguration(BookSuite.getInstance().getResource("strings.yml"));
 		}
 	}
 

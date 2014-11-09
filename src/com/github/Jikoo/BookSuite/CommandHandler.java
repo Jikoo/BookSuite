@@ -74,8 +74,7 @@ public class CommandHandler implements CommandExecutor {
 				plugin.update.delayUpdateCheck(sender, true, 0L);
 				return true;
 			}
-			if (args.length >= 3 && (args[0].equals("g") || args[0].equals("give"))
-					&& CommandPermissions.GIVE.checkPermission(sender)) {
+			if (args.length >= 3 && args[0].matches("g(ive)?") && CommandPermissions.GIVE.checkPermission(sender)) {
 				give(sender, args);
 				return true;
 			}
@@ -99,7 +98,7 @@ public class CommandHandler implements CommandExecutor {
 
 		// command: /book <usage|help>
 		// prints out usage and help based on additional args
-		if (args[0].equals("usage") || args[0].equals("help")) {
+		if (args[0].matches("usage|help")) {
 			usage(p, args);
 			return true;
 		}
@@ -125,17 +124,16 @@ public class CommandHandler implements CommandExecutor {
 		}
 
 		if (args.length == 1) {
-			// command: /book <l(ist)|ls> - list all files in
+			// command: /book <l(ist|s)> - list all files in
 			// /SavedBooks/
-			if ((args[0].equals("list") || args[0].equals("ls"))
-					&& CommandPermissions.LIST.checkPermission(p)) {
+			if (args[0].matches("l(ist|s)") && CommandPermissions.LIST.checkPermission(p)) {
 				plugin.functions.listBookFilesIn(plugin.getDataFolder() + "/SavedBooks/", p);
 				// TODO list private other
 				return true;
 			}
 
 			// command: /book u(nsign) - attempt to unsign book
-			if ((args[0].equals("u") || args[0].equals("unsign"))
+			if ((args[0].matches("u(nsign)?"))
 					&& CommandPermissions.UNSIGN.checkPermission(p)) {
 				unsign(p);
 				return true;
@@ -148,32 +146,26 @@ public class CommandHandler implements CommandExecutor {
 		}
 
 		// command: /book <e(xport)|s(ave)> <filename> - attempt to save book in hand to file
-		if ((args[0].equals("e") || args[0].equals("export")
-				|| args[0].equals("s") || args[0].equals("save"))
-				&& CommandPermissions.EXPORT.checkPermission(p)) {
+		if (args[0].matches("e(xport)?|s(save)?") && CommandPermissions.EXPORT.checkPermission(p)) {
 			export(p, args);
 			return true;
 		}
 
 		// command: /book <i(mport)|f(ile)|l(oad)> <file> - attempt to import a locally saved book
-		if ((args[0].equals("f") || args[0].equals("file") || args[0].equals("l")
-				|| args[0].equals("load") || args[0].equals("import") || args[0].equals("i"))
-				&& CommandPermissions.IMPORT.checkPermission(p)) {
+		if (args[0].matches("f(ile)?|l(oad)?|i(mport)?") && CommandPermissions.IMPORT.checkPermission(p)) {
 			importLocal(p, args);
 			return true;
 		}
 
 		// command: /book u(rl) <url> - attempt to import a book from a remote location
-		if ((args[0].equals("u") || args[0].equals("url"))
-				&& CommandPermissions.IMPORT.checkPermission(p)) {
-			
+		if (args[0].matches("u(rl)?") && CommandPermissions.IMPORT.checkPermission(p)) {
+			importRemote(p, args);
 			return true;
 		}
 
 		// command: /book d(elete) <filename> - attempt to
 		// delete file
-		if ((args[0].equals("d") || args[0].equals("delete"))
-				&& CommandPermissions.DELETE.checkPermission(p)) {
+		if (args[0].matches("d(elete)?") && CommandPermissions.DELETE.checkPermission(p)) {
 			if (!args[1].contains(".")) {
 				args[1] += ".book";
 			}
@@ -184,8 +176,7 @@ public class CommandHandler implements CommandExecutor {
 
 		// command: /book t(itle) <args> - attempt to change title
 		// with additional args. Include spaces.
-		if ((args[0].equals("t") || args[0].equals("title"))
-				&& CommandPermissions.TITLE.checkPermission(p)) {
+		if (args[0].matches("t(itle)?") && CommandPermissions.TITLE.checkPermission(p)) {
 			title(p, args);
 			return true;
 		}
@@ -210,8 +201,7 @@ public class CommandHandler implements CommandExecutor {
 
 		// command: /book a(uthor) <args> - attempt to change author
 		// with additional args. Include spaces.
-		if ((args[0].equals("a") || args[0].equals("author"))
-				&& CommandPermissions.AUTHOR.checkPermission(p)) {
+		if (args[0].matches("a(author)?") && CommandPermissions.AUTHOR.checkPermission(p)) {
 			author(p, args);
 			return true;
 		}
@@ -500,7 +490,7 @@ public class CommandHandler implements CommandExecutor {
 
 		if (failure) {
 			p.sendMessage(plugin.msgs.get("UNKNOWN_TOPIC") + sb1.substring(0, sb1.length() - 2));
-			p.sendMessage(plugin.msgs.get("USAGE_TOPIC"));
+			p.sendMessage(plugin.msgs.get("USAGE_TOPICS"));
 			p.sendMessage(ChatColor.DARK_RED + listPermittedCommands(p));
 		}
 	}

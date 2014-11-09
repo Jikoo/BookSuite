@@ -23,10 +23,8 @@ public class UpdateStrings {
 	}
 
 	public boolean update() {
-		YamlConfiguration strings = YamlConfiguration.loadConfiguration(new File(plugin
-				.getDataFolder(), "strings.yml"));
-		YamlConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin
-				.getResource("strings.yml"));
+		YamlConfiguration strings = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "strings.yml"));
+		YamlConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin.getResource("strings.yml"));
 		Set<String> options = defaultStrings.getKeys(false);
 		Set<String> current = strings.getKeys(false);
 		boolean changed = false;

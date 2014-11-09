@@ -96,7 +96,7 @@ public class Functions {
 	public boolean checkCopyPermission(Player p, String a) {
 		if (p.hasPermission("booksuite.copy.other"))
 			return true;
-		if (p.hasPermission("booksuite.copy.self") && (p.getName().equals(a) || p.getDisplayName().equals(a)))
+		if (p.hasPermission("booksuite.copy.self") && isAuthor(p, a))
 			return true;
 		else if (p.hasPermission("booksuite.copy.self"))
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_PERMISSION_COPY_OTHER"));
@@ -439,7 +439,7 @@ public class Functions {
 		text = text.replaceAll("(<|\\[)(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Gg][Rr][Ee][Ee][Nn](>|\\])", ChatColor.GREEN.toString());
 		text = text.replaceAll("(<|\\[)[Aa][Qq][Uu][Aa](>|\\])", ChatColor.AQUA.toString());
 		text = text.replaceAll("(<|\\[)(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Rr][Ee][Dd](>|\\])", ChatColor.RED.toString());
-		text = text.replaceAll("(<|\\[)(([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Pp][Uu][Rr][Pp][Ll][Ee]|[Pp][Ii][Nn][Kk]|[Mm][Aa][Gg][Ee][Nn][Tt][Aa])(>|\\])", ChatColor.LIGHT_PURPLE.toString());
+		text = text.replaceAll("(<|\\[)((([Ll]|[Bb][Rr])[Ii][Gg][Hh][Tt]_?)?[Pp][Uu][Rr][Pp][Ll][Ee]|[Pp][Ii][Nn][Kk]|[Mm][Aa][Gg][Ee][Nn][Tt][Aa])(>|\\])", ChatColor.LIGHT_PURPLE.toString());
 		text = text.replaceAll("(<|\\[)[Yy][Ee][Ll][Ll][Oo][Ww](>|\\])", ChatColor.YELLOW.toString());
 		text = text.replaceAll("(<|\\[)[Ww][Hh][Ii][Tt][Ee](>|\\])", ChatColor.WHITE.toString());
 
