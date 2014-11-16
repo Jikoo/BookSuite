@@ -14,19 +14,14 @@ package com.github.Jikoo.BookSuite;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
-import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
 	protected String version;
 
-	public final int currentFile = 13;
-	public boolean hasUpdate;
-	public String updateString;
 	public Msgs msgs;
 
-	protected UpdateCheck update;
 	protected PermissionsListener perms;
 
 	public Functions functions;
@@ -62,14 +57,6 @@ public class BookSuite extends JavaPlugin {
 			perms.enable();
 		}
 
-		if (getConfig().getBoolean("update-check")) {
-			update = new UpdateCheck();
-			if (getConfig().getBoolean("login-update-check")) {
-				update.enableNotifications();
-			}
-			update.asyncUpdateCheck(null, false);
-		}
-
 		listener = MainListener.getInstance();
 		getServer().getPluginManager().registerEvents(listener, this);
 		command = CommandHandler.getInstance();
@@ -80,11 +67,6 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-
-		if (update != null) {
-			update.disableNotifications();
-			update = null;
-		}
 
 		if (perms != null)
 			perms.disable();

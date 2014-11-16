@@ -20,7 +20,6 @@ import org.bukkit.permissions.PermissionAttachment;
 
 public class Permissions {
 
-	boolean enabled = false;
 	Map<UUID, PermissionAttachment> attachments = new HashMap<UUID, PermissionAttachment>();
 
 	public void addDefaultPermissions(Player p) {

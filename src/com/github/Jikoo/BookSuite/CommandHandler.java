@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,7 +28,6 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
-import com.github.Jikoo.BookSuite.update.UpdateCheck;
 import com.github.Jikoo.BookSuite.update.UpdateConfig;
 import com.github.Jikoo.BookSuite.update.UpdateStrings;
 
@@ -47,7 +45,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public enum CommandPermissions {
-		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, GIVE, EXPORT, LIST, LOCK, DELETE, RELOAD, UPDATE;
+		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, GIVE, EXPORT, LIST, LOCK, DELETE, RELOAD;
 
 		public boolean checkPermission(CommandSender s) {
 			return (s.hasPermission("booksuite.command." + this.lName()) || !(s instanceof Player));
@@ -68,10 +66,6 @@ public class CommandHandler implements CommandExecutor {
 
 			if (args[0].equals("reload") && CommandPermissions.RELOAD.checkPermission(sender)) {
 				reload(sender);
-				return true;
-			}
-			if (args[0].equals("update") && CommandPermissions.UPDATE.checkPermission(sender)) {
-				plugin.update.delayUpdateCheck(sender, true, 0L);
 				return true;
 			}
 			if (args.length >= 3 && args[0].matches("g(ive)?") && CommandPermissions.GIVE.checkPermission(sender)) {
@@ -282,18 +276,6 @@ public class CommandHandler implements CommandExecutor {
 			}
 		}
 
-		if (plugin.getConfig().getBoolean("login-update-check")) {
-			if (plugin.update == null)
-				plugin.update = new UpdateCheck();
-			plugin.update.disableNotifications();
-			plugin.update.enableNotifications();
-		} else {
-			if (plugin.update != null) {
-				plugin.update.disableNotifications();
-				plugin.update = null;
-			}
-		}
-
 		sender.sendMessage(plugin.msgs.get("SUCCESS_RELOAD").replace("<plugin.version>", plugin.version));
 	}
 
@@ -405,6 +387,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public void give(CommandSender s, String[] args) {
+		@SuppressWarnings("deprecation") // No real alternative for getting player by name
 		Player recipient = Bukkit.getPlayer(args[1]);
 		if (recipient == null) {
 			s.sendMessage(plugin.msgs.get("FAILURE_PLAYER"));
