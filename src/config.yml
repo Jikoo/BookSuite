@@ -1,8 +1,6 @@
 # For more details about the configuration, please see
 # http://dev.bukkit.org/bukkit-plugins/booksuite/pages/default-config/
 # 
-# Please note: Mail is in an experimental state and may be subject to
-# change. For this reason, it is disabled by default.
 
 ###  PERMISSIONS  ###
 # If you use a permissions plugin and don't want ops to have all permissions, set to false and assign permissions.
@@ -26,21 +24,10 @@ enable-erasers: true
 # This allows players to sign books as <team prefix><display name><team suffix>.
 # 
 # N.B. To support prefix and suffix changes, when checking if the player is an author, containing the display name is enough.
-# This means the user "Minecraft" will be able to unsign books by "123Minecraft123"
+# This means the user "Minecraft" will be able to unsign books by the user "123Minecraft123"
 # 
-# N.B. This does not support Vault or any other such plugin, only Bukkit's teams.
+# N.B. This does not support Vault or any other such plugin, only vanilla Minecraft teams.
 enable-aliases: true
-
-###  UPDATE CHECK  ###
-# update-check:
-#   If true:
-#     - /book update can be used to check for updates.
-#     - updater will run when the plugin is enabled.
-# login-update-check:
-#   If true, will check for updates when a player who can use "/book update" logs in.
-#   update-check: false disables this option.
-update-check: true
-login-update-check: true
 
 ###  DEBUG  ###
 # This option will print out more information when non-gamebreaking errors occur.

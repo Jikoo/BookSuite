@@ -11,6 +11,7 @@
  ******************************************************************************/
 package com.github.Jikoo.BookSuite;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -163,7 +164,7 @@ public class CommandHandler implements CommandExecutor {
 			if (!args[1].contains(".")) {
 				args[1] += ".book";
 			}
-			plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1]);
+			new File(plugin.getDataFolder(), "/SavedBooks/" + args[1]).delete();
 			p.sendMessage(plugin.msgs.get("SUCCESS_DELETE").replace("<file.name>", args[1]));
 			return true;
 		}
@@ -343,7 +344,7 @@ public class CommandHandler implements CommandExecutor {
 			return;
 		}
 		if (overwritable.containsKey(p.getName())) {
-			plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", overwritable.get(p.getName()));
+			new File(plugin.getDataFolder(), "/SavedBooks/" + overwritable.get(p.getName())).delete();
 			if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(),
 					plugin.getDataFolder() + "/SavedBooks/", overwritable.get(p.getName()))) {
 				p.sendMessage(plugin.msgs.get("SUCCESS_EXPORT")
@@ -356,7 +357,7 @@ public class CommandHandler implements CommandExecutor {
 			p.sendMessage(plugin.msgs.get("FAILURE_OVERWRITE"));
 			return;
 		}
-		if (!plugin.filemanager.delete(plugin.getDataFolder() + "/SavedBooks/", args[1])) {
+		if (!new File(plugin.getDataFolder(), "/SavedBooks/" + args[1]).delete()) {
 			p.sendMessage(plugin.msgs.get("OVERWRITE_WARN"));
 		}
 		if (plugin.filemanager.makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(),

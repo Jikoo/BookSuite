@@ -4,6 +4,9 @@
 package com.github.Jikoo.BookSuite.update;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Set;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,7 +27,15 @@ public class UpdateStrings {
 
 	public boolean update() {
 		YamlConfiguration strings = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "strings.yml"));
-		YamlConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin.getResource("strings.yml"));
+		InputStream stream = plugin.getResource("strings.yml");
+		InputStreamReader reader = new InputStreamReader(stream);
+		YamlConfiguration defaultStrings = YamlConfiguration.loadConfiguration(reader);
+		try {
+			stream.close();
+			reader.close();
+		} catch (IOException e) {
+			BSLogger.debugWarn("Unable to close streams while reading default config!");
+		}
 		Set<String> options = defaultStrings.getKeys(false);
 		Set<String> current = strings.getKeys(false);
 		boolean changed = false;

@@ -11,24 +11,33 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Msgs {
 	private static YamlConfiguration strings;
 	public Msgs() {
-		String defaultLocation = "plugins" + File.pathSeparatorChar + "BookSuite"
-				+ File.pathSeparatorChar;
-		File f = new File(defaultLocation, "strings.yml");
-		if (f.exists()) {
-			strings = YamlConfiguration.loadConfiguration(f);
+		File f = new File(BookSuite.getInstance().getDataFolder(), "strings.yml");
+		if (!f.exists()) {
+			InputStream stream = BookSuite.getInstance().getResource("strings.yml");
+			InputStreamReader reader = new InputStreamReader(stream);
+			strings = YamlConfiguration.loadConfiguration(reader);
+			try {
+				stream.close();
+				reader.close();
+			} catch (IOException e) {
+				BSLogger.debugWarn("Unable to close streams while loading strings.yml!");
+			}
 		} else {
-			strings = YamlConfiguration.loadConfiguration(BookSuite.getInstance().getResource("strings.yml"));
+			strings = YamlConfiguration.loadConfiguration(f);
 		}
 	}
 
 	public String get(String s) {
 		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(s));
-		return msg.equals("null") ? null : msg;
+		return msg == null ? null : msg.equals("null") ? null : msg;
 	}
 }

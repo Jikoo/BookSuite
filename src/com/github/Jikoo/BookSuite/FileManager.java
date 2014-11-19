@@ -265,21 +265,6 @@ public class FileManager {
 		}
 	}
 
-	/**
-	 * Deletes specified File
-	 * 
-	 * @param directory the directory
-	 * @param filename the File name
-	 * 
-	 * @return true if successful
-	 */
-	public boolean delete(String directory, String filename) {
-		File file = new File(directory, filename);
-		if (!file.exists())
-			return false;
-		return file.delete();
-	}
-
 	protected void disable() {
 		instance = null;
 	}
