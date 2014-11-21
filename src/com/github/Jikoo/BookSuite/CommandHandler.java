@@ -212,7 +212,7 @@ public class CommandHandler implements CommandExecutor {
 		if (plugin.functions.isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
 				|| p.hasPermission("booksuite.command.title.other")) {
 			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-			bm.setTitle(plugin.functions.addColor(StringUtils.join(args, ' ', 1, args.length - 1)));
+			bm.setTitle(plugin.functions.addColor(StringUtils.join(args, ' ', 1, args.length)));
 			p.getItemInHand().setItemMeta(bm);
 			p.sendMessage(plugin.msgs.get("SUCCESS_TITLE"));
 		} else {
@@ -226,7 +226,7 @@ public class CommandHandler implements CommandExecutor {
 			return;
 		}
 		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
-		bm.setAuthor(plugin.functions.addColor(StringUtils.join(args, ' ', 1, args.length - 1)));
+		bm.setAuthor(plugin.functions.addColor(StringUtils.join(args, ' ', 1, args.length)));
 		p.getItemInHand().setItemMeta(bm);
 		return;
 	}
@@ -368,8 +368,12 @@ public class CommandHandler implements CommandExecutor {
 
 	public void importLocal(Player p, String[] args) {
 		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p,
-				plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[1]), false));
+		String bookdata = plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[1]);
+		if (bookdata == null) {
+			p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
+			return;
+		}
+		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, bookdata, false));
 		if (!newbook.hasItemMeta() || newbook.getItemMeta() == null) {
 			p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
 			return;

@@ -89,8 +89,12 @@ public class FileManager {
 		}
 		Scanner s = null;
 		StringBuilder sb = new StringBuilder();
+		File bookfile = new File(directory, file);
+		if (!bookfile.exists()) {
+			return null;
+		}
 		try {
-			s = new Scanner(new File(directory, file));
+			s = new Scanner(bookfile);
 			while (s.hasNextLine()) {
 				sb.append(s.nextLine()).append('\n');
 			}

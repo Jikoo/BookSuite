@@ -534,7 +534,7 @@ public class Functions {
 	}
 
 	public boolean isAuthor(Player p, String author) {
-		return p.getName().equals(author) || BookSuite.getInstance().getConfig().getBoolean("enable-aliases") && author.contains(p.getDisplayName());
+		return author == null || p.getName().equals(author) || BookSuite.getInstance().getConfig().getBoolean("enable-aliases") && author.contains(p.getDisplayName());
 	}
 
 	protected void disable() {
