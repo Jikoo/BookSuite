@@ -47,11 +47,8 @@ public class MainListener implements Listener {
 	 * @param event world triggered event
 	 */
 	@SuppressWarnings("deprecation")
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 
 		Player p = event.getPlayer();
 
@@ -145,11 +142,8 @@ public class MainListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onBookEdit(PlayerEditBookEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		Player player = event.getPlayer();
 
 		BookMeta bm = event.getNewBookMeta();

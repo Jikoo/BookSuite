@@ -58,11 +58,8 @@ public class PermissionsListener implements Listener {
 	}
 
 	@SuppressWarnings("deprecation") // TODO own method to avoid Bukkit's overzealous deprecation
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		if (event.getMessage().toLowerCase().contains("op")) {
 			String[] command = event.getMessage().toLowerCase().replaceAll("/", "").split(" ");
 			if (!command[0].equals("op") && !command[0].equals("deop")) {

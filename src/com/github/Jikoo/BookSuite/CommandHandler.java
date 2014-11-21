@@ -323,7 +323,7 @@ public class CommandHandler implements CommandExecutor {
 		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
 		if (plugin.getConfig().getBoolean("allow-private-saving") && args.length > 2
 				&& args[2].equalsIgnoreCase("private")) {
-			args[1] = p.getName() + '/' + args[1];
+			args[1] = p.getName() + '/' + args[1];//TODO UUID
 		}
 		if (plugin.filemanager.makeFileFromBookMeta(bm, plugin.getDataFolder() + "/SavedBooks/", args[1])) {
 			p.sendMessage(plugin.msgs.get("SUCCESS_EXPORT").replace("<book.savename>", args[1]));
