@@ -15,7 +15,6 @@
 :added aliases
 : - credits all players who edit an unsigned book
 : - sign with display name
-:added private saves (and relevant config)
 :added debug mode and cleaned up message logging
 :fixed making a press using the inbuilt function consuming stairs when in creative
 :fixed inbuilt permissions sometimes causing an error on reload

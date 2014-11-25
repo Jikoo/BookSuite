@@ -12,7 +12,6 @@
 package com.github.Jikoo.BookSuite;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -478,29 +477,14 @@ public class Functions {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_LIST_NOBOOKS"));
 			return;
 		}
-		File[] publicBooks = file.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				if (new File(dir, name).isDirectory()) {
-					return false;
-				}
-				return true;
-			}
-		});
-		File[] privateBooks = null;
-		if (BookSuite.getInstance().getConfig().getBoolean("allow-private-saving")) {
-			File privateFile = new File(file, p.getName());
-			if (privateFile.exists()) {
-				privateBooks = privateFile.listFiles();
-			}
-		}
-		if ((publicBooks == null || publicBooks.length == 0)
-				&& (privateBooks == null || privateBooks.length == 0)) {
+		File[] publicBooks = file.listFiles();
+		if (publicBooks == null || publicBooks.length == 0) {
 			p.sendMessage(BookSuite.getInstance().msgs.get("FAILURE_LIST_NOBOOKS"));
 			return;
 		}
 		String bookList = new String(); // TODO fix
 		if (publicBooks != null && publicBooks.length != 0) {
-			p.sendMessage(BookSuite.getInstance().msgs.get("SUCCESS_LIST_PUBLIC"));
+			p.sendMessage(BookSuite.getInstance().msgs.get("SUCCESS_LIST"));
 			for (File bookFile : publicBooks) {
 				bookList += bookFile.getName().replace(".book", "") + ", ";
 				// Maximum allowed characters in a server-to-client chat message is 32767.
@@ -509,20 +493,6 @@ public class Functions {
 				// 
 				// Maximum book name from in-game save is 92 characters.
 				// Server admins will just have to not be stupid.
-				if (bookList.length() > 32500) {
-					p.sendMessage(ChatColor.DARK_GREEN
-							+ bookList.substring(0, bookList.length() - 2));
-					bookList = new String();
-				}
-			}
-			p.sendMessage(ChatColor.DARK_GREEN + bookList.substring(0, bookList.length() - 2));
-		}
-		if (privateBooks != null && privateBooks.length != 0) {
-			bookList = new String();
-			p.sendMessage(BookSuite.getInstance().msgs.get("SUCCESS_LIST_PRIVATE"));
-			for (File bookFile : privateBooks) {
-				bookList += bookFile.getName().replace(".book", "") + ", ";
-
 				if (bookList.length() > 32500) {
 					p.sendMessage(ChatColor.DARK_GREEN
 							+ bookList.substring(0, bookList.length() - 2));
