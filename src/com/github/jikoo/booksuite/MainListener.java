@@ -9,7 +9,7 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite;
+package com.github.jikoo.booksuite;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -27,7 +27,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.material.Cauldron;
 import org.bukkit.scoreboard.Team;
 
-import com.github.Jikoo.BookSuite.copy.PrintingPress;
+import com.github.jikoo.booksuite.copy.PrintingPress;
 
 public class MainListener implements Listener {
 

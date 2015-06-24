@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.Jikoo.BookSuite.update;
+package com.github.jikoo.booksuite.update;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.github.Jikoo.BookSuite.BSLogger;
-import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.jikoo.booksuite.BSLogger;
+import com.github.jikoo.booksuite.BookSuite;
 
 /**
  * @author Jikoo

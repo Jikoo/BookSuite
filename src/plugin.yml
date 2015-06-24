@@ -1,11 +1,11 @@
 name: BookSuite
 
-main: com.github.Jikoo.BookSuite.BookSuite
+main: com.github.jikoo.booksuite.BookSuite
 version: 4.0.0
-author: Adam Gunn (PlanarWarp/Jikoo)
+author: Adam Gunn (Jikoo)
 authors: [Ted Meyer (tmathmeyer)]
 description: A large collection of book-related functions.
-website: http://dev.bukkit.org/server-mods/booksuite/
+website: http://dev.bukkit.org/bukkit-plugins/booksuite/
 
 permissions:
  booksuite.admin:

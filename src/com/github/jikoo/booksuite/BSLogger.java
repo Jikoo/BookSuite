@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
-package com.github.Jikoo.BookSuite;
+package com.github.jikoo.booksuite;
 
 import org.bukkit.Bukkit;
 

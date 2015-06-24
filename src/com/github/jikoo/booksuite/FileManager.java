@@ -9,7 +9,7 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite;
+package com.github.jikoo.booksuite;
 
 import java.io.File;
 import java.io.FileNotFoundException;

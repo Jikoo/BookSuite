@@ -9,7 +9,7 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.copy;
+package com.github.jikoo.booksuite.copy;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,7 +17,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.jikoo.booksuite.BookSuite;
 
 public class PrintingPress {
 

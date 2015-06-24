@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.permissions;
+package com.github.jikoo.booksuite.permissions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.jikoo.booksuite.BookSuite;
 
 public class PermissionsListener implements Listener {
 	Permissions permissions;
@@ -57,7 +57,6 @@ public class PermissionsListener implements Listener {
 		}.runTask(BookSuite.getInstance());
 	}
 
-	@SuppressWarnings("deprecation") // TODO own method to avoid Bukkit's overzealous deprecation
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (event.getMessage().toLowerCase().contains("op")) {
@@ -99,7 +98,6 @@ public class PermissionsListener implements Listener {
 		}
 	}
 
-	@SuppressWarnings("deprecation") // TODO own method to avoid Bukkit's overzealous deprecation
 	@EventHandler
 	public void onConsoleCommand(ServerCommandEvent event) {
 		if (event.getCommand().toLowerCase().contains("op")) {

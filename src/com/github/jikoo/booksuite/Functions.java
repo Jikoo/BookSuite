@@ -9,7 +9,7 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite;
+package com.github.jikoo.booksuite;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -127,7 +127,6 @@ public class Functions {
 	 * 
 	 * @param p the player
 	 */
-	@SuppressWarnings("deprecation")
 	public void copy(Player p, int quantity) {
 		ItemStack duplicate = p.getItemInHand().clone();
 		duplicate.setAmount(duplicate.getMaxStackSize());

@@ -8,7 +8,7 @@
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.permissions;
+package com.github.jikoo.booksuite.permissions;
 
 import java.util.HashMap;
 import java.util.Map;

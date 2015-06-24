@@ -9,7 +9,7 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite;
+package com.github.jikoo.booksuite;
 
 import java.io.File;
 import java.net.URL;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,9 +29,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
-import com.github.Jikoo.BookSuite.update.UpdateConfig;
-import com.github.Jikoo.BookSuite.update.UpdateStrings;
+import com.github.jikoo.booksuite.permissions.PermissionsListener;
+import com.github.jikoo.booksuite.update.UpdateConfig;
+import com.github.jikoo.booksuite.update.UpdateStrings;
 
 public class CommandHandler implements CommandExecutor {
 
@@ -61,6 +62,7 @@ public class CommandHandler implements CommandExecutor {
 		}
 	}
 
+	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length >= 1) {
 			args[0] = args[0].toLowerCase();
@@ -388,7 +390,6 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public void give(CommandSender s, String[] args) {
-		@SuppressWarnings("deprecation") // No real alternative for getting player by name
 		Player recipient = Bukkit.getPlayer(args[1]);
 		if (recipient == null) {
 			s.sendMessage(plugin.msgs.get("FAILURE_PLAYER"));
@@ -509,6 +510,7 @@ public class CommandHandler implements CommandExecutor {
 
 	public void asyncBookImport(final Player p, final String s) {
 		new BukkitRunnable() {
+			@Override
 			public void run() {
 				BookMeta bm;
 				StringBuilder sb = new StringBuilder();
@@ -530,6 +532,7 @@ public class CommandHandler implements CommandExecutor {
 
 	public void syncBookImport(final Player p, final BookMeta bm) {
 		new BukkitRunnable() {
+			@Override
 			public void run() {
 				ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
 				if (bm.hasPages()) {
@@ -559,6 +562,7 @@ public class CommandHandler implements CommandExecutor {
 
 	public void syncOverwriteTimer(final Player p) {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+			@Override
 			public void run() {
 				if (overwritable.containsKey(p.getName())) {
 					overwritable.remove(p.getName());

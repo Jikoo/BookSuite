@@ -9,13 +9,13 @@
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
-package com.github.Jikoo.BookSuite;
+package com.github.jikoo.booksuite;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.Jikoo.BookSuite.permissions.PermissionsListener;
-import com.github.Jikoo.BookSuite.update.UpdateConfig;
-import com.github.Jikoo.BookSuite.update.UpdateStrings;
+import com.github.jikoo.booksuite.permissions.PermissionsListener;
+import com.github.jikoo.booksuite.update.UpdateConfig;
+import com.github.jikoo.booksuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
 	protected String version;

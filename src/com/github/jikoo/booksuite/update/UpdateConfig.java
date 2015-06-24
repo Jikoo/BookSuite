@@ -8,11 +8,11 @@
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
-package com.github.Jikoo.BookSuite.update;
+package com.github.jikoo.booksuite.update;
 
 import java.util.Set;
 
-import com.github.Jikoo.BookSuite.BookSuite;
+import com.github.jikoo.booksuite.BookSuite;
 
 public class UpdateConfig {
 
