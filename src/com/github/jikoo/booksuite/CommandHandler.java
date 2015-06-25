@@ -47,7 +47,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	public enum CommandPermissions {
-		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, GIVE, EXPORT, LIST, LOCK, DELETE, RELOAD;
+		EDIT, AUTHOR, TITLE, COPY, UNSIGN, IMPORT, GIVE, EXPORT, LIST, DELETE, RELOAD;
 
 		public boolean checkPermission(CommandSender s) {
 			return (s.hasPermission("booksuite.command." + this.lName()) || !(s instanceof Player));
