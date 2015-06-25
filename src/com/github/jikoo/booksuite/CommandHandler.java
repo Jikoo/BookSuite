@@ -366,12 +366,18 @@ public class CommandHandler implements CommandExecutor {
 
 	public void importLocal(Player p, String[] args) {
 		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
-		String bookdata = plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[1]);
-		if (bookdata == null) {
+		File directory = new File(plugin.getDataFolder(), "SavedBooks");
+		if (!directory.exists()) {
 			p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
 			return;
 		}
-		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p, bookdata, false));
+		File bookFile = new File(directory, args[2].contains(".") ? args[2] : args[2] + ".book");
+		if (!bookFile.exists()) {
+			p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
+			return;
+		}
+		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(p,
+				plugin.filemanager.getFileData(bookFile), false));
 		if (!newbook.hasItemMeta() || newbook.getItemMeta() == null) {
 			p.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
 			return;
@@ -396,8 +402,18 @@ public class CommandHandler implements CommandExecutor {
 			return;
 		}
 		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
+		File directory = new File(plugin.getDataFolder(), "SavedBooks");
+		if (!directory.exists()) {
+			s.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
+			return;
+		}
+		File bookFile = new File(directory, args[2].contains(".") ? args[2] : args[2] + ".book");
+		if (!bookFile.exists()) {
+			s.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
+			return;
+		}
 		newbook.setItemMeta(plugin.filemanager.makeBookMetaFromText(s,
-				plugin.filemanager.getFileData(plugin.getDataFolder() + "/SavedBooks/", args[2]), false));
+				plugin.filemanager.getFileData(bookFile), false));
 		if (!newbook.hasItemMeta() || newbook.getItemMeta() == null) {
 			s.sendMessage(plugin.msgs.get("FAILURE_FILE_NONEXISTANT"));
 			return;

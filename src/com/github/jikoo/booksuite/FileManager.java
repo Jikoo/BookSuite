@@ -83,18 +83,14 @@ public class FileManager {
 		return text;
 	}
 
-	public String getFileData(String directory, String file) {
-		if (!file.contains(".")) {
-			file += ".book";
+	public String getFileData(File file) {
+		if (!file.exists()) {
+			throw new RuntimeException("Requested file does not exist: " + file.getAbsolutePath() + File.pathSeparator + file.getName());
 		}
 		Scanner s = null;
 		StringBuilder sb = new StringBuilder();
-		File bookfile = new File(directory, file);
-		if (!bookfile.exists()) {
-			return null;
-		}
 		try {
-			s = new Scanner(bookfile);
+			s = new Scanner(file);
 			while (s.hasNextLine()) {
 				sb.append(s.nextLine()).append('\n');
 			}
