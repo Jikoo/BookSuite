@@ -198,7 +198,7 @@ public class CommandHandler implements CommandExecutor {
 
 		// command: /book a(uthor) <args> - attempt to change author
 		// with additional args. Include spaces.
-		if (args[0].matches("a(author)?") && CommandPermissions.AUTHOR.checkPermission(p)) {
+		if (args[0].matches("a(uthor)?") && CommandPermissions.AUTHOR.checkPermission(p)) {
 			author(p, args);
 			return true;
 		}
