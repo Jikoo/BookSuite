@@ -74,7 +74,6 @@ public class CommandHandler implements CommandExecutor {
 					.replace("<plugin.version>", plugin.getDescription().getVersion()));
 			sender.sendMessage(plugin.getMessages().get("HELP_CONSOLE_GIVE"));
 			sender.sendMessage(plugin.getMessages().get("HELP_CONSOLE_RELOAD"));
-			sender.sendMessage(plugin.getMessages().get("HELP_CONSOLE_UPDATE"));
 			return true;
 		}
 
