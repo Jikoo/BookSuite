@@ -24,8 +24,3 @@ enable-erasers: true
 # 
 # N.B. This does not support Vault or any other such plugin, only vanilla Minecraft teams.
 enable-aliases: true
-
-###  DEBUG  ###
-# This option will print out more information when non-gamebreaking errors occur.
-# If you see odd messages from BookSuite in your logs, please enable this and report the results.
-debug-mode: false

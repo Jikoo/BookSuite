@@ -54,7 +54,7 @@ public class PermissionsListener implements Listener {
 					permissions.addDefaultPermissions(player.getPlayer());
 				}
 			}
-		}.runTask(BookSuite.getInstance());
+		}.runTask(plugin);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -94,7 +94,7 @@ public class PermissionsListener implements Listener {
 						}
 					}
 				}
-			}.runTask(BookSuite.getInstance());
+			}.runTask(plugin);
 		}
 	}
 
@@ -129,7 +129,7 @@ public class PermissionsListener implements Listener {
 							}
 						}
 					}
-				}.runTask(BookSuite.getInstance());
+				}.runTask(plugin);
 			}
 		}
 	}

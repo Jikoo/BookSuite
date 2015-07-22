@@ -34,7 +34,7 @@ public class UpdateStrings {
 			stream.close();
 			reader.close();
 		} catch (IOException e) {
-			BSLogger.debugWarn("Unable to close streams while reading default config!");
+			BSLogger.warn("Unable to close streams while reading default config!");
 		}
 		Set<String> options = defaultStrings.getKeys(false);
 		Set<String> current = strings.getKeys(false);

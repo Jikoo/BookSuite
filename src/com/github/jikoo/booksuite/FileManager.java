@@ -27,6 +27,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class FileManager {
 
+	private final BookSuite plugin;
+
+	protected FileManager(BookSuite plugin) {
+		this.plugin = plugin;
+	}
+
 	/**
 	 * Makes a BookMeta from text. Text is read from a plaintext File file
 	 * stored in the directory location. If the file is read from a URL,
@@ -72,7 +78,7 @@ public class FileManager {
 				} else if (line.contains("<page>")) {
 					page = "";
 				} else if (line.contains("</page>")) {
-					text.addPage(BookSuite.getInstance().functions.parseBML(page));
+					text.addPage(plugin.getFunctions().parseBML(page));
 				} else {
 					page += line + "<n>";
 				}
@@ -263,23 +269,5 @@ public class FileManager {
 			BSLogger.err(e);
 			return true;
 		}
-	}
-
-	protected void disable() {
-		instance = null;
-	}
-
-	/** The FileManager instance. */
-	private static FileManager instance;
-
-	/**
-	 * Gets the single instance of FileManager.
-	 * 
-	 * @return single instance of FileManager
-	 */
-	protected static FileManager getInstance() {
-		if (instance == null)
-			instance = new FileManager();
-		return instance;
 	}
 }

@@ -17,7 +17,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerEditBookEvent;
@@ -31,14 +30,10 @@ import com.github.jikoo.booksuite.copy.PrintingPress;
 
 public class MainListener implements Listener {
 
-	BookSuite plugin = BookSuite.getInstance();
+	private final BookSuite plugin;
 
-	private static MainListener instance;
-
-	protected static MainListener getInstance() {
-		if (instance == null)
-			instance = new MainListener();
-		return instance;
+	protected MainListener(BookSuite plugin) {
+		this.plugin = plugin;
 	}
 
 	/**
@@ -62,23 +57,22 @@ public class MainListener implements Listener {
 		Block clicked = event.getClickedBlock();
 
 		// PRESS OPERATION
-		if (plugin.functions.isPrintingPress(clicked)) {
-			PrintingPress press = new PrintingPress(clicked);
+		if (plugin.getFunctions().isPrintingPress(clicked)) {
 
 			if (p.hasPermission("booksuite.denynowarn.press")) {
 				return;
 			}
 
 			if (!p.hasPermission("booksuite.copy.self")) {
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_COPY"));
+				p.sendMessage(plugin.getMessages().get("FAILURE_PERMISSION_COPY"));
 				event.setCancelled(true);
 				return;
 			}
 
-			if (is.getType() == Material.MAP && plugin.functions.canObtainMap(p)) {
-				press.operatePress();
-				plugin.functions.copy(p, 1);
-				p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+			if (is.getType() == Material.MAP && plugin.getFunctions().canObtainMap(p)) {
+				new PrintingPress(plugin, clicked).operate();
+				plugin.getFunctions().copy(p, 1);
+				p.sendMessage(plugin.getMessages().get("SUCCESS_COPY"));
 				event.setCancelled(true);
 				return;
 			}
@@ -86,11 +80,11 @@ public class MainListener implements Listener {
 			if (is.getType() == Material.WRITTEN_BOOK || is.getType() == Material.BOOK_AND_QUILL) {
 				BookMeta bm = (BookMeta) is.getItemMeta();
 
-				if (plugin.functions.checkCopyPermission(p, bm.getAuthor())
-						&& plugin.functions.canObtainBook(p)) {
-					press.operatePress();
-					plugin.functions.copy(p, 1);
-					p.sendMessage(plugin.msgs.get("SUCCESS_COPY"));
+				if (plugin.getFunctions().checkCopyPermission(p, bm.getAuthor())
+						&& plugin.getFunctions().canObtainBook(p)) {
+					new PrintingPress(plugin, clicked).operate();
+					plugin.getFunctions().copy(p, 1);
+					p.sendMessage(plugin.getMessages().get("SUCCESS_COPY"));
 				}
 				event.setCancelled(true);
 				return;
@@ -99,8 +93,8 @@ public class MainListener implements Listener {
 		}
 
 		// PRESS EASY CREATION
-		if (plugin.functions.canMakePress(clicked, event.getBlockFace(), is, p)) {
-			clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(), plugin.functions.getCorrectStairOrientation(p), true);
+		if (plugin.getFunctions().canMakePress(clicked, event.getBlockFace(), is, p)) {
+			clicked.getRelative(BlockFace.UP).setTypeIdAndData(is.getTypeId(), plugin.getFunctions().getCorrectStairOrientation(p), true);
 			if (p.getGameMode() != GameMode.CREATIVE) {
 				if (is.getAmount() == 1) {
 					p.setItemInHand(null);
@@ -114,28 +108,28 @@ public class MainListener implements Listener {
 		}
 
 		// ERASER
-		if (plugin.functions.canErase(clicked, is)) {
+		if (plugin.getFunctions().canErase(clicked, is)) {
 			BookMeta bm = (BookMeta) is.getItemMeta();
 
 			if (p.hasPermission("booksuite.denynowarn.erase")) {
 				return;
 			}
 			if (!p.hasPermission("booksuite.block.erase")) {
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE"));
+				p.sendMessage(plugin.getMessages().get("FAILURE_PERMISSION_ERASE"));
 				event.setCancelled(true);
 				return;
 			}
 
 			Cauldron cauldron = (Cauldron) clicked.getState().getData();
 			if (p.getGameMode() != GameMode.CREATIVE && cauldron.isEmpty() && !p.hasPermission("booksuite.block.erase.free")) {
-				p.sendMessage(plugin.msgs.get("FAILURE_ERASE_NOWATER"));
-			} else if (plugin.functions.isAuthor(p, bm.getAuthor()) || p.hasPermission("booksuite.block.erase.other")) {
-				plugin.functions.unsign(p);
+				p.sendMessage(plugin.getMessages().get("FAILURE_ERASE_NOWATER"));
+			} else if (plugin.getFunctions().isAuthor(p, bm.getAuthor()) || p.hasPermission("booksuite.block.erase.other")) {
+				plugin.getFunctions().unsign(p);
 				if (!p.hasPermission("booksuite.block.erase.free") && p.getGameMode() != GameMode.CREATIVE) {
 					clicked.setData((byte) (clicked.getData() - 1));
 				}
 			} else {
-				p.sendMessage(plugin.msgs.get("FAILURE_PERMISSION_ERASE_OTHER"));
+				p.sendMessage(plugin.getMessages().get("FAILURE_PERMISSION_ERASE_OTHER"));
 			}
 			event.setCancelled(true);
 			return;
@@ -151,18 +145,18 @@ public class MainListener implements Listener {
 		if (event.isSigning() && plugin.getConfig().getBoolean("enable-aliases") && player.hasPermission("booksuite.sign.alias")) {
 			Team team = event.getPlayer().getScoreboard().getPlayerTeam(player);
 			StringBuilder name = new StringBuilder();
-			name.append(team != null ? team.getPrefix() : "").append(player.getDisplayName()).append(team != null ? team.getSuffix() : "");
+			if (team != null) {
+				name.append(team.getPrefix());
+			}
+			if (team != null) {
+				name.append(team.getSuffix());
+			}
 			bm.setAuthor(name.toString());
 			if (event.getPlayer().hasPermission("booksuite.sign.color") && bm.hasTitle()) {
-				bm.setTitle(Functions.getInstance().addColor(bm.getTitle()));
+				bm.setTitle(plugin.getFunctions().addColor(bm.getTitle()));
 			}
 		}
 
 		event.setNewBookMeta(bm);
-	}
-
-	public void disable() {
-		HandlerList.unregisterAll(this);
-		instance = null;
 	}
 }

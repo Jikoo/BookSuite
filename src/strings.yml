@@ -2,8 +2,7 @@
 # 
 # To use apostrophes in messages, you must use two: 'This is how it''s done.'
 # 
-# Please note: Variables such as <player> and <book.savename>
-# are not available for all messages!
+# Variables such as <player> and <book.savename> are not available for all messages!
 # 
 # BML can be used for colors in all messages.
 FAILURE_COMMAND_NEEDBAQ: '<darkred>You must be holding a book and quill to use this command!'
@@ -20,8 +19,10 @@ FAILURE_EDIT_NOBAQ: '<darkred>You must be holding a book and quill to use this c
 FAILURE_ERASE_NOWATER: '<darkred>You''ll need some water to unsign this book.'
 FAILURE_FILE_EXISTANT: '<darkred>A book by this name already exists!'
 FAILURE_FILE_NONEXISTANT: '<darkred>Error reading book file. Does it exist?'
+FAILURE_IMPORT_URL: '<darkred>Error reading from URL.'
 FAILURE_LIST_NOBOOKS: '<darkred>No books are saved!'
 FAILURE_OVERWRITE: '<darkred>What are you trying to overwrite? Use the save function.'
+FAILURE_OVERWRITE_TIME: '<darkred>Overwrite time expired!'
 FAILURE_PERMISSION_COPY: '<darkred>You do not have permission to copy that!'
 FAILURE_PERMISSION_COPY_OTHER: '<darkred>You do not have permission to copy others'' books.'
 FAILURE_PERMISSION_ERASE: '<darkred>You do not have permission to use erasers.'
@@ -30,9 +31,7 @@ FAILURE_PERMISSION_TITLE_OTHER: '<darkred>You do not have permission to rename o
 FAILURE_PERMISSION_UNSIGN_OTHER: '<darkred>You do not have permission to unsign others'' books!'
 FAILURE_PLAYER: '<darkred>Unknown player!'
 FAILURE_SPACE: '<darkred>No free inventory space!'
-FAILURE_UNLOCK_ALREADY: '<darkred>This book is not locked!'
 FAILURE_USAGE: '<darkred>Proper usage: '
-LOCK: '<darkred>Locked Book'
 HELP_CONSOLE_GIVE: '<aqua>book g(ive) <player> <savename><darkgreen> - give specified player a book.'
 HELP_CONSOLE_RELOAD: '<aqua>book reload<darkgreen> - reload the plugin.'
 HELP_CONSOLE_UPDATE: '<aqua>book update<darkgreen> - check for plugin updates.'
@@ -49,7 +48,6 @@ SUCCESS_GIVE_RECIEVE: '<darkgreen><sender> just gave you <book.title>!'
 SUCCESS_IMPORT: '<darkgreen>Imported <book.savename> successfully!'
 SUCCESS_IMPORT_INITIATED: '<darkgreen>Attempting to import.'
 SUCCESS_LIST: '<darkgreen>Saved books: '
-SUCCESS_LOCK: '<darkgreen>Book locked!'
 SUCCESS_RELOAD: '<aqua>BookSuite v<darkpurple><plugin.version><aqua> reloaded!'
 SUCCESS_TITLE: '<darkgreen>Title changed!'
 SUCCESS_UNLOCK: '<darkgreen>Book unlocked!'

@@ -11,6 +11,7 @@
  ******************************************************************************/
 package com.github.jikoo.booksuite;
 
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.jikoo.booksuite.permissions.PermissionsListener;
@@ -18,27 +19,16 @@ import com.github.jikoo.booksuite.update.UpdateConfig;
 import com.github.jikoo.booksuite.update.UpdateStrings;
 
 public class BookSuite extends JavaPlugin {
-	protected String version;
 
-	public Msgs msgs;
-
-	protected PermissionsListener perms;
-
-	public Functions functions;
-	public FileManager filemanager;
-
+	private Messages msgs;
+	private Functions functions;
+	private FileManager filemanager;
+	private PermissionsListener perms;
 	private MainListener listener;
 	private CommandHandler command;
 
-
-	private static BookSuite instance;
-
 	@Override
 	public void onEnable() {
-		version = this.getDescription().getVersion();
-
-		instance = this;
-
 		saveDefaultConfig();
 
 		if (new UpdateConfig(this).update()) {
@@ -47,48 +37,40 @@ public class BookSuite extends JavaPlugin {
 		if (new UpdateStrings(this).update()) {
 			BSLogger.info("More customization has been added to strings.yml.");
 		}
-		msgs = new Msgs();
 
-		functions = Functions.getInstance();
-		filemanager = FileManager.getInstance();
+		msgs = new Messages(this);
+		functions = new Functions(this);
+		filemanager = new FileManager(this);
 
 		if (getConfig().getBoolean("use-inbuilt-permissions")) {
 			perms = new PermissionsListener(this);
 			perms.enable();
 		}
 
-		listener = MainListener.getInstance();
+		listener = new MainListener(this);
 		getServer().getPluginManager().registerEvents(listener, this);
-		command = CommandHandler.getInstance();
+		command = new CommandHandler(this);
 		getCommand("book").setExecutor(command);
+	}
 
-		BSLogger.info(new StringBuilder("BookSuite v").append(version).append(" enabled").toString());
+	public FileManager getFileManager() {
+		return this.filemanager;
+	}
+
+	public Functions getFunctions() {
+		return this.functions;
+	}
+
+	public Messages getMessages() {
+		return this.msgs;
 	}
 
 	@Override
 	public void onDisable() {
-
-		if (perms != null)
+		if (perms != null) {
 			perms.disable();
-		perms = null;
-
-		command = null;
-
-		functions.disable();
-		functions = null;
-
-		filemanager.disable();
-		filemanager = null;
-
-		listener.disable();
-		listener = null;
-
-		instance = null;
-
-		BSLogger.info(new StringBuilder("BookSuite v").append(version).append(" disabled").toString());
-	}
-
-	public static BookSuite getInstance() {
-		return instance;
+			perms = null;
+		}
+		HandlerList.unregisterAll(this);
 	}
 }

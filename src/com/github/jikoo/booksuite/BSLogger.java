@@ -13,6 +13,7 @@ package com.github.jikoo.booksuite;
 import org.bukkit.Bukkit;
 
 public class BSLogger {
+
 	/**
 	 * A small utility to replace BookSuite.getInstance().getLogger.info()
 	 * <p>
@@ -32,25 +33,7 @@ public class BSLogger {
 		Bukkit.getLogger().severe("[BookSuite] " + msg);
 	}
 
-	public static void debugInfo(String msg) {
-		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
-			return;
-		}
-		Bukkit.getConsoleSender().sendMessage("[BookSuite Debug] " + msg);
-	}
-
-	public static void debugWarn(String msg) {
-		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
-			return;
-		}
-		Bukkit.getLogger().warning("[BookSuite Debug] " + msg);
-	}
-
 	public static void err(Exception e) {
-		if (!BookSuite.getInstance().getConfig().getBoolean("debug-mode")) {
-			return;
-		}
-
 		warn(assemble(e));
 	}
 

@@ -17,19 +17,23 @@ import java.io.InputStreamReader;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class Msgs {
-	private static YamlConfiguration strings;
-	public Msgs() {
-		File f = new File(BookSuite.getInstance().getDataFolder(), "strings.yml");
+public class Messages {
+
+	private final YamlConfiguration strings;
+	private final BookSuite plugin;
+
+	public Messages(BookSuite plugin) {
+		this.plugin = plugin;
+		File f = new File(plugin.getDataFolder(), "strings.yml");
 		if (!f.exists()) {
-			InputStream stream = BookSuite.getInstance().getResource("strings.yml");
+			InputStream stream = plugin.getResource("strings.yml");
 			InputStreamReader reader = new InputStreamReader(stream);
 			strings = YamlConfiguration.loadConfiguration(reader);
 			try {
 				stream.close();
 				reader.close();
 			} catch (IOException e) {
-				BSLogger.debugWarn("Unable to close streams while loading strings.yml!");
+				BSLogger.warn("Unable to close streams while loading strings.yml!");
 			}
 		} else {
 			strings = YamlConfiguration.loadConfiguration(f);
@@ -37,7 +41,7 @@ public class Msgs {
 	}
 
 	public String get(String s) {
-		String msg = BookSuite.getInstance().functions.parseBML(strings.getString(s));
+		String msg = plugin.getFunctions().parseBML(strings.getString(s));
 		return msg == null ? null : msg.equals("null") ? null : msg;
 	}
 }

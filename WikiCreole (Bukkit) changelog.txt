@@ -1,9 +1,16 @@
-;4.0.0
+;[[https://github.com/Jikoo/BookSuite/releases/tag/4.0.2|4.0.2]]
+:Fixed /book load not working properly
+:Removed debug-mode config option
+:Refactored a lot of internals
+;[[https://github.com/Jikoo/BookSuite/releases/tag/4.0.1|4.0.1]]
+:Fixed /book give throwing an error instead of warning a user when an invalid book is specified
+:Fixed /book author not working properly
+:Removed unused help topic
+;[[https://github.com/Jikoo/BookSuite/releases/tag/4.0.0|4.0.0]]
 :Rewrote the majority of the plugin to not be terrible
 :Removed mail - Cool idea, too messy and inconvenient in practice.
 :Stripped out a bunch of future plans, other book plugins handle them much better.
 :Aliases now only sign written books as your display name (including team prefix and suffix)
-:BML parsing now ignores case, mix as you please!
 ;3.2.0 (never functional enough for release)
 :added mail at last! (N.B. experimental; disabled by default)
 :added /book give <player> <savename> - This one's for you, gamermomoe :D
