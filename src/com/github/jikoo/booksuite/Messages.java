@@ -25,18 +25,19 @@ public class Messages {
 	public Messages(BookSuite plugin) {
 		this.plugin = plugin;
 		File f = new File(plugin.getDataFolder(), "strings.yml");
-		if (!f.exists()) {
-			InputStream stream = plugin.getResource("strings.yml");
-			InputStreamReader reader = new InputStreamReader(stream);
-			strings = YamlConfiguration.loadConfiguration(reader);
-			try {
-				stream.close();
-				reader.close();
-			} catch (IOException e) {
-				BSLogger.warn("Unable to close streams while loading strings.yml!");
-			}
-		} else {
+		if (f.exists()) {
 			strings = YamlConfiguration.loadConfiguration(f);
+		} else {
+			strings = new YamlConfiguration();
+		}
+		InputStream stream = plugin.getResource("strings.yml");
+		InputStreamReader reader = new InputStreamReader(stream);
+		strings.setDefaults(YamlConfiguration.loadConfiguration(reader));
+		try {
+			stream.close();
+			reader.close();
+		} catch (IOException e) {
+			BSLogger.warn("Unable to close streams while loading strings.yml!");
 		}
 	}
 
