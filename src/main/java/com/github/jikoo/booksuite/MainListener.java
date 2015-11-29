@@ -143,7 +143,7 @@ public class MainListener implements Listener {
 		BookMeta bm = event.getNewBookMeta();
 
 		if (event.isSigning() && plugin.getConfig().getBoolean("enable-aliases") && player.hasPermission("booksuite.sign.alias")) {
-			Team team = event.getPlayer().getScoreboard().getPlayerTeam(player);
+			Team team = event.getPlayer().getScoreboard().getTeam(player.getName());
 			StringBuilder name = new StringBuilder();
 			if (team != null) {
 				name.append(team.getPrefix());
