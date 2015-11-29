@@ -14,7 +14,6 @@ package com.github.jikoo.booksuite;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.jikoo.booksuite.permissions.PermissionsListener;
 import com.github.jikoo.booksuite.update.UpdateConfig;
 import com.github.jikoo.booksuite.update.UpdateStrings;
 
@@ -23,9 +22,6 @@ public class BookSuite extends JavaPlugin {
 	private Messages msgs;
 	private Functions functions;
 	private FileManager filemanager;
-	private PermissionsListener perms;
-	private MainListener listener;
-	private CommandHandler command;
 
 	@Override
 	public void onEnable() {
@@ -42,15 +38,8 @@ public class BookSuite extends JavaPlugin {
 		functions = new Functions(this);
 		filemanager = new FileManager(this);
 
-		if (getConfig().getBoolean("use-inbuilt-permissions")) {
-			perms = new PermissionsListener(this);
-			perms.enable();
-		}
-
-		listener = new MainListener(this);
-		getServer().getPluginManager().registerEvents(listener, this);
-		command = new CommandHandler(this);
-		getCommand("book").setExecutor(command);
+		getServer().getPluginManager().registerEvents(new MainListener(this), this);
+		getCommand("book").setExecutor(new CommandHandler(this));
 	}
 
 	public FileManager getFileManager() {
@@ -67,10 +56,6 @@ public class BookSuite extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		if (perms != null) {
-			perms.disable();
-			perms = null;
-		}
 		HandlerList.unregisterAll(this);
 	}
 }

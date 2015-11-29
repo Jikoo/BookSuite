@@ -10,19 +10,18 @@ website: http://dev.bukkit.org/bukkit-plugins/booksuite/
 permissions:
  booksuite.admin:
   description: Everything bookish and sweet!
-  default: false
+  default: op
   children:
    booksuite.free: true
-   booksuite.copy.admin: true
    booksuite.command.admin: true
    booksuite.block.erase.other: true
    booksuite.sign: true
  booksuite.default:
   description: Average Joe's permissions.
-  default: false
+  default: true
   children:
    booksuite.standard:
-    default: false
+    default: true
     children:
      booksuite.copy.default: true
      booksuite.command.default: true
@@ -32,125 +31,113 @@ permissions:
 
  booksuite.free:
   description: No cost associated with anything!
-  default: false
   children:
    booksuite.book.free:
     description: Copy and create books for free
-    default: false
    booksuite.block.erase.free:
     description: Don't use water from cauldron when erasing a book
-    default: false
 
- booksuite.copy.admin:
-  description: Copy everything copiable
-  default: false
+ booksuite.copy.default:
+  description: Default copy functions
   children:
    booksuite.copy.other:
     description: Copy all books
-    default: false
-    children:
-     booksuite.copy.self: true
-   booksuite.copy.default:
-    description: Default copy functions
-    default: false
     children:
      booksuite.copy.self:
       description: Copy own books
-      default: false
       children:
        booksuite.denynowarn.press: false
 
  booksuite.command.admin:
   description: All commands
-  default: false
   children:
    booksuite.command.default:
     description: Standard commands
-    default: false
     children:
      booksuite.command.list:
       description: List all .book files in /SavedBooks/
-      default: false
+      children:
+       booksuite.command: true
      booksuite.command.import:
       description: Make a book from file
-      default: false
+      children:
+       booksuite.command: true
      booksuite.command.export:
       description: Make a file from book
-      default: false
+      children:
+       booksuite.command: true
      booksuite.command.edit:
       description: Allow usage of addpage and delpage for book and quill editing
-      default: false
+      children:
+       booksuite.command: true
      booksuite.command.give:
       description: Allow usage of /book give <player> <book> to import for others
-      default: false
+      children:
+       booksuite.command: true
    booksuite.command.import.other:
     description: Import a book with an author other than self
-    default: false
     children:
      booksuite.command.import: true
    booksuite.command.unsign.other:
     description: Unsign books by anyone
-    default: false
     children:
      booksuite.command.unsign:
       description: Unsign books by self
-      default: false
+      children:
+       booksuite.command: true
    booksuite.command.copy.other:
     description: Copy books by anyone
-    default: false
     children:
      booksuite.command.copy:
       description: Copy books by self
-      default: false
+      children:
+       booksuite.command: true
    booksuite.command.author:
     description: Change author
-    default: false
+    children:
+     booksuite.command: true
    booksuite.command.title.other:
     description: Re-title books by anyone
-    default: false
     children:
      booksuite.command.title:
       description: Re-title books by self
-      default: false
+      children:
+       booksuite.command: true
    booksuite.command.delete:
     description: Delete a book from /SavedBooks/
-    default: false
+    children:
+     booksuite.command: true
    booksuite.command.reload:
     description: Reload the plugin
-    default: false
+    children:
+     booksuite.command: true
    booksuite.command.update:
     description: Check for updates
-    default: false
+    children:
+     booksuite.command: true
 
  booksuite.sign:
   description: All functions available on book signing
-  default: false
   children:
    booksuite.sign.color: true
    booksuite.sign.alias: true
-   booksuite.sign.other: true
 
  booksuite.block.erase.other:
   description: Erase others' books
-  default: false
   children:
    booksuite.block.erase:
     description: Erase own books
-    default: false
 
  booksuite.denynowarn:
   description: Vanilla behavior on attempted usage of "eraser" and "press"
-  default: false
   children:
    booksuite.denynowarn.press:
     description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
-    default: false
    booksuite.denynowarn.erase:
     description: Right click cauldron with book does not notify if lacking unsign perms
-    default: false
 
 commands:
  book:
-  default: true
+  permission: booksuite.command
   description: BookSuite's universal command
   aliases: [booksuite, bsuite, bs]

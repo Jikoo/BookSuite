@@ -2,10 +2,6 @@
 # http://dev.bukkit.org/bukkit-plugins/booksuite/pages/default-config/
 # 
 
-###  PERMISSIONS  ###
-# If you use a permissions plugin and don't want ops to have all permissions, set to false and assign permissions.
-use-inbuilt-permissions: true
-
 ###  PRINTING PRESS  ###
 # Set to false to globally disable the use of printing presses.
 enable-printing-presses: true
