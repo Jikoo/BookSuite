@@ -1,7 +1,7 @@
-;[[https://github.com/Jikoo/BookSuite/releases/tag/4.0.3|4.0.3]]
-:Removed the inbuilt permissions system.
-:Added the permission booksuite.command (default true) to /book. It will no longer tab complete for users without access. It will still return the customizable denial message for users with access to the command who cannot use any sub-commands.
 ;[[https://github.com/Jikoo/BookSuite/releases/tag/4.0.2|4.0.2]]
+:Changed default permission: booksuite.copy.other now defaults to true, as anyone can use vanilla means to copy any book.
+:Removed the inbuilt permissions system and relevant config option.
+:Added the permission booksuite.command (default true) to /book. It will no longer tab complete for users without access. It will still return the customizable denial message for users with access to the command who cannot use any sub-commands.
 :Fixed /book load not working properly
 :Removed debug-mode config option
 :Refactored a lot of internals
