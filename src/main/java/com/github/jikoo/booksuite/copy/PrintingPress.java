@@ -62,7 +62,6 @@ public class PrintingPress {
 			state.setRawData((byte) 7);
 		} else if (state.getType() == Material.WOOD_STAIRS) {
 			state.setType(Material.WOOD_STEP);
-			state.setRawData((byte) 0);
 		} else if (state.getType() == Material.SPRUCE_WOOD_STAIRS) {
 			state.setType(Material.WOOD_STEP);
 			state.setRawData((byte) 1);
@@ -78,16 +77,16 @@ public class PrintingPress {
 		} else if (state.getType() == Material.DARK_OAK_STAIRS) {
 			state.setType(Material.WOOD_STEP);
 			state.setRawData((byte) 5);
+		} else if (state.getType() == Material.RED_SANDSTONE_STAIRS) {
+			state.setType(Material.STONE_SLAB2);
+//		} else if (state.getType() == Material.PURPUR_STAIRS) { // TODO 1.9 support
+//			state.setType(Material.PURPUR_SLAB);
 		} else state.setType(Material.STEP);
 
 		return state;
 	}
 
 	public void operate() {
-		if (changedBlock.getData().equals(originalBlock.getData())) {
-			// Unknown stair type
-			return;
-		}
 		changedBlock.update(true);
 		new BukkitRunnable() {
 			@Override
