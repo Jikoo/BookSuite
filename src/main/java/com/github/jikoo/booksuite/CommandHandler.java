@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
@@ -34,7 +34,7 @@ public class CommandHandler implements CommandExecutor {
 	private final BookSuite plugin;
 	private final HashMap<String, String> overwritable = new HashMap<String, String>();
 
-	protected CommandHandler(BookSuite plugin) {
+	CommandHandler(BookSuite plugin) {
 		this.plugin = plugin;
 	}
 
@@ -129,10 +129,6 @@ public class CommandHandler implements CommandExecutor {
 			return invalidCommand(sender);
 		}
 
-		if (args.length < 2) {
-			return invalidCommand(sender);
-		}
-
 		// command: /book <e(xport)|s(ave)> <filename> - attempt to save book in hand to file
 		if (args[0].matches("e(xport)?|s(save)?") && CommandPermissions.EXPORT.checkPermission(p)) {
 			export(p, args);
@@ -197,40 +193,39 @@ public class CommandHandler implements CommandExecutor {
 		return invalidCommand(sender);
 	}
 
-	public void title(Player p, String[] args) {
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+	private void title(Player p, String[] args) {
+		if (!p.getInventory().getItemInMainHand().getType().equals(Material.WRITTEN_BOOK)) {
 			p.sendMessage(plugin.getMessages().get("FAILURE_COMMAND_NEEDBOOK"));
 			return;
 		}
-		if (plugin.getFunctions().isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
+		if (plugin.getFunctions().isAuthor(p, ((BookMeta)p.getInventory().getItemInMainHand().getItemMeta()).getAuthor())
 				|| p.hasPermission("booksuite.command.title.other")) {
-			BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+			BookMeta bm = (BookMeta) p.getInventory().getItemInMainHand().getItemMeta();
 			bm.setTitle(plugin.getFunctions().addColor(StringUtils.join(args, ' ', 1, args.length)));
-			p.getItemInHand().setItemMeta(bm);
+			p.getInventory().getItemInMainHand().setItemMeta(bm);
 			p.sendMessage(plugin.getMessages().get("SUCCESS_TITLE"));
 		} else {
 			p.sendMessage(plugin.getMessages().get("FAILURE_PERMISSION_TITLE_OTHER"));
 		}
 	}
 
-	public void author(Player p, String[] args) {
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+	private void author(Player p, String[] args) {
+		if (!p.getInventory().getItemInMainHand().getType().equals(Material.WRITTEN_BOOK)) {
 			p.sendMessage(plugin.getMessages().get("FAILURE_COMMAND_NEEDBOOK"));
 			return;
 		}
-		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+		BookMeta bm = (BookMeta) p.getInventory().getItemInMainHand().getItemMeta();
 		bm.setAuthor(plugin.getFunctions().addColor(StringUtils.join(args, ' ', 1, args.length)));
-		p.getItemInHand().setItemMeta(bm);
-		return;
+		p.getInventory().getItemInMainHand().setItemMeta(bm);
 	}
 
-	public void unsign(Player p) {
-		if (!p.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)
-				&& !p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+	private void unsign(Player p) {
+		if (!p.getInventory().getItemInMainHand().getType().equals(Material.WRITABLE_BOOK)
+				&& !p.getInventory().getItemInMainHand().getType().equals(Material.WRITTEN_BOOK)) {
 			p.sendMessage(plugin.getMessages().get("FAILURE_COMMAND_NEEDEITHER"));
 			return;
 		}
-		if (plugin.getFunctions().isAuthor(p, ((BookMeta)p.getItemInHand().getItemMeta()).getAuthor())
+		if (plugin.getFunctions().isAuthor(p, ((BookMeta)p.getInventory().getItemInMainHand().getItemMeta()).getAuthor())
 				|| p.hasPermission("booksuite.command.unsign.other")) {
 			plugin.getFunctions().unsign(p);
 			p.sendMessage(plugin.getMessages().get("SUCCESS_UNSIGN"));
@@ -239,7 +234,7 @@ public class CommandHandler implements CommandExecutor {
 		p.sendMessage(plugin.getMessages().get("FAILURE_PERMISSION_UNSIGN_OTHER"));
 	}
 
-	public void reload(CommandSender sender) {
+	private void reload(CommandSender sender) {
 		plugin.reloadConfig();
 
 		plugin.onDisable();
@@ -248,7 +243,7 @@ public class CommandHandler implements CommandExecutor {
 		sender.sendMessage(plugin.getMessages().get("SUCCESS_RELOAD").replace("<plugin.version>", plugin.getDescription().getVersion()));
 	}
 
-	public void copyItem(Player p, String[] args) {
+	private void copyItem(Player p, String[] args) {
 		int copies;
 		if (args.length >= 2) {
 			try {
@@ -261,7 +256,7 @@ public class CommandHandler implements CommandExecutor {
 			copies = 1;
 		}
 
-		ItemStack is = p.getItemInHand();
+		ItemStack is = p.getInventory().getItemInMainHand();
 		if (is.getType().equals(Material.MAP)) {
 			plugin.getFunctions().copy(p, copies);
 			p.sendMessage(plugin.getMessages().get("SUCCESS_COPY"));
@@ -271,7 +266,7 @@ public class CommandHandler implements CommandExecutor {
 			p.sendMessage(plugin.getMessages().get("FAILURE_COPY_UNCOPIABLE"));
 			return;
 		}
-		if (is.getType().equals(Material.WRITTEN_BOOK) || is.getType().equals(Material.BOOK_AND_QUILL)) {
+		if (is.getType().equals(Material.WRITTEN_BOOK) || is.getType().equals(Material.WRITABLE_BOOK)) {
 			BookMeta bm = (BookMeta) is.getItemMeta();
 			if (plugin.getFunctions().checkCommandCopyPermission(p, bm.getAuthor())) {
 				plugin.getFunctions().copy(p, copies);
@@ -280,15 +275,14 @@ public class CommandHandler implements CommandExecutor {
 			return;
 		}
 		p.sendMessage(plugin.getMessages().get("FAILURE_COPY_UNCOPIABLE"));
-		return;
 	}
 
-	public void export(Player p, String[] args) {
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+	private void export(Player p, String[] args) {
+		if (!p.getInventory().getItemInMainHand().getType().equals(Material.WRITTEN_BOOK)) {
 			p.sendMessage(plugin.getMessages().get("FAILURE_COMMAND_NEEDBOOK"));
 			return;
 		}
-		BookMeta bm = (BookMeta) p.getItemInHand().getItemMeta();
+		BookMeta bm = (BookMeta) p.getInventory().getItemInMainHand().getItemMeta();
 		if (plugin.getFileManager().makeFileFromBookMeta(bm, plugin.getDataFolder() + "/SavedBooks/", args[1])) {
 			p.sendMessage(plugin.getMessages().get("SUCCESS_EXPORT").replace("<book.savename>", args[1]));
 			return;
@@ -302,14 +296,14 @@ public class CommandHandler implements CommandExecutor {
 		syncOverwriteTimer(p);
 	}
 
-	public void overwrite(Player p, String[] args) {
-		if (!p.getItemInHand().getType().equals(Material.WRITTEN_BOOK)) {
+	private void overwrite(Player p, String[] args) {
+		if (!p.getInventory().getItemInMainHand().getType().equals(Material.WRITTEN_BOOK)) {
 			p.sendMessage(plugin.getMessages().get("FAILURE_COMMAND_NEEDBOOK"));
 			return;
 		}
 		if (overwritable.containsKey(p.getName())) {
 			new File(plugin.getDataFolder(), "/SavedBooks/" + overwritable.get(p.getName())).delete();
-			if (plugin.getFileManager().makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(),
+			if (plugin.getFileManager().makeFileFromBookMeta((BookMeta) p.getInventory().getItemInMainHand().getItemMeta(),
 					plugin.getDataFolder() + "/SavedBooks/", overwritable.get(p.getName()))) {
 				p.sendMessage(plugin.getMessages().get("SUCCESS_EXPORT")
 						.replace("<book.savename>", overwritable.get(p.getName())));
@@ -324,13 +318,13 @@ public class CommandHandler implements CommandExecutor {
 		if (!new File(plugin.getDataFolder(), "/SavedBooks/" + args[1]).delete()) {
 			p.sendMessage(plugin.getMessages().get("OVERWRITE_WARN"));
 		}
-		if (plugin.getFileManager().makeFileFromBookMeta((BookMeta) p.getItemInHand().getItemMeta(),
+		if (plugin.getFileManager().makeFileFromBookMeta((BookMeta) p.getInventory().getItemInMainHand().getItemMeta(),
 				plugin.getDataFolder() + "/SavedBooks/", args[1])) {
 			p.sendMessage(plugin.getMessages().get("SUCCESS_EXPORT"));
 		}
 	}
 
-	public void importLocal(Player p, String[] args) {
+	private void importLocal(Player p, String[] args) {
 		ItemStack newbook = new ItemStack(Material.WRITTEN_BOOK, 1);
 		File directory = new File(plugin.getDataFolder(), "SavedBooks");
 		if (!directory.exists()) {
@@ -354,14 +348,14 @@ public class CommandHandler implements CommandExecutor {
 		}
 	}
 
-	public void importRemote(Player p, String[] args) {
+	private void importRemote(Player p, String[] args) {
 		if (plugin.getFunctions().canObtainBook(p)) {
 			asyncBookImport(p, args[1]);
 			p.sendMessage(plugin.getMessages().get("SUCCESS_IMPORT_INITIATED"));
 		}
 	}
 
-	public void give(CommandSender s, String[] args) {
+	private void give(CommandSender s, String[] args) {
 		Player recipient = Bukkit.getPlayer(args[1]);
 		if (recipient == null) {
 			s.sendMessage(plugin.getMessages().get("FAILURE_PLAYER"));
@@ -395,7 +389,7 @@ public class CommandHandler implements CommandExecutor {
 				.replace("<book.title>", ((BookMeta) newbook.getItemMeta()).getTitle()));
 	}
 
-	public void usage(Player p, String[] args) {
+	private void usage(Player p, String[] args) {
 		if (listPermittedCommands(p).length() <= 0) {
 			return;
 		}
@@ -408,10 +402,9 @@ public class CommandHandler implements CommandExecutor {
 		StringBuilder sb1 = new StringBuilder();
 		for (String s : args) {
 			s = s.replaceAll("\\W\\z", "");
-			if (s.equals(args[0])) {} else {
+			if (!s.equals(args[0])) {
 				try {
-					CommandPermissions cdp = CommandPermissions
-							.uValueOf(s);
+					CommandPermissions cdp = CommandPermissions.uValueOf(s);
 					if (cdp.checkPermission(p)) {
 						switch (cdp) {
 						case EDIT:
@@ -433,7 +426,7 @@ public class CommandHandler implements CommandExecutor {
 						}
 					} else {
 						failure = true;
-						sb1.append(s + ", ");
+						sb1.append(s).append(", ");
 					}
 				} catch (IllegalArgumentException e) {
 					if ((s.equalsIgnoreCase("press") || s.equalsIgnoreCase("printingpress"))
@@ -449,7 +442,7 @@ public class CommandHandler implements CommandExecutor {
 							p.sendMessage(plugin.getMessages().get("USAGE_ERASER_WATER"));
 					} else {
 						failure = true;
-						sb1.append(s + ", ");
+						sb1.append(s).append(", ");
 					}
 				}
 			}
@@ -462,24 +455,22 @@ public class CommandHandler implements CommandExecutor {
 		}
 	}
 
-	public String listPermittedCommands(CommandSender s) {
+	private String listPermittedCommands(CommandSender s) {
 		StringBuilder sb = new StringBuilder();
 
 		if (s.hasPermission("booksuite.copy.self"))
-			sb.append(ChatColor.AQUA + "printingpress" + ChatColor.DARK_GREEN
-					+ ", ");
+			sb.append(ChatColor.AQUA.toString()).append("printingpress").append(ChatColor.DARK_GREEN.toString()).append(", ");
 		if (s.hasPermission("booksuite.block.erase"))
-			sb.append(ChatColor.AQUA + "eraser" + ChatColor.DARK_GREEN + ", ");
+			sb.append(ChatColor.AQUA.toString()).append("eraser").append(ChatColor.DARK_GREEN.toString()).append(", ");
 		for (CommandPermissions i : CommandPermissions.values()) {
 			if (i.checkPermission(s))
-				sb.append(ChatColor.AQUA + i.lName() + ChatColor.DARK_GREEN
-						+ ", ");
+				sb.append(ChatColor.AQUA).append(i.lName()).append(ChatColor.DARK_GREEN).append(", ");
 		}
 
 		return sb.substring(0, sb.length() - 2);
 	}
 
-	public boolean invalidCommand(CommandSender sender) {
+	private boolean invalidCommand(CommandSender sender) {
 		if (listPermittedCommands(sender).length() > 0) {
 			sender.sendMessage(plugin.getMessages().get("VERSION").replaceAll("<plugin.version>", plugin.getDescription().getVersion()));
 			sender.sendMessage(plugin.getMessages().get("USAGE_HELP"));
@@ -490,7 +481,7 @@ public class CommandHandler implements CommandExecutor {
 		return true;
 	}
 
-	public void asyncBookImport(final Player p, final String s) {
+	private void asyncBookImport(final Player p, final String s) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -498,21 +489,19 @@ public class CommandHandler implements CommandExecutor {
 				StringBuilder sb = new StringBuilder();
 				try {
 					URL url = new URL(s);
-					Scanner urlInput = new Scanner(url.openStream());;
+					Scanner urlInput = new Scanner(url.openStream());
 					while (urlInput.hasNextLine()) {
 						sb.append(urlInput.nextLine()).append('\n');
 					}
 					urlInput.close();
-				} catch (Exception e) {
-					bm = (BookMeta) new ItemStack(Material.WRITTEN_BOOK);
-				}
+				} catch (Exception e) {}
 				bm = plugin.getFileManager().makeBookMetaFromText(p, sb.toString(), true);
 				syncBookImport(p, bm);
 			}
 		}.runTaskAsynchronously(plugin);
 	}
 
-	public void syncBookImport(final Player p, final BookMeta bm) {
+	private void syncBookImport(final Player p, final BookMeta bm) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -527,11 +516,11 @@ public class CommandHandler implements CommandExecutor {
 				} else {
 					p.sendMessage(plugin.getMessages().get("FAILURE_IMPORT_URL"));
 					if (p.getInventory().firstEmpty() > 0) {
-						p.getInventory().addItem(new ItemStack(Material.INK_SACK, 1));
+						p.getInventory().addItem(new ItemStack(Material.INK_SAC, 1));
 						p.getInventory().addItem(new ItemStack(Material.BOOK, 1));
 					} else {
 						p.getWorld().dropItem(p.getLocation(),
-								new ItemStack(Material.INK_SACK, 1)).setPickupDelay(0);
+								new ItemStack(Material.INK_SAC, 1)).setPickupDelay(0);
 						p.getWorld().dropItem(p.getLocation(),
 								new ItemStack(Material.BOOK, 1)).setPickupDelay(0);
 					}
@@ -540,7 +529,7 @@ public class CommandHandler implements CommandExecutor {
 		}.runTask(plugin);
 	}
 
-	public void syncOverwriteTimer(final Player p) {
+	private void syncOverwriteTimer(final Player p) {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {

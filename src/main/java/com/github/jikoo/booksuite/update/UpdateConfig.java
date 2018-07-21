@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
@@ -16,7 +16,7 @@ import com.github.jikoo.booksuite.BookSuite;
 
 public class UpdateConfig {
 
-	BookSuite plugin;
+	private BookSuite plugin;
 
 	public UpdateConfig(BookSuite plugin) {
 		this.plugin = plugin;

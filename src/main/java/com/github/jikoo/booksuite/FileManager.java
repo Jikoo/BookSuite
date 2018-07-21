@@ -4,32 +4,28 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
  ******************************************************************************/
 package com.github.jikoo.booksuite;
 
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-
-public class FileManager {
+class FileManager {
 
 	private final BookSuite plugin;
 
-	protected FileManager(BookSuite plugin) {
+	FileManager(BookSuite plugin) {
 		this.plugin = plugin;
 	}
 
@@ -38,15 +34,14 @@ public class FileManager {
 	 * stored in the directory location. If the file is read from a URL,
 	 * additional regex is applied to prevent special characters appearing
 	 * incorrectly.
-	 * 
-	 * @param p the Player attempting to obtain a book
-	 * @param file the name of the File to read
-	 * @param location the directory of the File
+	 *
+	 * @param s the CommandSender attempting to load a book
+	 * @param fileData the BookMeta in Book Markdown Language
 	 * @param isURL the type of import
-	 * 
+	 *
 	 * @return the BookMeta created.
 	 */
-	public BookMeta makeBookMetaFromText(CommandSender s, String fileData, boolean isURL) {
+	BookMeta makeBookMetaFromText(CommandSender s, String fileData, boolean isURL) {
 		BookMeta text = (BookMeta) new ItemStack(Material.WRITTEN_BOOK, 1).getItemMeta();
 		boolean isBookText = !isURL;
 		String page = "";
@@ -70,7 +65,9 @@ public class FileManager {
 				}
 				if (line.length() >= 2 && line.substring(0, 2).equals("//")) {
 					// do nothing, this line is a book comment
-				} else if (line.contains("<author>")
+					continue;
+				}
+				if (line.contains("<author>")
 						&& (!isURL || s.hasPermission("booksuite.command.import.other"))) {
 					text.setAuthor(line.replace("<author>", "").replace("</author>", ""));
 				} else if (line.contains("<title>")) {
@@ -89,7 +86,7 @@ public class FileManager {
 		return text;
 	}
 
-	public String getFileData(File file) {
+	String getFileData(File file) {
 		if (!file.exists()) {
 			throw new RuntimeException("Requested file does not exist: " + file.getAbsolutePath() + File.pathSeparator + file.getName());
 		}
@@ -103,7 +100,7 @@ public class FileManager {
 			s.close();
 			return sb.toString();
 		} catch (FileNotFoundException e) {
-			BSLogger.err(e);
+			e.printStackTrace();
 			return null;
 		} finally {
 			if (s != null) {
@@ -113,78 +110,17 @@ public class FileManager {
 	}
 
 	/**
-	 * Makes an ItemStack from text. Text is read from a plaintext File filename
-	 * stored in the directory directory.
-	 * 
-	 * @param directory the directory of the File
-	 * @param filename the name of the File to read
-	 * 
-	 * @return the ItemStack created
-	 */
-	public ItemStack makeItemStackFromFile(String directory, String filename) {
-		ItemStack is = new ItemStack(Material.DIRT, 1);
-		ItemMeta im = is.getItemMeta();
-		try {
-			File itemFile = new File(directory, filename + ".item");
-			Scanner s = new Scanner(itemFile);
-			List<String> lore = new ArrayList<String>();
-			boolean handlingEnchants = false;
-			while (s.hasNext()) {
-				String line = s.nextLine();
-
-				if (line.contains("<TypeID>")) {
-					is.setType(Material.matchMaterial(line.replaceAll("<Type>",
-							"").replaceAll("</Type>", "")));
-				} else if (line.contains("<Amount>")) {
-					is.setAmount(Integer.parseInt(line.replaceAll("<Amount>",
-							"").replaceAll("</Amount>", "")));
-				} else if (line.contains("<Durability>")) {
-					is.setDurability((short) Integer
-							.parseInt(line.replaceAll("<Durability>", "")
-									.replaceAll("</Durability>", "")));
-				} else if (line.contains("<Lore>")) {
-					lore.clear();
-				} else if (line.contains("</Lore>")) {
-					im.setLore(lore);
-				} else if (line.contains("<DisplayName>")) {
-					im.setDisplayName(line.replaceAll("<DisplayName>", "")
-							.replaceAll("</DisplayName>", ""));
-				} else if (line.contains("<Enchantments>")) {
-					handlingEnchants = true;
-				} else if (line.contains("</Enchantments>")) {
-					break;
-				} else if (handlingEnchants) {
-					String[] enchant = line.split(":");
-					im.addEnchant(
-							Enchantment.getByName(enchant[0]),
-							Integer.parseInt(enchant[1]), true);
-				} else {
-					lore.add(line);
-				}
-			}
-			s.close();
-			is.setItemMeta(im);
-			return is;
-		} catch (Exception e) {
-			BSLogger.err(e);
-			im.setDisplayName("Item file error! My condolences.");
-			is.setItemMeta(im);
-			return is;
-		}
-	}
-
-	/**
 	 * Makes a plaintext File filename in directory directory from the contents
 	 * of BookMeta bm.
-	 * 
+	 *
 	 * @param bm the BookMeta
 	 * @param directory the directory to write to
 	 * @param filename the File to write
-	 * 
+	 *
 	 * @return true, if successful
 	 */
-	public boolean makeFileFromBookMeta(BookMeta bm, String directory,
-			String filename) {
+	boolean makeFileFromBookMeta(BookMeta bm, String directory,
+								 String filename) {
 
 		try {
 			File bookLocation = new File(directory);
@@ -202,72 +138,18 @@ public class FileManager {
 			}
 			FileWriter file = new FileWriter(bookFile);
 			file.write("<book>\n");
-			file.append("<author>" + bm.getAuthor() + "</author>\n");
-			file.append("<title>" + bm.getTitle() + "</title>\n");
+			file.append("<author>").append(bm.getAuthor()).append("</author>\n");
+			file.append("<title>").append(bm.getTitle()).append("</title>\n");
 			for (int i = 1; i <= bm.getPageCount(); i++) {
-				file.append("<page>\n" + bm.getPage(i) + "\n</page>\n");
+				file.append("<page>\n").append(bm.getPage(i)).append("\n</page>\n");
 			}
 			file.append("</book>");
 			file.close();
 			return true;
 		} catch (Exception e) {
-			BSLogger.err(e);
+			e.printStackTrace();
 			return true;
 		}
 	}
 
-	/**
-	 * Makes a plaintext File filename in directory directory from the contents
-	 * of ItemStack is.
-	 * 
-	 * @param is the ItemStack
-	 * @param directory the directory to write to
-	 * @param filename the name of the File to write
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean makeFileFromItemStack(ItemStack is, String directory,
-			String filename) {
-		try {
-			File itemLocation = new File(directory);
-			if (!itemLocation.exists())
-				itemLocation.mkdirs();
-			File itemFile = new File(itemLocation, filename + ".item");
-			if (!itemFile.exists()) {
-				itemFile.createNewFile();
-			} else {
-				return false;
-			}
-			FileWriter file = new FileWriter(itemFile);
-			file.write("<Type>" + is.getType().name() + "</Type>\n");
-			file.append("<Amount>" + is.getAmount() + "</Amount>");
-			file.append("<Durability>" + is.getDurability() + "</Durability>\n");
-			if (is.hasItemMeta()) {
-				ItemMeta im = is.getItemMeta();
-				if (im.hasDisplayName())
-					file.append("<DisplayName>" + im.getDisplayName()
-							+ "</DisplayName>\n");
-				if (im.hasLore()) {
-					List<String> loreList = im.getLore();
-					file.append("<Lore>\n");
-					for (int i = 0; i < loreList.size(); i++)
-						file.append(loreList.get(i) + "\n");
-					file.append("</Lore>\n");
-				}
-				if (im.hasEnchants()) {
-					file.append("<Enchantments>\n");
-					for (Enchantment e : Enchantment.values()) {
-						file.append(e.getName() + ":" + im.getEnchantLevel(e)
-								+ "\n");
-					}
-					file.append("</Enchantments>");
-				}
-			}
-			file.close();
-			return false;
-		} catch (Exception e) {
-			BSLogger.err(e);
-			return true;
-		}
-	}
 }

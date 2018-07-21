@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
@@ -28,10 +28,10 @@ public class BookSuite extends JavaPlugin {
 		saveDefaultConfig();
 
 		if (new UpdateConfig(this).update()) {
-			BSLogger.warn("Your configuration has been updated, please check it!");
+			this.getLogger().warning("Your configuration has been updated, please check it!");
 		}
 		if (new UpdateStrings(this).update()) {
-			BSLogger.info("More customization has been added to strings.yml.");
+			this.getLogger().info("More customization has been added to strings.yml.");
 		}
 
 		msgs = new Messages(this);
@@ -42,7 +42,7 @@ public class BookSuite extends JavaPlugin {
 		getCommand("book").setExecutor(new CommandHandler(this));
 	}
 
-	public FileManager getFileManager() {
+	FileManager getFileManager() {
 		return this.filemanager;
 	}
 
@@ -50,7 +50,7 @@ public class BookSuite extends JavaPlugin {
 		return this.functions;
 	}
 
-	public Messages getMessages() {
+	Messages getMessages() {
 		return this.msgs;
 	}
 

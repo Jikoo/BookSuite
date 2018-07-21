@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Adam Gunn
  ******************************************************************************/
@@ -17,12 +17,12 @@ import java.io.InputStreamReader;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class Messages {
+class Messages {
 
 	private final YamlConfiguration strings;
 	private final BookSuite plugin;
 
-	public Messages(BookSuite plugin) {
+	Messages(BookSuite plugin) {
 		this.plugin = plugin;
 		File f = new File(plugin.getDataFolder(), "strings.yml");
 		if (f.exists()) {
@@ -37,11 +37,11 @@ public class Messages {
 			stream.close();
 			reader.close();
 		} catch (IOException e) {
-			BSLogger.warn("Unable to close streams while loading strings.yml!");
+			System.err.println("Unable to close streams while loading strings.yml!");
 		}
 	}
 
-	public String get(String s) {
+	String get(String s) {
 		String msg = plugin.getFunctions().parseBML(strings.getString(s));
 		return msg == null ? null : msg.equals("null") ? null : msg;
 	}

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.jikoo.booksuite.update;
 
@@ -11,15 +11,14 @@ import java.util.Set;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.github.jikoo.booksuite.BSLogger;
 import com.github.jikoo.booksuite.BookSuite;
 
 /**
  * @author Jikoo
- * 
+ *
  */
 public class UpdateStrings {
-	BookSuite plugin;
+	private BookSuite plugin;
 
 	public UpdateStrings(BookSuite plugin) {
 		this.plugin = plugin;
@@ -34,7 +33,7 @@ public class UpdateStrings {
 			stream.close();
 			reader.close();
 		} catch (IOException e) {
-			BSLogger.warn("Unable to close streams while reading default config!");
+			System.err.println("Unable to close streams while reading default config!");
 		}
 		Set<String> options = defaultStrings.getKeys(false);
 		Set<String> current = strings.getKeys(false);
@@ -60,7 +59,7 @@ public class UpdateStrings {
 			try {
 				strings.save(new File(plugin.getDataFolder(), "strings.yml"));
 			} catch (Exception e) {
-				BSLogger.err(e);
+				e.printStackTrace();
 			}
 		}
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Adam Gunn - ideas and implementation
  *     Ted Meyer - IO assistance and BML (Book Markup Language)
@@ -36,53 +36,16 @@ public class PrintingPress {
 
 	/**
 	 * Turns the stair block into a slab for graphical effect.
-	 * 
-	 * @param b the stair block to be transformed
+	 *
+	 * @param block the stair block to be transformed
 	 */
-	@SuppressWarnings("deprecation") // No alternative to this yet.
 	private BlockState getStairSlabState(Block block) {
 		BlockState state = block.getState();
-		if (state.getType() == Material.SANDSTONE_STAIRS) {
-			state.setType(Material.STEP);
-			state.setRawData((byte) 1);
-		} else if (state.getType() == Material.COBBLESTONE_STAIRS) {
-			state.setType(Material.STEP);
-			state.setRawData((byte) 3);
-		} else if (state.getType() == Material.BRICK_STAIRS) {
-			state.setType(Material.STEP);
-			state.setRawData((byte) 4);
-		} else if (state.getType() == Material.SMOOTH_STAIRS) {
-			state.setType(Material.STEP);
-			state.setRawData((byte) 5);
-		} else if (state.getType() == Material.NETHER_BRICK_STAIRS) {
-			state.setType(Material.STEP);
-			state.setRawData((byte) 6);
-		} else if (state.getType() == Material.QUARTZ_STAIRS) {
-			state.setType(Material.STEP);
-			state.setRawData((byte) 7);
-		} else if (state.getType() == Material.WOOD_STAIRS) {
-			state.setType(Material.WOOD_STEP);
-		} else if (state.getType() == Material.SPRUCE_WOOD_STAIRS) {
-			state.setType(Material.WOOD_STEP);
-			state.setRawData((byte) 1);
-		} else if (state.getType() == Material.BIRCH_WOOD_STAIRS) {
-			state.setType(Material.WOOD_STEP);
-			state.setRawData((byte) 2);
-		} else if (state.getType() == Material.JUNGLE_WOOD_STAIRS) {
-			state.setType(Material.WOOD_STEP);
-			state.setRawData((byte) 3);
-		} else if (state.getType() == Material.ACACIA_STAIRS) {
-			state.setType(Material.WOOD_STEP);
-			state.setRawData((byte) 4);
-		} else if (state.getType() == Material.DARK_OAK_STAIRS) {
-			state.setType(Material.WOOD_STEP);
-			state.setRawData((byte) 5);
-		} else if (state.getType() == Material.RED_SANDSTONE_STAIRS) {
-			state.setType(Material.STONE_SLAB2);
-//		} else if (state.getType() == Material.PURPUR_STAIRS) { // TODO 1.9 support
-//			state.setType(Material.PURPUR_SLAB);
-		} else state.setType(Material.STEP);
-
+		Material newMaterial = Material.getMaterial(block.getType().name().replace("STAIRS", "SLAB"));
+		if (newMaterial == null) {
+			newMaterial = Material.STONE_SLAB;
+		}
+		state.setType(newMaterial);
 		return state;
 	}
 
