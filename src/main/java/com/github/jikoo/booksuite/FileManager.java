@@ -90,10 +90,8 @@ class FileManager {
 		if (!file.exists()) {
 			throw new RuntimeException("Requested file does not exist: " + file.getAbsolutePath() + File.pathSeparator + file.getName());
 		}
-		Scanner s = null;
 		StringBuilder sb = new StringBuilder();
-		try {
-			s = new Scanner(file);
+		try (Scanner s = new Scanner(file)) {
 			while (s.hasNextLine()) {
 				sb.append(s.nextLine()).append('\n');
 			}
@@ -102,10 +100,6 @@ class FileManager {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
-		} finally {
-			if (s != null) {
-				s.close();
-			}
 		}
 	}
 
@@ -119,8 +113,7 @@ class FileManager {
 	 *
 	 * @return true, if successful
 	 */
-	boolean makeFileFromBookMeta(BookMeta bm, String directory,
-								 String filename) {
+	boolean makeFileFromBookMeta(BookMeta bm, String directory, String filename) {
 
 		try {
 			File bookLocation = new File(directory);

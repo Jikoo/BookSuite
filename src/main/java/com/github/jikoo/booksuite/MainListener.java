@@ -152,21 +152,18 @@ public class MainListener implements Listener {
 		// EASY PRESS CREATION
 		final Block block = event.getBlock();
 		final BlockState state = event.getBlock().getState();
-		Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
-			@Override
-			public void run() {
+		Bukkit.getScheduler().runTask(this.plugin, () -> {
 
-				if (!block.getState().equals(state)) {
-					// Ensure block has not been changed - event cancellation, etc.
-					return;
-				}
-				BlockData data = block.getBlockData();
-				if (!(data instanceof Bisected)) {
-					return;
-				}
-				((Bisected) data).setHalf(Bisected.Half.TOP);
-				block.setBlockData(data, true);
+			if (!block.getState().equals(state)) {
+				// Ensure block has not been changed - event cancellation, etc.
+				return;
 			}
+			BlockData data = block.getBlockData();
+			if (!(data instanceof Bisected)) {
+				return;
+			}
+			((Bisected) data).setHalf(Bisected.Half.TOP);
+			block.setBlockData(data, true);
 		});
 
 	}

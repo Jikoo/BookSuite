@@ -177,7 +177,7 @@ public class Functions {
 		}
 		ItemStack book = p.getInventory().getItemInMainHand();
 		BookMeta bm = (BookMeta) book.getItemMeta();
-		List<String> pages = new ArrayList<String>(bm.getPages());
+		List<String> pages = new ArrayList<>(bm.getPages());
 		try {
 			pages.add(Integer.parseInt(pageNumber), text);
 			bm.setPages(pages);
@@ -208,7 +208,7 @@ public class Functions {
 		}
 		ItemStack book = p.getInventory().getItemInMainHand();
 		BookMeta bm = (BookMeta) book.getItemMeta();
-		List<String> pages = new ArrayList<String>(bm.getPages());
+		List<String> pages = new ArrayList<>(bm.getPages());
 		try {
 			pages.remove(Integer.parseInt(pageNumber) + 1);
 			bm.setPages(pages);

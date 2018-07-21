@@ -58,6 +58,6 @@ public class PrintingPress {
 					originalBlock.update(true);
 				}
 			}
-		}.runTaskLater(plugin, 20L);
+		}.runTaskLater(plugin, 10L);
 	}
 }

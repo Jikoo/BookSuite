@@ -32,7 +32,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class CommandHandler implements CommandExecutor {
 
 	private final BookSuite plugin;
-	private final HashMap<String, String> overwritable = new HashMap<String, String>();
+	private final HashMap<String, String> overwritable = new HashMap<>();
 
 	CommandHandler(BookSuite plugin) {
 		this.plugin = plugin;
@@ -530,13 +530,10 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	private void syncOverwriteTimer(final Player p) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-			@Override
-			public void run() {
-				if (overwritable.containsKey(p.getName())) {
-					overwritable.remove(p.getName());
-					p.sendMessage(plugin.getMessages().get("FAILURE_OVERWRITE_TIME"));
-				}
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+			if (overwritable.containsKey(p.getName())) {
+				overwritable.remove(p.getName());
+				p.sendMessage(plugin.getMessages().get("FAILURE_OVERWRITE_TIME"));
 			}
 		}, 200L);
 	}
