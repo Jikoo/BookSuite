@@ -1,7 +1,7 @@
 name: BookSuite
 
 main: com.github.jikoo.booksuite.BookSuite
-version: 4.0.3
+version: ${project.version}
 author: Adam Gunn (Jikoo)
 authors: [Ted Meyer (tmathmeyer)]
 description: A large collection of book-related functions.
@@ -130,11 +130,14 @@ permissions:
     description: Erase own books
 
  booksuite.denynowarn:
+  default: false
   description: Vanilla behavior on attempted usage of "eraser" and "press"
   children:
    booksuite.denynowarn.press:
+    default: false
     description: Crafting bench functions as usual when right clicked with a book - no warning, gui opens.
    booksuite.denynowarn.erase:
+    default: false
     description: Right click cauldron with book does not notify if lacking unsign perms
 
 commands:

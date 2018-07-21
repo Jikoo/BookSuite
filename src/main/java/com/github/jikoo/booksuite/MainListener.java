@@ -183,6 +183,7 @@ public class MainListener implements Listener {
 			if (team != null) {
 				name.append(team.getPrefix());
 			}
+			name.append(player.getDisplayName().isEmpty() ? player.getName() : player.getDisplayName());
 			if (team != null) {
 				name.append(team.getSuffix());
 			}

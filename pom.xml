@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>BookSuite</groupId>
   <artifactId>BookSuite</artifactId>
-  <version>0.0.1</version>
+  <version>4.0.3</version>
   <name>BookSuite</name>
   <description>A Bukkit plugin for several book-related functions.</description>
   <repositories>
@@ -20,20 +20,11 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>${project.name}</finalName>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
-        <includes>
-          <include>**/*.yml</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>**/*.yml</exclude>
-        </excludes>
       </resource>
     </resources>
     <plugins>
